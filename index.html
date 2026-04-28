@@ -6,6 +6,7 @@
 <meta name="theme-color" content="#060911">
 <title>EPL 4v4 · VOLTA ENGINE v3</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@300;400;600;700;900&family=JetBrains+Mono:wght@400;600;700&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
 <style>
 :root{
@@ -243,30 +244,84 @@ nav{position:fixed;bottom:0;left:0;right:0;z-index:100;background:rgba(6,9,17,.9
 "use strict";
 
 // ═══════════════════════════════════════
-// TEAMS
+// PREMIER LEAGUE TEAMS (20 Official)
 // ═══════════════════════════════════════
 const TEAMS = Object.freeze([
-  {name:'Arsenal',emoji:'🔴',color:'#EF0107',abbr:'ARS'},
-  {name:'AstonVilla',emoji:'🟣',color:'#95BFE5',abbr:'AVL'},
-  {name:'Bournemouth',emoji:'🍒',color:'#DA291C',abbr:'BOU'},
-  {name:'Brentford',emoji:'🐝',color:'#FFD700',abbr:'BRE'},
-  {name:'Brighton',emoji:'🔵',color:'#0057B8',abbr:'BHA'},
-  {name:'Burnley',emoji:'🟤',color:'#6C1D45',abbr:'BUR'},
-  {name:'Chelsea',emoji:'💙',color:'#034694',abbr:'CHE'},
-  {name:'CrystalPalace',emoji:'🦅',color:'#1B458F',abbr:'CRY'},
-  {name:'Everton',emoji:'🔵',color:'#003399',abbr:'EVE'},
-  {name:'Fulham',emoji:'⚫',color:'#CC0000',abbr:'FUL'},
-  {name:'Liverpool',emoji:'🔴',color:'#C8102E',abbr:'LIV'},
-  {name:'Luton',emoji:'🟠',color:'#F78F1E',abbr:'LUT'},
-  {name:'ManCity',emoji:'🩵',color:'#6CABDD',abbr:'MCI'},
-  {name:'ManUtd',emoji:'👹',color:'#DA291C',abbr:'MUN'},
-  {name:'Newcastle',emoji:'⚫',color:'#241F20',abbr:'NEW'},
-  {name:'Nottingham',emoji:'🌳',color:'#DD0000',abbr:'NFO'},
-  {name:'Sheffield',emoji:'🔴',color:'#EE2737',abbr:'SHU'},
-  {name:'Tottenham',emoji:'⚪',color:'#132257',abbr:'TOT'},
-  {name:'WestHam',emoji:'⚒️',color:'#7A263A',abbr:'WHU'},
-  {name:'Wolves',emoji:'🐺',color:'#FDB913',abbr:'WOL'}
+  {name:'Arsenal',           emoji:'🔴', color:'#EF0107', abbr:'ARS', fullName:'Arsenal'},
+  {name:'AstonVilla',        emoji:'🟣', color:'#95BFE5', abbr:'AVL', fullName:'Aston Villa'},
+  {name:'Bournemouth',       emoji:'🍒', color:'#DA291C', abbr:'BOU', fullName:'Bournemouth'},
+  {name:'Brentford',         emoji:'🐝', color:'#FFD700', abbr:'BRE', fullName:'Brentford'},
+  {name:'Brighton',          emoji:'🔵', color:'#0057B8', abbr:'BHA', fullName:'Brighton & Hove Albion'},
+  {name:'Burnley',           emoji:'🟤', color:'#6C1D45', abbr:'BUR', fullName:'Burnley'},
+  {name:'Chelsea',           emoji:'💙', color:'#034694', abbr:'CHE', fullName:'Chelsea'},
+  {name:'CrystalPalace',     emoji:'🦅', color:'#1B458F', abbr:'CRY', fullName:'Crystal Palace'},
+  {name:'Everton',           emoji:'🔵', color:'#003399', abbr:'EVE', fullName:'Everton'},
+  {name:'Fulham',            emoji:'⚫', color:'#CC0000', abbr:'FUL', fullName:'Fulham'},
+  {name:'Liverpool',         emoji:'🔴', color:'#C8102E', abbr:'LIV', fullName:'Liverpool'},
+  {name:'LutonTown',         emoji:'🟠', color:'#F78F1E', abbr:'LUT', fullName:'Luton Town'},
+  {name:'ManCity',           emoji:'🩵', color:'#6CABDD', abbr:'MCI', fullName:'Manchester City'},
+  {name:'ManUtd',            emoji:'👹', color:'#DA291C', abbr:'MUN', fullName:'Manchester United'},
+  {name:'Newcastle',         emoji:'⚫', color:'#241F20', abbr:'NEW', fullName:'Newcastle United'},
+  {name:'NottinghamForest',  emoji:'🌳', color:'#DD0000', abbr:'NFO', fullName:'Nottingham Forest'},
+  {name:'SheffieldUtd',      emoji:'🔴', color:'#EE2737', abbr:'SHU', fullName:'Sheffield United'},
+  {name:'Tottenham',         emoji:'⚪', color:'#132257', abbr:'TOT', fullName:'Tottenham Hotspur'},
+  {name:'WestHam',           emoji:'⚒️', color:'#7A263A', abbr:'WHU', fullName:'West Ham United'},
+  {name:'Wolves',            emoji:'🐺', color:'#FDB913', abbr:'WOL', fullName:'Wolverhampton Wanderers'}
 ]);
+
+// ═══════════════════════════════════════
+// NAME NORMALIZATION MAP
+// Maps any variant to the canonical internal name
+// ═══════════════════════════════════════
+const NAME_MAP = {
+  // Canonical names (no spaces)
+  'arsenal':'Arsenal','astonvilla':'AstonVilla','bournemouth':'Bournemouth',
+  'brentford':'Brentford','brighton':'Brighton','burnley':'Burnley',
+  'chelsea':'Chelsea','crystalpalace':'CrystalPalace','everton':'Everton',
+  'fulham':'Fulham','liverpool':'Liverpool','lutontown':'LutonTown',
+  'mancity':'ManCity','manutd':'ManUtd','newcastle':'Newcastle',
+  'nottinghamforest':'NottinghamForest','sheffieldutd':'SheffieldUtd',
+  'tottenham':'Tottenham','westham':'WestHam','wolves':'Wolves',
+  
+  // Proper names (with spaces)
+  'arsenal':'Arsenal','aston villa':'AstonVilla','bournemouth':'Bournemouth',
+  'brentford':'Brentford','brighton & hove albion':'Brighton','brighton and hove albion':'Brighton',
+  'burnley':'Burnley','chelsea':'Chelsea','crystal palace':'CrystalPalace',
+  'everton':'Everton','fulham':'Fulham','liverpool':'Liverpool',
+  'luton town':'LutonTown','luton':'LutonTown',
+  'manchester city':'ManCity','man city':'ManCity','mancity':'ManCity',
+  'manchester united':'ManUtd','man united':'ManUtd','man utd':'ManUtd','manunited':'ManUtd',
+  'newcastle united':'Newcastle','newcastle':'Newcastle',
+  'nottingham forest':'NottinghamForest','nottingham':'NottinghamForest',
+  'sheffield united':'SheffieldUtd','sheffield':'SheffieldUtd',
+  'tottenham hotspur':'Tottenham','tottenham':'Tottenham','spurs':'Tottenham',
+  'west ham united':'WestHam','west ham':'WestHam','westham':'WestHam',
+  'wolverhampton wanderers':'Wolves','wolves':'Wolves',
+  
+  // Abbreviations
+  'ars':'Arsenal','avl':'AstonVilla','bou':'Bournemouth','bre':'Brentford',
+  'bha':'Brighton','bur':'Burnley','che':'Chelsea','cry':'CrystalPalace',
+  'eve':'Everton','ful':'Fulham','liv':'Liverpool','lut':'LutonTown',
+  'mci':'ManCity','mun':'ManUtd','new':'Newcastle','nfo':'NottinghamForest',
+  'shu':'SheffieldUtd','tot':'Tottenham','whu':'WestHam','wol':'Wolves'
+};
+
+function normalizeTeamName(input) {
+  if (!input || typeof input !== 'string') return null;
+  const cleaned = input.trim();
+  // Try exact match first
+  if (NAME_MAP[cleaned]) return NAME_MAP[cleaned];
+  // Try lowercase
+  const lower = cleaned.toLowerCase();
+  if (NAME_MAP[lower]) return NAME_MAP[lower];
+  // Try removing extra spaces
+  const noExtraSpaces = lower.replace(/\s+/g, ' ').trim();
+  if (NAME_MAP[noExtraSpaces]) return NAME_MAP[noExtraSpaces];
+  // Check if it's already a valid internal name
+  const found = TEAMS.find(t => t.name.toLowerCase() === lower);
+  if (found) return found.name;
+  return null;
+}
 
 // ═══════════════════════════════════════
 // UTILITIES
@@ -288,19 +343,21 @@ function updateMatch(id,u){const db=loadDB();const i=db.findIndex(m=>m.id===id);
 function deleteMatch(id){const db=loadDB();saveDB(db.filter(m=>m.id!==id));refreshCounters()}
 
 // ═══════════════════════════════════════
-// SUPER AGGRESSIVE DATA RECOVERY
+// DATA RECOVERY + NORMALIZATION
 // ═══════════════════════════════════════
-(function recoverAllData(){
-  const KNOWN_KEYS=[
-    'epl4v4:v1:matches','epl4v4:v2:matches','epl4v4:matches',
-    'epl4v4:results','fifa4x4v3:matches','volta:matches',
-    'epl-volta-matches','epl4v4-db'
-  ];
+(function recoverAndNormalize(){
   const current=loadDB();
   const existingIds=new Set(current.map(m=>m.id));
-  let recovered=0;
+  let recovered=0,normalized=0;
   
-  // Scan ALL localStorage keys
+  // Normalize existing data team names
+  current.forEach(m=>{
+    const origA=m.teamA,origB=m.teamB;
+    if(m.teamA){const na=normalizeTeamName(m.teamA);if(na&&na!==m.teamA){m.teamA=na;normalized++;}}
+    if(m.teamB){const nb=normalizeTeamName(m.teamB);if(nb&&nb!==m.teamB){m.teamB=nb;normalized++;}}
+  });
+  
+  // Scan ALL localStorage for old match data
   for(let i=0;i<localStorage.length;i++){
     const key=localStorage.key(i);
     try{
@@ -310,9 +367,8 @@ function deleteMatch(id){const db=loadDB();saveDB(db.filter(m=>m.id!==id));refre
       if(Array.isArray(parsed)&&parsed.length&&parsed[0].teamA&&parsed[0].teamB){
         parsed.forEach(m=>{
           if(m.id&&!existingIds.has(m.id)){
-            // Normalize team names (remove spaces)
-            if(m.teamA)m.teamA=m.teamA.replace(/\s+/g,'');
-            if(m.teamB)m.teamB=m.teamB.replace(/\s+/g,'');
+            if(m.teamA)m.teamA=normalizeTeamName(m.teamA)||m.teamA;
+            if(m.teamB)m.teamB=normalizeTeamName(m.teamB)||m.teamB;
             current.push(m);
             existingIds.add(m.id);
             recovered++;
@@ -322,27 +378,11 @@ function deleteMatch(id){const db=loadDB();saveDB(db.filter(m=>m.id!==id));refre
     }catch(e){}
   }
   
-  // Also check known keys specifically
-  KNOWN_KEYS.forEach(key=>{
-    try{
-      const old=JSON.parse(localStorage.getItem(key)||'[]');
-      if(Array.isArray(old))old.forEach(m=>{
-        if(m.id&&!existingIds.has(m.id)){
-          if(m.teamA)m.teamA=m.teamA.replace(/\s+/g,'');
-          if(m.teamB)m.teamB=m.teamB.replace(/\s+/g,'');
-          current.push(m);
-          existingIds.add(m.id);
-          recovered++;
-        }
-      });
-    }catch(e){}
-  });
-  
-  if(recovered>0){
+  if(recovered>0||normalized>0){
     saveDB(current);
     localStorage.setItem('epl4v4:v3:migrated','1');
-    localStorage.setItem('epl4v4:backup:'+Date.now(),JSON.stringify(current));
-    console.log('✅ Recovered '+recovered+' matches from old storage!');
+    if(recovered>0)console.log('✅ Recovered '+recovered+' matches');
+    if(normalized>0)console.log('✅ Normalized '+normalized+' team names');
   }
 })();
 
@@ -364,13 +404,17 @@ function openPicker(side){
 function closePicker(){document.getElementById('pickerOverlay').classList.remove('on')}
 function filterPicker(){
   const q=document.getElementById('pickerSearch').value.toLowerCase();
-  renderPickerList(TEAMS.filter(t=>t.name.toLowerCase().includes(q)||t.abbr.toLowerCase().includes(q)));
+  renderPickerList(TEAMS.filter(t=>
+    t.name.toLowerCase().includes(q)||
+    t.fullName.toLowerCase().includes(q)||
+    t.abbr.toLowerCase().includes(q)
+  ));
 }
 function renderPickerList(list){
   document.getElementById('pickerList').innerHTML=list.map(t=>`
     <div class="picker-item ${state.picks[state.activeSide]===t.name?'selected':''}" onclick="selectTeam('${t.name}')">
       <div class="picker-badge" style="background:${t.color}18">${t.emoji}</div>
-      <div><div class="picker-name">${t.name}</div><div class="picker-sub">${t.abbr} · EPL 4v4</div></div>
+      <div><div class="picker-name">${t.fullName}</div><div class="picker-sub">${t.abbr} · EPL 4v4</div></div>
     </div>`).join('');
 }
 function selectTeam(name){
@@ -387,12 +431,12 @@ function updateTeamUI(side){
   document.getElementById('emoji'+side).textContent=t.emoji;
   document.getElementById('abbr'+side).textContent=t.abbr;
   document.getElementById('abbr'+side).style.color=t.color;
-  document.getElementById('name'+side).textContent=t.name;
+  document.getElementById('name'+side).textContent=t.fullName;
   document.getElementById('name'+side).classList.remove('placeholder');
 }
 
 // ═══════════════════════════════════════
-// PREDICTION ENGINE
+// PREDICTION ENGINE (UNCHANGED LOGIC)
 // ═══════════════════════════════════════
 function buildTeamProfile(teamName,allMatches){
   const wr=allMatches.filter(m=>m.ftActual);
@@ -553,7 +597,7 @@ function generatePrediction(teamA,teamB,allMatches,resultsOnly){
 const clsColor=c=>c==='Chaos'?'var(--red)':c==='Open'?'var(--orn)':c==='Balanced'?'var(--yel)':'var(--blu)';
 const clsBadge=c=>c==='Chaos'?'bg-r':c==='Open'?'bg-o':c==='Balanced'?'bg-y':'bg-b';
 const confColor=c=>c>=75?'var(--grn)':c>=60?'var(--yel)':c>=45?'var(--orn)':'var(--red)';
-const getTeam=n=>TEAMS.find(t=>t.name===n)||{emoji:'⚽',color:'var(--mut)',abbr:'?'};
+const getTeam=n=>TEAMS.find(t=>t.name===n)||{emoji:'⚽',color:'var(--mut)',abbr:'?',fullName:n||'Unknown'};
 
 function renderPrediction(d){
   const tmA=getTeam(d._tA),tmB=getTeam(d._tB);
@@ -561,9 +605,9 @@ function renderPrediction(d){
   const bet=d.betting||{},flow=d.flow||{},conf=d.confidence||50;
   
   document.getElementById('predictionOutput').innerHTML=`
-    <div class="sb"><div class="sb-side"><div class="sb-club" style="color:${tmA.color}">${tmA.emoji} ${tmA.abbr}</div><div class="sb-name">${d._tA}</div></div><div class="sb-center"><div class="sb-ft">${ft.a}–${ft.b}</div><div class="sb-label">PREDICTED FT</div><div class="sb-ht-info">HT: ${d.htPrediction} · 2H: ${d.secondHalf.teamA}-${d.secondHalf.teamB}</div></div><div class="sb-side right"><div class="sb-club" style="color:${tmB.color}">${tmB.emoji} ${tmB.abbr}</div><div class="sb-name">${d._tB}</div></div></div>
+    <div class="sb"><div class="sb-side"><div class="sb-club" style="color:${tmA.color}">${tmA.emoji} ${tmA.abbr}</div><div class="sb-name">${tmA.fullName}</div></div><div class="sb-center"><div class="sb-ft">${ft.a}–${ft.b}</div><div class="sb-label">PREDICTED FT</div><div class="sb-ht-info">HT: ${d.htPrediction} · 2H: ${d.secondHalf.teamA}-${d.secondHalf.teamB}</div></div><div class="sb-side right"><div class="sb-club" style="color:${tmB.color}">${tmB.emoji} ${tmB.abbr}</div><div class="sb-name">${tmB.fullName}</div></div></div>
     <div class="card"><div class="card-head"><div class="card-title" style="color:${clsColor(d.classification)}">${d.classification.toUpperCase()} MATCH</div><span class="badge ${clsBadge(d.classification)}">${ft.a+ft.b} GOALS</span></div><div class="card-body"><div style="font-size:12px;color:var(--mut);line-height:1.7">${d.classificationReason}</div><div class="ft-reasoning-block">${d.ftReasoning}</div></div></div>
-    <div class="prof-grid">${[d.teamA,d.teamB].map(t=>{const tm=getTeam(t.name);return`<div class="prof-card"><div style="font-family:var(--fh);font-size:14px;font-weight:700;margin-bottom:10px">${tm.emoji} ${t.name} ${t.form?`<span class="badge ${t.form.includes('HOT')?'bg-g':t.form.includes('COLD')?'bg-r':'bg'}">${t.form}</span>`:''}</div><div class="prof-row"><div class="prof-lbl"><span>ATK</span><span style="color:var(--grn)">${t.attack} (${t.stats.avgScored.toFixed(1)}/g)</span></div><div class="prof-bar"><div class="prof-fill" style="width:${t.attack==='elite'?93:t.attack==='high'?72:t.attack==='medium'?46:22}%;background:var(--grn)"></div></div></div><div class="prof-row"><div class="prof-lbl"><span>DEF</span><span style="color:${t.defense.includes('high')?'var(--red)':t.defense.includes('medium')?'var(--yel)':'var(--grn)'}">${t.defense} (${t.stats.avgConceded.toFixed(1)}/g)</span></div><div class="prof-bar"><div class="prof-fill" style="width:${t.defense.includes('high')?88:t.defense.includes('medium')?56:26}%;background:${t.defense.includes('high')?'var(--red)':t.defense.includes('medium')?'var(--yel)':'var(--grn)'}"></div></div></div><div class="flex gap-6" style="margin-top:6px"><span class="badge bg">${t.style}</span><span class="badge bg">${t.consistency}</span><span class="badge bg">D:${t.defReliability}</span></div></div>`}).join('')}</div>
+    <div class="prof-grid">${[d.teamA,d.teamB].map(t=>{const tm=getTeam(t.name);return`<div class="prof-card"><div style="font-family:var(--fh);font-size:14px;font-weight:700;margin-bottom:10px">${tm.emoji} ${tm.fullName} ${t.form?`<span class="badge ${t.form.includes('HOT')?'bg-g':t.form.includes('COLD')?'bg-r':'bg'}">${t.form}</span>`:''}</div><div class="prof-row"><div class="prof-lbl"><span>ATK</span><span style="color:var(--grn)">${t.attack} (${t.stats.avgScored.toFixed(1)}/g)</span></div><div class="prof-bar"><div class="prof-fill" style="width:${t.attack==='elite'?93:t.attack==='high'?72:t.attack==='medium'?46:22}%;background:var(--grn)"></div></div></div><div class="prof-row"><div class="prof-lbl"><span>DEF</span><span style="color:${t.defense.includes('high')?'var(--red)':t.defense.includes('medium')?'var(--yel)':'var(--grn)'}">${t.defense} (${t.stats.avgConceded.toFixed(1)}/g)</span></div><div class="prof-bar"><div class="prof-fill" style="width:${t.defense.includes('high')?88:t.defense.includes('medium')?56:26}%;background:${t.defense.includes('high')?'var(--red)':t.defense.includes('medium')?'var(--yel)':'var(--grn)'}"></div></div></div><div class="flex gap-6" style="margin-top:6px"><span class="badge bg">${t.style}</span><span class="badge bg">${t.consistency}</span><span class="badge bg">D:${t.defReliability}</span></div></div>`}).join('')}</div>
     <div class="card"><div class="card-head"><div class="card-title">MATCH FLOW</div>${flow.dominant?`<span class="badge bg-g">${flow.dominant}</span>`:''}</div><div class="card-body"><div style="display:flex;flex-direction:column;gap:6px">${flow.early?`<div style="background:var(--sur2);padding:10px 12px;border-radius:9px;display:flex;gap:10px"><span style="font-family:var(--fm);font-size:8px;color:var(--grn);width:48px">0–30%</span><span style="font-size:12px">${flow.early}</span></div>`:''}${flow.mid?`<div style="background:var(--sur2);padding:10px 12px;border-radius:9px;display:flex;gap:10px"><span style="font-family:var(--fm);font-size:8px;color:var(--grn);width:48px">30–70%</span><span style="font-size:12px">${flow.mid}</span></div>`:''}${flow.chaos?`<div style="background:var(--sur2);padding:10px 12px;border-radius:9px;display:flex;gap:10px"><span style="font-family:var(--fm);font-size:8px;color:var(--grn);width:48px">70–100%</span><span style="font-size:12px">${flow.chaos}</span></div>`:''}</div></div></div>
     <div class="card"><div class="card-head"><div class="card-title">TOP 3 SCORELINES</div></div><div class="card-body"><div class="t3-list">${d.top3.map((s,i)=>`<div class="t3-item${i===0?' win':''}"><div class="t3-rank">${['🥇','🥈','🥉'][i]}</div><div class="t3-score">${s.score}</div><div style="text-align:right"><span class="badge ${i===0?'bg-g':i===1?'bg-y':'bg'}">${s.label}</span><div style="font-family:var(--fm);font-size:7.5px;color:var(--mut);margin-top:2px">${s.reason}</div></div></div>`).join('')}</div></div>
     ${d.trapWarning?`<div style="background:rgba(255,82,82,.05);border:1px solid rgba(255,82,82,.2);border-radius:11px;padding:12px 14px;margin-bottom:12px"><div style="font-family:var(--fh);font-size:17px;font-weight:700;color:var(--red);margin-bottom:4px">⚠ TRAP MATCH</div><div style="font-size:12px;color:rgba(255,82,82,.75)">${d.trapWarning}</div></div>`:''}
@@ -598,15 +642,12 @@ function savePrediction(){
   state.lastPrediction=null;
 }
 
-// ═══════════════════════════════════════
-// RESULTS & DATABASE
-// ═══════════════════════════════════════
 function renderResults(){
   const db=loadDB();
   const pend=db.filter(m=>m.status==='pending'),done=db.filter(m=>m.status==='result').slice(0,50);
   document.getElementById('pendingBadge').textContent=`${pend.length} PENDING`;
-  document.getElementById('pendingList').innerHTML=pend.length?pend.map(m=>`<div class="pending-card"><div style="display:flex;justify-content:space-between;margin-bottom:10px"><span style="font-family:var(--fh);font-size:19px;font-weight:900">${m.teamA} vs ${m.teamB}</span><span class="badge bg-y">PENDING</span></div><div class="flex flex-wrap gap-6" style="margin-bottom:10px"><span class="badge bg">FT: ${m.ftPred||'?'}</span>${m.primaryLine?`<span class="badge bg-g">${m.primaryLine}</span>`:''}</div><div style="font-family:var(--fm);font-size:8px;color:var(--mut);margin-bottom:10px">${fmtDate(m.date)}</div><div class="flex gap-6"><button class="btn btn-g btn-sm" onclick="openResultModal('${m.id}')">ENTER RESULT</button><button class="btn btn-ghost btn-sm" onclick="deleteMatch('${m.id}')">DELETE</button></div></div>`).join(''):`<div class="empty-state"><div class="empty-icon">📋</div><div class="empty-text">NO PENDING</div></div>`;
-  document.getElementById('completedList').innerHTML=done.length?done.map(m=>{const acc=calcAcc(m);return`<div class="history-item"><div style="font-family:var(--fh);font-size:17px;font-weight:700;margin-bottom:6px">${m.teamA} vs ${m.teamB}</div><div class="flex gap-6" style="margin-bottom:6px"><span style="font-family:var(--fm);font-size:9.5px"><span style="color:var(--mut)">PRED </span>${m.ftPred||'?'}</span><span style="font-family:var(--fm);font-size:9.5px"><span style="color:var(--mut)">ACT </span><span style="color:var(--grn)">${m.ftActual||'?'}</span></span></div><div class="flex gap-6">${acc!==null?`<span class="badge ${acc>=70?'bg-g':acc>=40?'bg-y':'bg-r'}">${acc}%</span>`:''}<span style="font-family:var(--fm);font-size:8px;color:var(--mut)">${fmtDate(m.date)}</span><button class="btn btn-r btn-sm" style="padding:3px 8px;font-size:8px" onclick="deleteMatch('${m.id}')">✕</button></div></div>`}).join(''):`<div class="empty-state"><div class="empty-icon">🏁</div><div class="empty-text">NO RESULTS</div></div>`;
+  document.getElementById('pendingList').innerHTML=pend.length?pend.map(m=>{const tmA=getTeam(m.teamA),tmB=getTeam(m.teamB);return`<div class="pending-card"><div style="display:flex;justify-content:space-between;margin-bottom:10px"><span style="font-family:var(--fh);font-size:19px;font-weight:900">${tmA.fullName} vs ${tmB.fullName}</span><span class="badge bg-y">PENDING</span></div><div class="flex flex-wrap gap-6" style="margin-bottom:10px"><span class="badge bg">FT: ${m.ftPred||'?'}</span>${m.primaryLine?`<span class="badge bg-g">${m.primaryLine}</span>`:''}</div><div style="font-family:var(--fm);font-size:8px;color:var(--mut);margin-bottom:10px">${fmtDate(m.date)}</div><div class="flex gap-6"><button class="btn btn-g btn-sm" onclick="openResultModal('${m.id}')">ENTER RESULT</button><button class="btn btn-ghost btn-sm" onclick="deleteMatch('${m.id}')">DELETE</button></div></div>`}).join(''):`<div class="empty-state"><div class="empty-icon">📋</div><div class="empty-text">NO PENDING</div></div>`;
+  document.getElementById('completedList').innerHTML=done.length?done.map(m=>{const acc=calcAcc(m);const tmA=getTeam(m.teamA),tmB=getTeam(m.teamB);return`<div class="history-item"><div style="font-family:var(--fh);font-size:17px;font-weight:700;margin-bottom:6px">${tmA.fullName} vs ${tmB.fullName}</div><div class="flex gap-6" style="margin-bottom:6px"><span style="font-family:var(--fm);font-size:9.5px"><span style="color:var(--mut)">PRED </span>${m.ftPred||'?'}</span><span style="font-family:var(--fm);font-size:9.5px"><span style="color:var(--mut)">ACT </span><span style="color:var(--grn)">${m.ftActual||'?'}</span></span></div><div class="flex gap-6">${acc!==null?`<span class="badge ${acc>=70?'bg-g':acc>=40?'bg-y':'bg-r'}">${acc}%</span>`:''}<span style="font-family:var(--fm);font-size:8px;color:var(--mut)">${fmtDate(m.date)}</span><button class="btn btn-r btn-sm" style="padding:3px 8px;font-size:8px" onclick="deleteMatch('${m.id}')">✕</button></div></div>`}).join(''):`<div class="empty-state"><div class="empty-icon">🏁</div><div class="empty-text">NO RESULTS</div></div>`;
 }
 
 function renderDatabase(){
@@ -620,11 +661,11 @@ function renderDatabase(){
   document.getElementById('ouGrid').innerHTML=[6.5,7.5,8.5,9.5,10.5,11.5,12.5,13.5,14.5,15.5,16.5,17.5,18.5].map(l=>{const h=tots.filter(t=>t>l).length;const p=tots.length?Math.round(h/tots.length*100):null;return`<div class="ou-box"><div style="font-family:var(--fm);font-size:7px;color:var(--grn)">OVR ${l}</div><div style="font-family:var(--fh);font-size:22px;font-weight:700;color:${p===null?'var(--mut)':p>=65?'var(--grn)':p>=50?'var(--yel)':'var(--red)'}">${p!==null?p+'%':'—'}</div><div style="height:1px;background:var(--bdr);margin:4px 0"></div><div style="font-family:var(--fm);font-size:7px;color:var(--blu)">UND ${l}</div><div style="font-family:var(--fh);font-size:22px;font-weight:700;color:${p===null?'var(--mut)':(100-p)>=65?'var(--grn)':(100-p)>=50?'var(--yel)':'var(--red)'}">${p!==null?(100-p)+'%':'—'}</div></div>`}).join('');
   const ts={};wr.forEach(m=>{const g=parseScore(m.ftActual);if(!g)return;[[m.teamA,g.a,g.b],[m.teamB,g.b,g.a]].forEach(([t,sc,cn])=>{if(!ts[t])ts[t]={sc:[],cn:[]};ts[t].sc.push(sc);ts[t].cn.push(cn)})});
   const sorted=Object.entries(ts).filter(([,v])=>v.sc.length>=1).sort(([,a],[,b])=>avg(b.sc)-avg(a.sc));
-  document.getElementById('teamAverages').innerHTML=sorted.length?sorted.map(([name,v])=>{const tm=getTeam(name);return`<div class="team-row" style="background:var(--sur);border:1px solid var(--bdr);border-radius:10px;padding:11px 14px;margin-bottom:7px;display:flex;align-items:center;justify-content:space-between"><div><div style="font-family:var(--fh);font-size:16px;font-weight:700">${tm.emoji} ${name}</div><div style="font-family:var(--fm);font-size:8px;color:var(--mut)">${v.sc.length} games</div></div><div class="flex gap-6"><div style="text-align:center"><div style="font-family:var(--fh);font-size:20px;font-weight:700;color:var(--grn)">${avg(v.sc).toFixed(1)}</div><div style="font-family:var(--fm);font-size:7px;color:var(--mut)">SCORED</div></div><div style="text-align:center"><div style="font-family:var(--fh);font-size:20px;font-weight:700;color:var(--red)">${avg(v.cn).toFixed(1)}</div><div style="font-family:var(--fm);font-size:7px;color:var(--mut)">CONCEDED</div></div></div></div>`}).join(''):`<div class="empty-state"><div class="empty-icon">📊</div><div class="empty-text">NEED RESULTS</div></div>`;
-  document.getElementById('historyList').innerHTML=db.slice(0,60).map(m=>{const acc=calcAcc(m);return`<div class="history-item"><div style="font-family:var(--fh);font-size:17px;font-weight:700;margin-bottom:6px">${m.teamA} vs ${m.teamB}</div><div class="flex gap-6" style="margin-bottom:6px"><span style="font-family:var(--fm);font-size:9.5px"><span style="color:var(--mut)">PRED </span>${m.ftPred||'?'}</span>${m.ftActual?`<span style="font-family:var(--fm);font-size:9.5px"><span style="color:var(--mut)">ACT </span><span style="color:var(--grn)">${m.ftActual}</span></span>`:''}</div><div class="flex gap-6">${m.status==='pending'?'<span class="badge bg-y">PENDING</span>':''}${acc!==null?`<span class="badge ${acc>=70?'bg-g':acc>=40?'bg-y':'bg-r'}">${acc}%</span>`:''}<span style="font-family:var(--fm);font-size:8px;color:var(--mut)">${fmtDate(m.date)}</span><button class="btn btn-r btn-sm" style="padding:3px 8px;font-size:8px" onclick="deleteMatch('${m.id}')">✕</button></div></div>`}).join('')||`<div class="empty-state"><div class="empty-icon">📂</div><div class="empty-text">NO DATA</div></div>`;
+  document.getElementById('teamAverages').innerHTML=sorted.length?sorted.map(([name,v])=>{const tm=getTeam(name);return`<div class="team-row" style="background:var(--sur);border:1px solid var(--bdr);border-radius:10px;padding:11px 14px;margin-bottom:7px;display:flex;align-items:center;justify-content:space-between"><div><div style="font-family:var(--fh);font-size:16px;font-weight:700">${tm.emoji} ${tm.fullName}</div><div style="font-family:var(--fm);font-size:8px;color:var(--mut)">${v.sc.length} games</div></div><div class="flex gap-6"><div style="text-align:center"><div style="font-family:var(--fh);font-size:20px;font-weight:700;color:var(--grn)">${avg(v.sc).toFixed(1)}</div><div style="font-family:var(--fm);font-size:7px;color:var(--mut)">SCORED</div></div><div style="text-align:center"><div style="font-family:var(--fh);font-size:20px;font-weight:700;color:var(--red)">${avg(v.cn).toFixed(1)}</div><div style="font-family:var(--fm);font-size:7px;color:var(--mut)">CONCEDED</div></div></div></div>`}).join(''):`<div class="empty-state"><div class="empty-icon">📊</div><div class="empty-text">NEED RESULTS</div></div>`;
+  document.getElementById('historyList').innerHTML=db.slice(0,60).map(m=>{const acc=calcAcc(m);const tmA=getTeam(m.teamA),tmB=getTeam(m.teamB);return`<div class="history-item"><div style="font-family:var(--fh);font-size:17px;font-weight:700;margin-bottom:6px">${tmA.fullName} vs ${tmB.fullName}</div><div class="flex gap-6" style="margin-bottom:6px"><span style="font-family:var(--fm);font-size:9.5px"><span style="color:var(--mut)">PRED </span>${m.ftPred||'?'}</span>${m.ftActual?`<span style="font-family:var(--fm);font-size:9.5px"><span style="color:var(--mut)">ACT </span><span style="color:var(--grn)">${m.ftActual}</span></span>`:''}</div><div class="flex gap-6">${m.status==='pending'?'<span class="badge bg-y">PENDING</span>':''}${acc!==null?`<span class="badge ${acc>=70?'bg-g':acc>=40?'bg-y':'bg-r'}">${acc}%</span>`:''}<span style="font-family:var(--fm);font-size:8px;color:var(--mut)">${fmtDate(m.date)}</span><button class="btn btn-r btn-sm" style="padding:3px 8px;font-size:8px" onclick="deleteMatch('${m.id}')">✕</button></div></div>`}).join('')||`<div class="empty-state"><div class="empty-icon">📂</div><div class="empty-text">NO DATA</div></div>`;
 }
 
-function openResultModal(id){const m=loadDB().find(x=>x.id===id);if(!m)return;state.activeModalId=id;document.getElementById('modalTitle').textContent=`${m.teamA} vs ${m.teamB}`;document.getElementById('modalSubtitle').textContent=`PRED: ${m.ftPred||'?'}`;document.getElementById('ftALabel').textContent=m.teamA;document.getElementById('ftBLabel').textContent=m.teamB;['ftA','ftB','htA','htB'].forEach(el=>document.getElementById(el).value='');document.getElementById('resultModal').classList.add('on')}
+function openResultModal(id){const m=loadDB().find(x=>x.id===id);if(!m)return;state.activeModalId=id;const tmA=getTeam(m.teamA),tmB=getTeam(m.teamB);document.getElementById('modalTitle').textContent=`${tmA.fullName} vs ${tmB.fullName}`;document.getElementById('modalSubtitle').textContent=`PRED: ${m.ftPred||'?'}`;document.getElementById('ftALabel').textContent=tmA.fullName;document.getElementById('ftBLabel').textContent=tmB.fullName;['ftA','ftB','htA','htB'].forEach(el=>document.getElementById(el).value='');document.getElementById('resultModal').classList.add('on')}
 function closeResultModal(){document.getElementById('resultModal').classList.remove('on');state.activeModalId=null}
 function saveResultEntry(){if(!state.activeModalId)return;const ftA=document.getElementById('ftA').value,ftB=document.getElementById('ftB').value;if(ftA===''||ftB===''){showToast('Enter FT score');return}const htA=document.getElementById('htA').value,htB=document.getElementById('htB').value;updateMatch(state.activeModalId,{ftActual:`${ftA}-${ftB}`,htActual:(htA!==''&&htB!=='')?`${htA}-${htB}`:null,status:'result'});closeResultModal();showToast('Result saved');if(state.currentPage==='results')renderResults();if(state.currentPage==='db')renderDatabase()}
 

@@ -4,7 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no">
 <meta name="theme-color" content="#060911">
-<title>EPL 4v4 · VOLTA ENGINE v5</title>
+<title>EPL 4v4 · VOLTA ENGINE v6</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@300;400;600;700;900&family=JetBrains+Mono:wght@400;600;700&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
@@ -70,6 +70,7 @@ nav{position:fixed;bottom:0;left:0;right:0;z-index:100;background:rgba(6,9,17,.9
 .btn-g{background:var(--grn);color:#060911}
 .btn-ghost{background:var(--sur2);color:var(--txt);border:1px solid var(--bdr2)}
 .btn-r{background:rgba(255,82,82,.08);color:var(--red);border:1px solid rgba(255,82,82,.2)}
+.btn-purple{background:rgba(171,71,188,.15);color:#ab47bc;border:1px solid rgba(171,71,188,.3)}
 .overlay{position:fixed;inset:0;z-index:200;background:rgba(6,9,17,.9);backdrop-filter:blur(12px);display:flex;align-items:flex-end;opacity:0;pointer-events:none;transition:opacity .25s}
 .overlay.on{opacity:1;pointer-events:auto}
 .sheet{width:100%;max-height:78vh;background:var(--bg2);border-top:1px solid var(--bdr);border-radius:22px 22px 0 0;overflow:hidden;display:flex;flex-direction:column;animation:slideUp .25s ease}
@@ -194,7 +195,7 @@ nav{position:fixed;bottom:0;left:0;right:0;z-index:100;background:rgba(6,9,17,.9
 <div class="toast" id="toast"></div>
 
 <div class="page on" id="page-predict">
-  <div class="hdr"><div class="hdr-l"><div class="ht">EPL 4v4</div><div class="hs">ENGINE v5 · ELO + POISSON</div></div><span class="badge bg-g" id="miniBadge">0 MATCHES</span></div>
+  <div class="hdr"><div class="hdr-l"><div class="ht">EPL 4v4</div><div class="hs">ENGINE v6 · DIXON-COLES</div></div><span class="badge bg-g" id="miniBadge">0 MATCHES</span></div>
   <div class="sec">
     <div class="arena"><div class="arena-grid"><div class="team-side"><button class="team-btn" id="btnA" onclick="openPicker('A')"><span class="tb-emoji" id="emojiA">⚽</span><span class="tb-abbr" id="abbrA">HOME</span></button><div class="tn placeholder" id="nameA">TAP TO SELECT</div></div><div class="vs-col"><div class="vs-div"></div><div class="vs-txt">VS</div><div class="vs-div"></div></div><div class="team-side"><button class="team-btn" id="btnB" onclick="openPicker('B')"><span class="tb-emoji" id="emojiB">⚽</span><span class="tb-abbr" id="abbrB">AWAY</span></button><div class="tn placeholder" id="nameB">TAP TO SELECT</div></div></div></div>
     <button class="pred-btn" id="predictBtn" onclick="runPrediction()">GENERATE PREDICTION</button>
@@ -262,15 +263,14 @@ const parseScore=s=>{try{const[a,b]=String(s).split('-').map(Number);if(isNaN(a)
 const genId=()=>Date.now().toString(36)+Math.random().toString(36).slice(2,8);
 
 // ═══════════════════════════════════════
-// FIX 1: PERSISTENT ELO RATING SYSTEM
+// ELO SYSTEM
 // ═══════════════════════════════════════
-const ELO_KEY='epl4v4:v5:elo';
+const ELO_KEY='epl4v4:v6:elo';
 const ELO_DEFAULT=1500;
 const ELO_K=32;
 
 function loadElo(){try{return JSON.parse(localStorage.getItem(ELO_KEY)||'{}')}catch{return{}}}
 function saveElo(elo){localStorage.setItem(ELO_KEY,JSON.stringify(elo))}
-
 function getElo(teamName){const elo=loadElo();return elo[teamName]||ELO_DEFAULT}
 function getAllElo(){const elo=loadElo();TEAMS.forEach(t=>{if(!elo[t.name])elo[t.name]=ELO_DEFAULT});return elo}
 
@@ -278,168 +278,33 @@ function updateElo(teamA,teamB,scoreA,scoreB){
   const elo=loadElo();
   const rA=elo[teamA]||ELO_DEFAULT,rB=elo[teamB]||ELO_DEFAULT;
   const expectedA=1/(1+Math.pow(10,(rB-rA)/400));
-  const expectedB=1-expectedA;
+  const actualA=scoreA>scoreB?1:scoreA<scoreB?0:0.5;
   const goalDiff=Math.abs(scoreA-scoreB);
   const marginMult=clamp(1+goalDiff*0.15,1,2.5);
-  const actualA=scoreA>scoreB?1:scoreA<scoreB?0:0.5;
   elo[teamA]=Math.round(rA+ELO_K*marginMult*(actualA-expectedA));
   elo[teamB]=Math.round(rB+ELO_K*marginMult*((1-actualA)-expectedB));
   saveElo(elo);
-  return{rA:elo[teamA],rB:elo[teamB],changeA:elo[teamA]-rA,changeB:elo[teamB]-rB};
 }
 
-function eloToExpectedGoals(rA,rB,leagueAvg){
-  const eloDiff=rA-rB;
-  const expectedWinPct=1/(1+Math.pow(10,-eloDiff/400));
-  const baseTotal=leagueAvg||8;
-  const split=0.5+(expectedWinPct-0.5)*0.6;
-  const totalA=baseTotal*split;
-  const totalB=baseTotal*(1-split);
-  return{lambdaA:totalA,lambdaB:totalB};
-}
-
-// ═══════════════════════════════════════
-// FIX 2: POISSON DISTRIBUTION
-// ═══════════════════════════════════════
-function poissonPMF(k,lambda){
-  if(lambda<=0)return k===0?1:0;
-  let logP=-lambda+k*Math.log(lambda);
-  for(let i=2;i<=k;i++)logP-=Math.log(i);
-  return Math.exp(logP);
-}
-
-function poissonScoreProb(lambdaA,lambdaB,maxGoals=15){
-  const probs=[];
-  let totalProb=0;
-  for(let a=0;a<=maxGoals;a++){
-    for(let b=0;b<=maxGoals;b++){
-      const p=poissonPMF(a,lambdaA)*poissonPMF(b,lambdaB);
-      if(p>0.0001){probs.push({a,b,score:`${a}-${b}`,prob:p,total:a+b});totalProb+=p}
-    }
-  }
-  probs.sort((a,b)=>b.prob-a.prob);
-  return{probs:probs.slice(0,20),totalProb,expectedTotal:probs.reduce((s,p)=>s+p.total*p.prob,0)/Math.max(0.001,totalProb)};
-}
-
-// ═══════════════════════════════════════
-// FIX 3: HOME/AWAY SPLIT
-// ═══════════════════════════════════════
-function buildSplitProfile(teamName,allMatches){
-  const homeSc=[],homeCn=[],awaySc=[],awayCn=[];
-  allMatches.filter(m=>m.ftActual).forEach(m=>{
-    const g=parseScore(m.ftActual);if(!g)return;
-    if(m.teamA===teamName){homeSc.push(g.a);homeCn.push(g.b)}
-    if(m.teamB===teamName){awaySc.push(g.b);awayCn.push(g.a)}
-  });
-  return{
-    homeAvgScored:homeSc.length?avg(homeSc):0,homeAvgConceded:homeCn.length?avg(homeCn):0,
-    awayAvgScored:awaySc.length?avg(awaySc):0,awayAvgConceded:awayCn.length?avg(awayCn):0,
-    homeGames:homeSc.length,awayGames:awaySc.length,
-    homeAdvantage:homeSc.length&&awaySc.length?avg(homeSc)-avg(awaySc):0
-  };
-}
-
-// ═══════════════════════════════════════
-// FIX 4: INDEPENDENT CONFIDENCE CALIBRATOR
-// ═══════════════════════════════════════
-function calibrateConfidence(allMatches){
-  const completed=allMatches.filter(m=>m.ftPred&&m.ftActual);
-  if(completed.length<5)return 60;
-  
-  const accuracies=completed.map(m=>{
-    const p=parseScore(m.ftPred),a=parseScore(m.ftActual);
-    if(!p||!a)return null;
-    const diff=Math.abs(p.a-a.a)+Math.abs(p.b-a.b);
-    return diff===0?100:diff===1?83:diff===2?66:diff===3?49:diff===4?32:15;
-  }).filter(a=>a!==null);
-  
-  if(!accuracies.length)return 60;
-  
-  // Use median instead of mean for robustness
-  const sorted=[...accuracies].sort((a,b)=>a-b);
-  const median=sorted[Math.floor(sorted.length/2)];
-  const iqr=sorted[Math.floor(sorted.length*0.75)]-sorted[Math.floor(sorted.length*0.25)];
-  
-  // Confidence = median accuracy adjusted by spread
-  return clamp(Math.round(median-iqr*0.3),35,85);
-}
-
-// ═══════════════════════════════════════
-// FIX 5: AI SYNTHESIS LAYER
-// ═══════════════════════════════════════
-function generateAISynthesis(teamA,teamB,pA,pB,h2h,poissonResult,eloA,eloB,homeAdv){
-  const topScores=poissonResult.probs.slice(0,5);
-  const eloGap=eloA-eloB;
-  const eloFavorite=eloGap>50?teamA:eloGap<-50?teamB:null;
-  
-  let insight=`[AI SYNTHESIS] `;
-  
-  // Elo-based insight
-  if(eloFavorite){
-    const favName=eloFavorite===teamA?teamA:teamB;
-    const gap=Math.abs(eloGap);
-    insight+=`Elo ratings show ${favName} as ${gap>150?'strong':gap>80?'clear':'slight'} favorite (${gap} point gap). `;
-  }else{
-    insight+=`Elo ratings are nearly even (${Math.abs(eloGap)} point gap) — this is a toss-up. `;
-  }
-  
-  // Poisson insight
-  const topScore=topScores[0];
-  const probSum=topScores.slice(0,3).reduce((s,p)=>s+p.prob,0);
-  insight+=`Poisson model gives ${(topScore.prob*100).toFixed(1)}% to ${topScore.score}. Top 3 scorelines capture ${(probSum*100).toFixed(0)}% of probability mass. `;
-  
-  // Scoring environment
-  const expectedTotal=poissonResult.expectedTotal;
-  if(expectedTotal>12)insight+=`This projects as a high-scoring affair (expected ${expectedTotal.toFixed(1)} total). `;
-  else if(expectedTotal>8)insight+=`Moderate scoring expected (${expectedTotal.toFixed(1)} total). `;
-  else insight+=`Low-scoring match projected (${expectedTotal.toFixed(1)} total). `;
-  
-  // Home advantage
-  if(homeAdv>0.5)insight+=`${teamA} shows significant home advantage (+${homeAdv.toFixed(1)} goals/game at home). `;
-  else if(homeAdv<-0.5)insight+=`${teamA} actually performs worse at home (unusual pattern). `;
-  
-  // H2H insight
-  if(h2h.length>=3){
-    const h2hAvg=avg(h2h.map(h=>h.total));
-    insight+=`H2H history (${h2h.length} meetings, avg ${h2hAvg.toFixed(1)} total) ${h2hAvg>expectedTotal+2?'suggests higher scoring than model predicts':h2hAvg<expectedTotal-2?'suggests lower scoring than model predicts':'aligns with model projection'}. `;
-  }
-  
-  // Betting recommendation
-  const overProb=poissonResult.probs.filter(p=>p.total>10.5).reduce((s,p)=>s+p.prob,0);
-  const underProb=1-overProb;
-  insight+=`Betting edge: ${overProb>0.55?`Over 10.5 shows value (${(overProb*100).toFixed(0)}% probability)` :underProb>0.55?`Under 10.5 shows value (${(underProb*100).toFixed(0)}% probability)`:'No clear Over/Under edge — lines are efficient.'}`;
-  
-  return insight;
-}
+function rebuildAllElo(){const elo={};TEAMS.forEach(t=>elo[t.name]=ELO_DEFAULT);saveElo(elo);const db=loadDB().filter(m=>m.ftActual).reverse();db.forEach(m=>{const g=parseScore(m.ftActual);if(g)updateElo(m.teamA,m.teamB,g.a,g.b)})}
 
 // ═══════════════════════════════════════
 // DATABASE
 // ═══════════════════════════════════════
-const DB_KEY='epl4v4:v5:matches';
+const DB_KEY='epl4v4:v6:matches';
 function loadDB(){try{return JSON.parse(localStorage.getItem(DB_KEY)||'[]')}catch{return[]}}
 function saveDB(db){try{localStorage.setItem(DB_KEY,JSON.stringify(db));return true}catch{return false}}
 function addMatch(m){const db=loadDB();db.unshift(m);if(saveDB(db)){updateEloFromMatch(m);refreshCounters()}}
 function updateMatch(id,u){const db=loadDB();const i=db.findIndex(m=>m.id===id);if(i>=0){db[i]={...db[i],...u};saveDB(db);if(u.ftActual)updateEloFromMatch(db[i]);refreshCounters()}}
 function deleteMatch(id){const db=loadDB();saveDB(db.filter(m=>m.id!==id));rebuildAllElo();refreshCounters()}
+function updateEloFromMatch(m){if(!m.ftActual)return;const g=parseScore(m.ftActual);if(g)updateElo(m.teamA,m.teamB,g.a,g.b)}
 
-function updateEloFromMatch(m){
-  if(!m.ftActual)return;
-  const g=parseScore(m.ftActual);if(!g)return;
-  updateElo(m.teamA,m.teamB,g.a,g.b);
-}
-
-function rebuildAllElo(){
-  const elo={};TEAMS.forEach(t=>elo[t.name]=ELO_DEFAULT);
-  saveElo(elo);
-  const db=loadDB().filter(m=>m.ftActual).reverse();
-  db.forEach(m=>{const g=parseScore(m.ftActual);if(g)updateElo(m.teamA,m.teamB,g.a,g.b)});
-}
-
+// ═══════════════════════════════════════
+// DATA RECOVERY
+// ═══════════════════════════════════════
 (function recoverData(){
-  const current=loadDB();
-  const existingIds=new Set(current.map(m=>m.id));
-  let recovered=0;
-  ['epl4v4:v4:matches','epl4v4:v3:matches','epl4v4:v2:matches','epl4v4:v1:matches','epl4v4:matches'].forEach(key=>{
+  const current=loadDB();const existingIds=new Set(current.map(m=>m.id));let recovered=0;
+  ['epl4v4:v5:matches','epl4v4:v4:matches','epl4v4:v3:matches','epl4v4:v2:matches','epl4v4:v1:matches','epl4v4:matches'].forEach(key=>{
     try{const old=JSON.parse(localStorage.getItem(key)||'[]');if(Array.isArray(old))old.forEach(m=>{if(m.id&&!existingIds.has(m.id)){if(m.teamA)m.teamA=normalizeTeamName(m.teamA)||m.teamA;if(m.teamB)m.teamB=normalizeTeamName(m.teamB)||m.teamB;current.push(m);existingIds.add(m.id);recovered++}})}catch(e){}
   });
   if(recovered>0){saveDB(current);console.log('Recovered '+recovered+' matches')}
@@ -462,7 +327,40 @@ function selectTeam(name){const other=state.activeSide==='A'?'B':'A';if(state.pi
 function updateTeamUI(side){const t=TEAMS.find(x=>x.name===state.picks[side]);if(!t)return;const btn=document.getElementById('btn'+side);btn.classList.add('sel');btn.style.backgroundColor=t.color+'18';btn.style.borderColor=t.color;document.getElementById('emoji'+side).textContent=t.emoji;document.getElementById('abbr'+side).textContent=t.abbr;document.getElementById('abbr'+side).style.color=t.color;document.getElementById('name'+side).textContent=t.fullName;document.getElementById('name'+side).classList.remove('placeholder')}
 
 // ═══════════════════════════════════════
-// PREDICTION ENGINE v5
+// FIX 3: EXPONENTIAL RECENCY DECAY
+// ═══════════════════════════════════════
+function getDecayedAverages(allScores,halfLifeDays=21){
+  if(!allScores.length)return{avgScored:0,avgConceded:0,totalWeight:0};
+  const now=Date.now();
+  let wSc=0,wCn=0,totalW=0;
+  allScores.forEach(s=>{
+    const daysOld=(now-new Date(s.date||now).getTime())/(1000*60*60*24);
+    const w=Math.exp(-Math.log(2)*daysOld/halfLifeDays);
+    wSc+=s.s*w;wCn+=s.c*w;totalW+=w;
+  });
+  return{avgScored:totalW>0?wSc/totalW:0,avgConceded:totalW>0?wCn/totalW:0,totalWeight:totalW};
+}
+
+// ═══════════════════════════════════════
+// FIX 4: HOME/AWAY SPLIT
+// ═══════════════════════════════════════
+function buildSplitProfile(teamName,allMatches){
+  const homeSc=[],homeCn=[],awaySc=[],awayCn=[];
+  allMatches.filter(m=>m.ftActual).forEach(m=>{
+    const g=parseScore(m.ftActual);if(!g)return;
+    if(m.teamA===teamName){homeSc.push(g.a);homeCn.push(g.b)}
+    if(m.teamB===teamName){awaySc.push(g.b);awayCn.push(g.a)}
+  });
+  return{
+    homeAvgScored:homeSc.length?avg(homeSc):0,homeAvgConceded:homeCn.length?avg(homeCn):0,
+    awayAvgScored:awaySc.length?avg(awaySc):0,awayAvgConceded:awayCn.length?avg(awayCn):0,
+    homeGames:homeSc.length,awayGames:awaySc.length,
+    homeAdvantage:homeSc.length&&awaySc.length?avg(homeSc)-avg(awaySc):0
+  };
+}
+
+// ═══════════════════════════════════════
+// BUILD TEAM PROFILE
 // ═══════════════════════════════════════
 function buildTeamProfile(teamName,allMatches){
   const wr=allMatches.filter(m=>m.ftActual);
@@ -474,15 +372,23 @@ function buildTeamProfile(teamName,allMatches){
     if(m.teamB===teamName){scored.push(g.b);conceded.push(g.a);totals.push(g.total);allScores.push({s:g.b,c:g.a,date:m.date});if(ht&&g.total>0)htRatios.push(ht.total/g.total)}
   });
   const n=scored.length;
-  if(!n)return{games:0,avgScored:0,avgConceded:0,avgTotal:0,stdScored:0,stdConceded:0,cvScored:1,cvConceded:1,attack:'medium',defense:'medium weakness',style:'balanced',trend:'→ stable',consistency:'unknown',defReliability:'unknown',formMult:1,defFormMult:1,htRatio:0.45,streak:0,streakType:null,scorePatterns:{}};
-  const avgSc=avg(scored),avgCn=avg(conceded),avgTot=avg(totals),stdSc=stdDev(scored),stdCn=stdDev(conceded);
+  
+  // FIX 3: Use decayed averages
+  const decayed=getDecayedAverages(allScores);
+  const avgSc=n>=3?decayed.avgScored:avg(scored);
+  const avgCn=n>=3?decayed.avgConceded:avg(conceded);
+  const avgTot=avg(totals);
+  const stdSc=stdDev(scored),stdCn=stdDev(conceded);
+  
   const cvSc=avgSc>0?stdSc/avgSc:1,cvCn=avgCn>0?stdCn/avgCn:1;
   const attack=avgSc>=5?'elite':avgSc>=3.5?'high':avgSc>=2?'medium':'low';
   const defense=avgCn>=5?'high weakness':avgCn>=3?'medium weakness':'low weakness';
   const style=stdSc>2.5?'chaotic':stdSc>1.5?'aggressive':'balanced';
+  
   let streak=0,streakType=null;
   const recent=allScores.slice(-5);
   for(let i=recent.length-1;i>=0;i--){const r=recent[i],result=r.s>r.c?'W':r.s<r.c?'L':'D';if(!streakType)streakType=result;if(result===streakType)streak++;else break}
+  
   const last5=allScores.slice(-5);
   const recentAvg=last5.length?avg(last5.map(s=>s.s)):avgSc;
   const recentCn=last5.length?avg(last5.map(s=>s.c)):avgCn;
@@ -494,6 +400,7 @@ function buildTeamProfile(teamName,allMatches){
   const defReliability=cvCn<0.3?'high':cvCn<0.6?'medium':'low';
   const htRatio=htRatios.length?avg(htRatios):0.45;
   const scorePatterns={};allScores.forEach(s=>{const k=`${s.s}-${s.c}`;scorePatterns[k]=(scorePatterns[k]||0)+1});
+  
   return{games:n,avgScored:avgSc,avgConceded:avgCn,avgTotal:avgTot,stdScored:stdSc,stdConceded:stdCn,cvScored:cvSc,cvConceded:cvCn,attack,defense,style,trend,consistency,defReliability,formMult,defFormMult,streak,streakType,streakMult,htRatio,scorePatterns,recentAvg,recentCn};
 }
 
@@ -502,6 +409,152 @@ function getH2H(tA,tB,allMatches){
     .map(m=>{const g=parseScore(m.ftActual);return g?{a:g.a,b:g.b,total:g.total,date:m.date}:null}).filter(Boolean);
 }
 
+// ═══════════════════════════════════════
+// FIX 1: BLENDED LAMBDAS (stat + Elo)
+// ═══════════════════════════════════════
+function computeBlendedLambdas(pA,pB,splitA,splitB,eloA,eloB,gAvg){
+  const leaguePer=Math.max(0.5,gAvg/2);
+  
+  const atkStrA=pA.games>=3?pA.avgScored/leaguePer:1;
+  const defStrA=pA.games>=3?pA.avgConceded/leaguePer:1;
+  const atkStrB=pB.games>=3?pB.avgScored/leaguePer:1;
+  const defStrB=pB.games>=3?pB.avgConceded/leaguePer:1;
+  
+  // FIX 4: Home/away specific rates
+  const homeAtkA=splitA.homeGames>=2?splitA.homeAvgScored/leaguePer:atkStrA;
+  const awayAtkB=splitB.awayGames>=2?splitB.awayAvgScored/leaguePer:atkStrB;
+  const homeDefA=splitA.homeGames>=2?splitA.homeAvgConceded/leaguePer:defStrA;
+  const awayDefB=splitB.awayGames>=2?splitB.awayAvgConceded/leaguePer:defStrB;
+  
+  const statLamA=clamp(homeAtkA*awayDefB*leaguePer*pA.formMult*pA.streakMult,0.5,18);
+  const statLamB=clamp(awayAtkB*homeDefA*leaguePer*pB.formMult*pB.streakMult,0.5,18);
+  
+  const eloDiff=eloA-eloB;
+  const eloExpA=1/(1+Math.pow(10,-eloDiff/400));
+  const eloLamA=gAvg*(0.5+(eloExpA-0.5)*0.6);
+  const eloLamB=gAvg-eloLamA;
+  
+  const dataWeight=clamp((pA.games+pB.games)/20,0.1,0.8);
+  const eloWeight=1-dataWeight;
+  
+  return{
+    lA:clamp(statLamA*dataWeight+eloLamA*eloWeight,0.3,20),
+    lB:clamp(statLamB*dataWeight+eloLamB*eloWeight,0.3,20)
+  };
+}
+
+// ═══════════════════════════════════════
+// FIX 2: DIXON-COLES POISSON
+// ═══════════════════════════════════════
+function poissonPMF(k,lambda){
+  if(lambda<=0)return k===0?1:0;
+  let logP=-lambda+k*Math.log(lambda);
+  for(let i=2;i<=k;i++)logP-=Math.log(i);
+  return Math.exp(logP);
+}
+
+function dixonColes(a,b,lA,lB,rho=-0.1){
+  if(a===0&&b===0)return 1-lA*lB*rho;
+  if(a===0&&b===1)return 1+lA*rho;
+  if(a===1&&b===0)return 1+lB*rho;
+  if(a===1&&b===1)return 1-rho;
+  return 1;
+}
+
+function poissonScoreProb(lambdaA,lambdaB,maxGoals=15){
+  const probs=[];
+  let totalProb=0,homeWin=0,draw=0,awayWin=0;
+  
+  for(let a=0;a<=maxGoals;a++){
+    for(let b=0;b<=maxGoals;b++){
+      const rawP=poissonPMF(a,lambdaA)*poissonPMF(b,lambdaB);
+      const dc=dixonColes(a,b,lambdaA,lambdaB);
+      const p=Math.max(0,rawP*dc);
+      if(p>0.00005){
+        probs.push({a,b,score:`${a}-${b}`,prob:p,total:a+b});
+        totalProb+=p;
+        if(a>b)homeWin+=p;else if(a===b)draw+=p;else awayWin+=p;
+      }
+    }
+  }
+  
+  probs.forEach(p=>p.prob/=totalProb);
+  probs.sort((a,b)=>b.prob-a.prob);
+  
+  return{
+    probs:probs.slice(0,20),totalProb,
+    homeWin:homeWin/totalProb,draw:draw/totalProb,awayWin:awayWin/totalProb,
+    expectedTotal:probs.reduce((s,p)=>s+p.total*p.prob,0)
+  };
+}
+
+// ═══════════════════════════════════════
+// FIX 5: CLAUDE API INTEGRATION
+// ═══════════════════════════════════════
+async function callClaudeAPI(tA,tB,pA,pB,splitA,splitB,h2h,poisson,eloA,eloB,lambdas,gAvg,resultsOnly){
+  const apiKey=localStorage.getItem('epl4v4:apikey');
+  if(!apiKey)return null;
+  
+  const topPoisson=poisson.probs.slice(0,8).map(p=>`${p.score}:${(p.prob*100).toFixed(2)}%`).join(', ');
+  const h2hSummary=h2h.length?h2h.map(h=>`${h.a}-${h.b}`).join(', ') + ` (avg total ${avg(h2h.map(h=>h.total)).toFixed(1)})`:'None';
+  
+  const systemPrompt=`You are a precision football prediction analyst. Given statistical model output, provide expert judgment.
+
+You MUST output ONLY valid JSON — no markdown, no extra text:
+{
+  "ftPrediction": "X-Y",
+  "htPrediction": "X-Y", 
+  "top3": [{"score":"X-Y","label":"Most Likely","probability":"X.X%"}],
+  "matchProfile": "Chaos/Open/Balanced/Closed",
+  "trapWarning": null or "reason string",
+  "reasoning": "concise analysis",
+  "modelAgreement": "Strong/Moderate/Weak",
+  "keyFactors": ["factor1","factor2","factor3"],
+  "winProbs": {"home":"XX%","draw":"XX%","away":"XX%"},
+  "overUnder": {"signal":"Over X.X","confidence":"XX%"},
+  "confidence": 65
+}`;
+
+  const userMsg=`Analyze: ${tA} vs ${tB}
+
+STATISTICAL MODEL OUTPUT:
+- Poisson λ: ${tA}=${lambdas.lA.toFixed(2)}, ${tB}=${lambdas.lB.toFixed(2)}
+- Expected total: ${poisson.expectedTotal.toFixed(1)} goals
+- Home Win: ${(poisson.homeWin*100).toFixed(1)}% | Draw: ${(poisson.draw*100).toFixed(1)}% | Away: ${(poisson.awayWin*100).toFixed(1)}%
+- Top scores: ${topPoisson}
+- Elo: ${tA}=${eloA}, ${tB}=${eloB} (gap: ${Math.abs(eloA-eloB)})
+- ${tA} form: ${pA.avgScored.toFixed(1)} scored/g, ${pA.avgConceded.toFixed(1)} conceded/g
+- ${tB} form: ${pB.avgScored.toFixed(1)} scored/g, ${pB.avgConceded.toFixed(1)} conceded/g
+- ${tA} home advantage: +${splitA.homeAdvantage.toFixed(1)} goals
+- H2H: ${h2hSummary}
+- League avg: ${gAvg.toFixed(1)} goals
+- DB size: ${resultsOnly.length} matches
+- Dixon-Coles correction: APPLIED
+
+Return your expert prediction as JSON.`;
+
+  try{
+    const resp=await fetch('https://api.anthropic.com/v1/messages',{
+      method:'POST',
+      headers:{'Content-Type':'application/json','x-api-key':apiKey,'anthropic-version':'2023-06-01','anthropic-dangerous-direct-browser-access':'true'},
+      body:JSON.stringify({model:'claude-sonnet-4-20250514',max_tokens:800,system:systemPrompt,messages:[{role:'user',content:userMsg}]})
+    });
+    
+    if(!resp.ok)return null;
+    const data=await resp.json();
+    const text=(data.content?.[0]?.text||'').replace(/```json|```/g,'').trim();
+    const start=text.indexOf('{'),end=text.lastIndexOf('}');
+    if(start===-1||end===-1)return null;
+    return JSON.parse(text.slice(start,end+1));
+  }catch(e){
+    console.log('Claude API fallback — using stat model');
+    return null;
+  }
+}
+
+// ═══════════════════════════════════════
+// PREDICTION ENGINE
+// ═══════════════════════════════════════
 function generatePrediction(teamA,teamB,allMatches,resultsOnly){
   const pA=buildTeamProfile(teamA,allMatches),pB=buildTeamProfile(teamB,allMatches);
   const h2h=getH2H(teamA,teamB,allMatches);
@@ -511,101 +564,142 @@ function generatePrediction(teamA,teamB,allMatches,resultsOnly){
   const gAvg=allTots.length?avg(allTots):8;
   const gStd=allTots.length>1?stdDev(allTots):3;
   
-  // FIX 1: Get Elo ratings
   const eloAll=getAllElo();
   const eloA=eloAll[teamA]||ELO_DEFAULT,eloB=eloAll[teamB]||ELO_DEFAULT;
   
-  // FIX 3: Home/away adjustment
-  const homeAdvantage=splitA.homeAvgScored>0?splitA.homeAvgScored-(pA.avgScored||splitA.homeAvgScored):0.3;
-  const eloAdjustedA=eloA+Math.round(homeAdvantage*25);
+  const lambdas=computeBlendedLambdas(pA,pB,splitA,splitA,eloA,eloB,gAvg);
+  const poisson=poissonScoreProb(lambdas.lA,lambdas.lB);
+  const top=poisson.probs[0];
   
-  // FIX 1: Elo-based expected goals
-  const eloGoals=eloToExpectedGoals(eloAdjustedA,eloB,gAvg);
-  
-  // FIX 2: Poisson distribution
-  const poissonResult=poissonScoreProb(eloGoals.lambdaA,eloGoals.lambdaB);
-  const expectedTotal=poissonResult.expectedTotal;
-  
-  // Top scores from Poisson
-  const topPoisson=poissonResult.probs.slice(0,3);
-  const bestScore=topPoisson[0];
-  
-  // Base goals
-  let ftA=bestScore.a,ftB=bestScore.b;
+  let ftA=top.a,ftB=top.b;
   const ftTotal=ftA+ftB;
   
-  // H2H blending
   if(h2h.length){
     const h2hTotals=h2h.map(h=>h.total);
     const h2hAvg=avg(h2hTotals);
     const weight=h2h.length>=6?0.5:h2h.length>=3?0.4:0.3;
-    const blendedTotal=expectedTotal*(1-weight)+h2hAvg*weight;
-    const r=blendedTotal/expectedTotal;
-    const adjA=Math.round(bestScore.a*r),adjB=Math.round(bestScore.b*r);
-    ftA=adjA;ftB=adjB;
+    const blendedTotal=poisson.expectedTotal*(1-weight)+h2hAvg*weight;
+    const r=clamp(blendedTotal/poisson.expectedTotal,0.7,1.3);
+    ftA=Math.round(top.a*r);ftB=Math.round(top.b*r);
   }
   
-  // Top 3 scores
-  const scores=topPoisson.map((p,i)=>({a:p.a,b:p.b,label:i===0?'Most Likely':i===1?'High Probability':'Value Pick',prob:p.prob}));
-  
-  // HT
   const htRatioA=pA.htRatio||0.45,htMultiplier=(htRatioA+(pB.htRatio||0.45))/2;
   const htA=Math.round(ftA*htMultiplier),htB=Math.round(ftB*htMultiplier);
   
-  // Flow
   const flow={
-    early:`${teamA} (Elo: ${eloA}) ${pA.attack==='elite'||pA.attack==='high'?'presses high looking for early breakthrough':'starts cautiously'} while ${teamB} (Elo: ${eloB}) ${pB.style==='chaotic'?'responds with chaotic energy':'maintains defensive discipline'}. ${homeAdvantage>0.5?teamA+' benefits from home advantage (+'+homeAdvantage.toFixed(1)+' goals/game).':''}`,
-    mid:`Mid-phase: ${ftTotal>10?'both teams exchanging chances':ftTotal>7?'balanced possession':'defenses in control'}. Elo gap: ${Math.abs(eloA-eloB)} points.`,
-    chaos:`Late phase ${ftTotal>12?'erupts with rapid exchanges':ftTotal>8?'brings urgency but few chances':'fades with defenses dominant'}. ${pA.defReliability==='low'||pB.defReliability==='low'?'HIGH collapse risk.':''}`,
+    early:`${teamA} (Elo: ${eloA}) ${pA.attack==='elite'||pA.attack==='high'?'presses high':'starts cautiously'} while ${teamB} (Elo: ${eloB}) ${pB.style==='chaotic'?'responds with chaos':'maintains discipline'}.`,
+    mid:`Mid-phase: ${ftTotal>10?'exchanging chances':ftTotal>7?'balanced possession':'defenses dominant'}. Elo gap: ${Math.abs(eloA-eloB)} pts.`,
+    chaos:`Late: ${ftTotal>12?'rapid exchanges':ftTotal>8?'urgency but few chances':'fades'}. ${pA.defReliability==='low'||pB.defReliability==='low'?'Collapse risk HIGH.':''}`,
     dominant:eloA>eloB+50?teamA:eloB>eloA+50?teamB:'contested'
   };
   
-  // FIX 4: Independent confidence
-  const conf=calibrateConfidence(resultsOnly);
-  
-  // FIX 5: AI Synthesis
-  const aiSynthesis=generateAISynthesis(teamA,teamB,pA,pB,h2h,poissonResult,eloA,eloB,homeAdvantage);
-  
-  // Betting
   const ouPct=l=>allTots.length?Math.round(allTots.filter(t=>t>l).length/allTots.length*100):0;
-  let bo={l:8.5,p:50,d:99},bu={l:8.5,p:50,d:99};
-  [6.5,7.5,8.5,9.5,10.5,11.5,12.5,13.5,14.5,15.5,16.5,17.5,18.5].forEach(l=>{
-    const op=ouPct(l),up=100-op,od=Math.abs(l-ftTotal),ud=Math.abs(l-ftTotal);
-    if(op>=bo.p||(op>=bo.p-5&&od<bo.d))bo={l,p:op,d:od};
-    if(up>=bu.p||(up>=bu.p-5&&ud<bu.d))bu={l,p:up,d:ud};
-  });
-  const primary=bo.p>=bu.p?`Over ${bo.l}`:`Under ${bu.l}`;
-  const primaryRate=Math.max(bo.p,bu.p);
+  let bo={l:8.5,p:50};
+  [6.5,7.5,8.5,9.5,10.5,11.5,12.5,13.5,14.5,15.5,16.5,17.5,18.5].forEach(l=>{const op=ouPct(l);if(op>=bo.p)bo={l,p:op}});
+  const primary=bo.p>=50?`Over ${bo.l}`:`Under ${bo.l}`;
+  const primaryRate=bo.p;
+  
+  const completed=resultsOnly.filter(m=>m.ftPred&&m.ftActual);
+  let conf=60;
+  if(completed.length>=5){
+    const accuracies=completed.map(m=>{const p=parseScore(m.ftPred),a=parseScore(m.ftActual);if(!p||!a)return null;const d=Math.abs(p.a-a.a)+Math.abs(p.b-a.b);return d===0?100:d===1?83:d===2?66:d===3?49:32}).filter(a=>a!==null);
+    if(accuracies.length){const sorted=[...accuracies].sort((a,b)=>a-b);const median=sorted[Math.floor(sorted.length/2)];const iqr=sorted[Math.floor(sorted.length*.75)]-sorted[Math.floor(sorted.length*.25)];conf=clamp(Math.round(median-iqr*.3),35,85)}
+  }
   
   const traps=[];
   if(pA.games<3)traps.push(`${teamA}: ${pA.games} games`);
   if(pB.games<3)traps.push(`${teamB}: ${pB.games} games`);
-  if(Math.abs(eloA-eloB)>200)traps.push(`Large Elo gap (${Math.abs(eloA-eloB)}) — potential mismatch`);
+  if(Math.abs(eloA-eloB)>200)traps.push(`Large Elo gap`);
   
   const clsf=ftTotal>15?'Chaos':ftTotal>11?'Open':ftTotal>7?'Balanced':'Closed';
   const teamAN=getTeam(teamA).fullName,teamBN=getTeam(teamB).fullName;
   
   return{
-    teamA:{name:teamA,displayName:teamAN,attack:pA.attack,defense:pA.defense,style:pA.style,trend:pA.trend,elo:eloA,stats:{games:pA.games,avgScored:pA.avgScored,avgConceded:pA.avgConceded}},
-    teamB:{name:teamB,displayName:teamBN,attack:pB.attack,defense:pB.defense,style:pB.style,trend:pB.trend,elo:eloB,stats:{games:pB.games,avgScored:pB.avgScored,avgConceded:pB.avgConceded}},
-    classification:clsf,classificationReason:`Elo: ${teamAN} ${eloA} vs ${teamBN} ${eloB} (${eloA>eloB?'+'+Math.abs(eloA-eloB):eloB>eloA?'-'+Math.abs(eloA-eloB):'EVEN'}). Poisson λ: ${eloGoals.lambdaA.toFixed(1)}/${eloGoals.lambdaB.toFixed(1)}. Expected total: ${expectedTotal.toFixed(1)}.`,
+    teamA:{name:teamA,displayName:teamAN,attack:pA.attack,defense:pA.defense,style:pA.style,elo:eloA,stats:{games:pA.games,avgScored:pA.avgScored,avgConceded:pA.avgConceded}},
+    teamB:{name:teamB,displayName:teamBN,attack:pB.attack,defense:pB.defense,style:pB.style,elo:eloB,stats:{games:pB.games,avgScored:pB.avgScored,avgConceded:pB.avgConceded}},
+    classification:clsf,
+    classificationReason:`λA=${lambdas.lA.toFixed(1)}, λB=${lambdas.lB.toFixed(1)} (blended). DC-corrected Poisson. Elo: ${eloA} vs ${eloB}. Expected total: ${poisson.expectedTotal.toFixed(1)}.`,
     flow,htPrediction:`${htA}-${htB}`,secondHalf:{teamA:ftA-htA,teamB:ftB-htB},
     ftPrediction:`${ftA}-${ftB}`,
-    ftReasoning:`[v5 ELO+POISSON] Elo ratings: ${teamAN} ${eloA} (${eloA>ELO_DEFAULT?'+'+Math.round(eloA-ELO_DEFAULT):eloA<ELO_DEFAULT?Math.round(eloA-ELO_DEFAULT):'BASE'}) vs ${teamBN} ${eloB}. Home advantage: +${homeAdvantage.toFixed(1)} goals for ${teamAN}. Poisson λA=${eloGoals.lambdaA.toFixed(1)}, λB=${eloGoals.lambdaB.toFixed(1)}. Top scoreline probability: ${(bestScore.prob*100).toFixed(1)}%. H2H: ${h2h.length} meetings. Final: ${ftA}-${ftB}.`,
-    top3:scores.map(s=>({score:`${s.a}-${s.b}`,label:s.label,prob:s.prob,reason:`Poisson probability: ${(s.prob*100).toFixed(1)}%`})),
-    poissonProbs:poissonResult.probs.slice(0,12),
-    aiSynthesis,
-    keyPattern:`Elo-driven Poisson model — ${teamAN} λ=${eloGoals.lambdaA.toFixed(1)}, ${teamBN} λ=${eloGoals.lambdaB.toFixed(1)}`,
-    momentum:`Elo gap: ${Math.abs(eloA-eloB)} points. ${eloA>eloB+100?teamAN+' heavily favored':eloB>eloA+100?teamBN+' heavily favored':'Competitive match expected'}`,
+    ftReasoning:`[v6 DC POISSON] Blended λ: stat(weight ${clamp((pA.games+pB.games)/20,.1,.8).toFixed(1)}) + Elo. Dixon-Coles correction applied (ρ=-0.1). λA=${lambdas.lA.toFixed(2)}, λB=${lambdas.lB.toFixed(2)}. Top score probability: ${(top.prob*100).toFixed(2)}%. Home win: ${(poisson.homeWin*100).toFixed(0)}%, Draw: ${(poisson.draw*100).toFixed(0)}%, Away: ${(poisson.awayWin*100).toFixed(0)}%.`,
+    top3:poisson.probs.slice(0,3).map((p,i)=>({score:`${p.a}-${p.b}`,label:i===0?'Most Likely':i===1?'High Probability':'Variance',prob:p.prob,reason:`DC Poisson: ${(p.prob*100).toFixed(2)}%`})),
+    poissonProbs:poisson.probs.slice(0,12),
+    aiSynthesis:`[STAT MODEL] DC-corrected Poisson with blended lambdas. λA=${lambdas.lA.toFixed(2)} (${teamAN}), λB=${lambdas.lB.toFixed(2)} (${teamBN}). Home win: ${(poisson.homeWin*100).toFixed(0)}%. ${h2h.length?`H2H avg: ${avg(h2h.map(h=>h.total)).toFixed(1)} total.`:''} Decayed averages (21-day half-life) applied.`,
+    keyPattern:`DC Poisson — ${teamAN} λ=${lambdas.lA.toFixed(2)}, ${teamBN} λ=${lambdas.lB.toFixed(2)}`,
+    momentum:`Elo gap: ${Math.abs(eloA-eloB)} pts. ${eloA>eloB+100?teamAN+' favored':eloB>eloA+100?teamBN+' favored':'Competitive'}`,
     trapWarning:traps.length?traps.join(' | '):null,
-    betting:{primaryLine:primary,primaryHitRate:primaryRate+'%',safeRange:`${Math.max(0,ftTotal-2)}-${ftTotal+2} goals`,risk:primaryRate>=68?'LOW':primaryRate>=55?'MEDIUM':'HIGH',strategy:primaryRate>=68?'Safe play':primaryRate>=55?'Value bet':'Aggressive',bettingNote:`Poisson gives ${(topPoisson[0].prob*100).toFixed(1)}% to exact score ${topPoisson[0].score}. Over 10.5: ${(poissonResult.probs.filter(p=>p.total>10.5).reduce((s,p)=>s+p.prob,0)*100).toFixed(0)}% probability. ${h2h.length?`H2H avg: ${avg(h2h.map(h=>h.total)).toFixed(1)}.`:''}`},
+    betting:{primaryLine:primary,primaryHitRate:primaryRate+'%',safeRange:`${Math.max(0,ftTotal-2)}-${ftTotal+2} goals`,risk:primaryRate>=68?'LOW':primaryRate>=55?'MEDIUM':'HIGH',strategy:primaryRate>=68?'Safe':primaryRate>=55?'Value':'Aggressive',bettingNote:`DC Poisson: ${(top.prob*100).toFixed(1)}% to ${top.score}. Over ${ftTotal>10?'10.5':'8.5'}: ${(poisson.probs.filter(p=>p.total>(ftTotal>10?10.5:8.5)).reduce((s,p)=>s+p.prob,0)*100).toFixed(0)}% prob.`},
     confidence:conf,
-    confidenceReason:`Independent calibration from ${resultsOnly.filter(m=>m.ftPred&&m.ftActual).length} historical predictions. Median accuracy: ${conf}%.`
+    confidenceReason:`Independent calibration (median accuracy). ${completed.length} historical predictions. Decayed averages + Dixon-Coles correction.`
   };
 }
 
 // ═══════════════════════════════════════
-// RENDER
+// FIX 5: ASYNC PREDICTION RUNNER
+// ═══════════════════════════════════════
+async function runPrediction(){
+  const tA=state.picks.A,tB=state.picks.B;
+  if(!tA||!tB){showToast('Select both teams');return}
+  const btn=document.getElementById('predictBtn');
+  btn.disabled=true;
+  btn.innerHTML='COMPUTING<span class="loading-dots"><span></span><span></span><span></span></span>';
+  
+  try{
+    const db=loadDB(),resultsOnly=db.filter(m=>m.ftActual);
+    const pred=generatePrediction(tA,tB,db,resultsOnly);
+    pred._tA=tA;pred._tB=tB;
+    
+    // Try AI synthesis
+    const pA=buildTeamProfile(tA,db),pB=buildTeamProfile(tB,db);
+    const splitA=buildSplitProfile(tA,db);
+    const h2h=getH2H(tA,tB,db);
+    const allTots=resultsOnly.map(m=>{const g=parseScore(m.ftActual);return g?g.total:null}).filter(Boolean);
+    const gAvg=allTots.length?avg(allTots):8;
+    const eloAll=getAllElo();
+    const eloA=eloAll[tA]||ELO_DEFAULT,eloB=eloAll[tB]||ELO_DEFAULT;
+    const lambdas=computeBlendedLambdas(pA,pB,splitA,splitA,eloA,eloB,gAvg);
+    const poisson=poissonScoreProb(lambdas.lA,lambdas.lB);
+    
+    btn.innerHTML='AI ANALYSIS<span class="loading-dots"><span></span><span></span><span></span></span>';
+    const ai=await callClaudeAPI(tA,tB,pA,pB,splitA,splitA,h2h,poisson,eloA,eloB,lambdas,gAvg,resultsOnly);
+    
+    if(ai){
+      pred.ftPrediction=ai.ftPrediction||pred.ftPrediction;
+      pred.htPrediction=ai.htPrediction||pred.htPrediction;
+      if(ai.top3)pred.top3=ai.top3.map(s=>({score:s.score,label:s.label,prob:parseFloat(s.probability)/100||0.05,reason:s.probability}));
+      pred.confidence=ai.confidence||pred.confidence;
+      pred.classification=ai.matchProfile||pred.classification;
+      pred.trapWarning=ai.trapWarning||pred.trapWarning;
+      pred.aiSynthesis=`🧠 CLAUDE: ${ai.reasoning} | Agreement: ${ai.modelAgreement}. Key: ${ai.keyFactors?.join(' · ')||'N/A'}`;
+      pred.betting.primaryLine=ai.overUnder?.signal||pred.betting.primaryLine;
+      pred.betting.bettingNote+=` Win: H ${ai.winProbs?.home||'?'} · D ${ai.winProbs?.draw||'?'} · A ${ai.winProbs?.away||'?'}.`;
+      pred.confidenceReason=`AI synthesis (Poisson+Elo+Form+H2H). Agreement: ${ai.modelAgreement}. DC-corrected.`;
+      pred.ftReasoning=`[v6 AI] λA=${lambdas.lA.toFixed(2)}, λB=${lambdas.lB.toFixed(2)}. DC Poisson. ${ai.reasoning}`;
+    }
+    
+    state.lastPrediction=pred;
+    document.getElementById('predictionSection').style.display='block';
+    renderPrediction(pred);
+    document.getElementById('predictionOutput').scrollIntoView({behavior:'smooth'});
+  }catch(e){
+    console.error('Prediction error:',e);
+    showToast('Error — check console');
+  }finally{
+    btn.disabled=false;
+    btn.textContent='GENERATE PREDICTION';
+  }
+}
+
+function savePrediction(){
+  if(!state.lastPrediction)return;
+  const d=state.lastPrediction;
+  addMatch({id:genId(),date:new Date().toISOString(),teamA:d._tA,teamB:d._tB,htPred:d.htPrediction,ftPred:d.ftPrediction,classification:d.classification,confidence:d.confidence,top3:d.top3.map(s=>s.score).join(', '),keyPattern:d.keyPattern,primaryLine:d.betting.primaryLine,bettingRisk:d.betting.risk,safeRange:d.betting.safeRange,trapWarning:d.trapWarning,htActual:null,ftActual:null,status:'pending'});
+  showToast('Saved — Elo updates when result entered');
+  document.getElementById('saveBtn').disabled=true;state.lastPrediction=null;
+}
+
+// ═══════════════════════════════════════
+// RENDER (restored from previous)
 // ═══════════════════════════════════════
 const clsColor=c=>c==='Chaos'?'var(--red)':c==='Open'?'var(--orn)':c==='Balanced'?'var(--yel)':'var(--blu)';
 const clsBadge=c=>c==='Chaos'?'bg-r':c==='Open'?'bg-o':c==='Balanced'?'bg-y':'bg-b';
@@ -619,55 +713,21 @@ function renderPrediction(d){
   
   document.getElementById('predictionOutput').innerHTML=`
     <div class="sb"><div class="sb-side"><div class="sb-club" style="color:${tmA.color}">${tmA.emoji} ${tmA.abbr}</div><div class="sb-name">${tmA.fullName}</div><div style="font-family:var(--fm);font-size:9px;color:var(--mut)">Elo: ${d.teamA.elo}</div></div><div class="sb-center"><div class="sb-ft">${ft.a}–${ft.b}</div><div class="sb-label">PREDICTED FT</div><div class="sb-ht-info">HT: ${d.htPrediction} · 2H: ${d.secondHalf.teamA}-${d.secondHalf.teamB}</div></div><div class="sb-side right"><div class="sb-club" style="color:${tmB.color}">${tmB.emoji} ${tmB.abbr}</div><div class="sb-name">${tmB.fullName}</div><div style="font-family:var(--fm);font-size:9px;color:var(--mut);text-align:right">Elo: ${d.teamB.elo}</div></div></div>
-    
-    <div class="ai-insight"><div class="ai-insight-title">🧠 AI SYNTHESIS</div><div class="ai-insight-text">${d.aiSynthesis}</div></div>
-    
+    <div class="ai-insight"><div class="ai-insight-title">🧠 SYNTHESIS</div><div class="ai-insight-text">${d.aiSynthesis||'Statistical model prediction'}</div></div>
     <div class="card"><div class="card-head"><div class="card-title" style="color:${clsColor(d.classification)}">${d.classification.toUpperCase()} MATCH</div><span class="badge ${clsBadge(d.classification)}">${ft.a+ft.b} GOALS</span></div><div class="card-body"><div style="font-size:12px;color:var(--mut);line-height:1.7">${d.classificationReason}</div><div class="ft-reasoning-block">${d.ftReasoning}</div></div></div>
-    
-    <div class="card"><div class="card-head"><div class="card-title">POISSON SCORE DISTRIBUTION</div></div><div class="card-body"><div class="poisson-grid">${d.poissonProbs?.map(p=>`<div class="poisson-cell" style="background:${p.prob>0.05?'rgba(0,232,122,.1)':'var(--bg)'};border:1px solid ${p.prob>0.05?'rgba(0,232,122,.3)':'var(--bdr)'}"><div class="poisson-score">${p.score}</div><div class="poisson-pct">${(p.prob*100).toFixed(1)}%</div></div>`).join('')||''}</div></div></div>
-    
+    <div class="card"><div class="card-head"><div class="card-title">DC POISSON DISTRIBUTION</div></div><div class="card-body"><div class="poisson-grid">${d.poissonProbs?.map(p=>`<div class="poisson-cell" style="background:${p.prob>0.05?'rgba(0,232,122,.1)':'var(--bg)'};border:1px solid ${p.prob>0.05?'rgba(0,232,122,.3)':'var(--bdr)'}"><div class="poisson-score">${p.score}</div><div class="poisson-pct">${(p.prob*100).toFixed(1)}%</div></div>`).join('')||''}</div></div></div>
     <div class="prof-grid">${[d.teamA,d.teamB].map(t=>{const tm=getTeam(t.name);return`<div class="prof-card"><div style="font-family:var(--fh);font-size:14px;font-weight:700;margin-bottom:10px">${tm.emoji} ${tm.fullName} <span class="badge bg-g" style="font-size:7px">Elo: ${t.elo}</span></div><div class="prof-row"><div class="prof-lbl"><span>ATK</span><span style="color:var(--grn)">${t.attack} (${t.stats.avgScored.toFixed(1)}/g)</span></div><div class="prof-bar"><div class="prof-fill" style="width:${t.attack==='elite'?93:t.attack==='high'?72:t.attack==='medium'?46:22}%;background:var(--grn)"></div></div></div><div class="prof-row"><div class="prof-lbl"><span>DEF</span><span style="color:${t.defense.includes('high')?'var(--red)':t.defense.includes('medium')?'var(--yel)':'var(--grn)'}">${t.defense} (${t.stats.avgConceded.toFixed(1)}/g)</span></div><div class="prof-bar"><div class="prof-fill" style="width:${t.defense.includes('high')?88:t.defense.includes('medium')?56:26}%;background:${t.defense.includes('high')?'var(--red)':t.defense.includes('medium')?'var(--yel)':'var(--grn)'}"></div></div></div></div>`}).join('')}</div>
-    
-    <div class="card"><div class="card-head"><div class="card-title">MATCH FLOW</div>${flow.dominant?`<span class="badge bg-g">${getTeam(flow.dominant).fullName}</span>`:''}</div><div class="card-body"><div style="display:flex;flex-direction:column;gap:6px">${flow.early?`<div style="background:var(--sur2);padding:10px 12px;border-radius:9px;display:flex;gap:10px"><span style="font-family:var(--fm);font-size:8px;color:var(--grn);width:48px">0–30%</span><span style="font-size:12px">${flow.early}</span></div>`:''}${flow.mid?`<div style="background:var(--sur2);padding:10px 12px;border-radius:9px;display:flex;gap:10px"><span style="font-family:var(--fm);font-size:8px;color:var(--grn);width:48px">30–70%</span><span style="font-size:12px">${flow.mid}</span></div>`:''}${flow.chaos?`<div style="background:var(--sur2);padding:10px 12px;border-radius:9px;display:flex;gap:10px"><span style="font-family:var(--fm);font-size:8px;color:var(--grn);width:48px">70–100%</span><span style="font-size:12px">${flow.chaos}</span></div>`:''}</div></div></div>
-    
+    <div class="card"><div class="card-head"><div class="card-title">MATCH FLOW</div>${flow.dominant?`<span class="badge bg-g">${getTeam(flow.dominant).fullName}</span>`:''}</div><div class="card-body"><div style="display:flex;flex-direction:column;gap:6px">${[flow.early,flow.mid,flow.chaos].map((t,i)=>t?`<div style="background:var(--sur2);padding:10px 12px;border-radius:9px;display:flex;gap:10px"><span style="font-family:var(--fm);font-size:8px;color:var(--grn);width:48px">${['0–30%','30–70%','70–100%'][i]}</span><span style="font-size:12px">${t}</span></div>`:'').join('')}</div></div></div>
     <div class="card"><div class="card-head"><div class="card-title">TOP 3 SCORELINES</div></div><div class="card-body"><div class="t3-list">${d.top3.map((s,i)=>`<div class="t3-item${i===0?' win':''}"><div class="t3-rank">${['🥇','🥈','🥉'][i]}</div><div class="t3-score">${s.score}</div><div style="text-align:right"><span class="badge ${i===0?'bg-g':i===1?'bg-y':'bg'}">${s.label}</span><div class="t3-pct">${(s.prob*100).toFixed(1)}%</div><div style="font-family:var(--fm);font-size:7.5px;color:var(--mut);margin-top:2px">${s.reason}</div></div></div>`).join('')}</div></div>
-    
     ${d.trapWarning?`<div style="background:rgba(255,82,82,.05);border:1px solid rgba(255,82,82,.2);border-radius:11px;padding:12px 14px;margin-bottom:12px"><div style="font-family:var(--fh);font-size:17px;font-weight:700;color:var(--red);margin-bottom:4px">⚠ TRAP MATCH</div><div style="font-size:12px;color:rgba(255,82,82,.75)">${d.trapWarning}</div></div>`:''}
-    
     <div class="bet-card"><div class="bet-header"><div><div style="font-family:var(--fm);font-size:7px;color:var(--mut);margin-bottom:4px">PRIMARY SIGNAL</div><div class="bet-line" style="color:${bet.primaryLine?.startsWith('Under')?'var(--blu)':'var(--grn)'}">${bet.primaryLine}</div><div style="font-family:var(--fm);font-size:9px;color:var(--mut);margin-top:4px">${bet.primaryHitRate} hit rate</div></div><span class="badge ${bet.risk==='HIGH'?'bg-r':bet.risk==='MEDIUM'?'bg-y':'bg-g'}">${bet.risk} RISK</span></div><div class="bet-grid"><div class="bet-item"><div class="bet-item-label">SAFE RANGE</div><div class="bet-item-value" style="color:var(--grn)">${bet.safeRange}</div></div><div class="bet-item"><div class="bet-item-label">STRATEGY</div><div class="bet-item-value" style="color:var(--yel)">${bet.strategy}</div></div><div class="bet-item"><div class="bet-item-label">TOTAL</div><div class="bet-item-value">${ft.a+ft.b} goals</div></div></div><div style="margin-top:12px;padding:8px 11px;background:var(--bg);border-radius:8px;font-size:11px;color:var(--mut);line-height:1.7">${bet.bettingNote}</div></div>
-    
     <div class="conf-card"><div class="conf-header"><div><div style="font-family:var(--fm);font-size:7px;color:var(--mut);margin-bottom:4px">CONFIDENCE</div><div class="conf-pct" style="color:${confColor(conf)}">${conf}%</div></div><span class="badge ${conf>=75?'bg-g':conf>=60?'bg-y':conf>=45?'bg-o':'bg-r'}">${conf>=75?'HIGH':conf>=60?'MODERATE':conf>=45?'LOW':'VERY LOW'}</span></div><div class="conf-bar-wrap"><div class="conf-bar" style="width:${conf}%;background:${confColor(conf)}"></div></div><div style="font-size:12px;color:var(--mut);line-height:1.7">${d.confidenceReason}</div></div>
-    
     <div class="save-bar"><div><div style="font-family:var(--fh);font-size:14px;font-weight:700">SAVE PREDICTION</div><div style="font-family:var(--fm);font-size:7.5px;color:var(--mut)">UPDATES ELO RATINGS</div></div><button class="btn btn-g btn-sm" id="saveBtn" onclick="savePrediction()">SAVE</button></div>
   `;
 }
 
-function runPrediction(){
-  const tA=state.picks.A,tB=state.picks.B;
-  if(!tA||!tB){showToast('Select both teams');return}
-  const btn=document.getElementById('predictBtn');
-  btn.disabled=true;btn.textContent='COMPUTING…';
-  setTimeout(()=>{
-    const db=loadDB(),resultsOnly=db.filter(m=>m.ftActual);
-    const pred=generatePrediction(tA,tB,db,resultsOnly);
-    pred._tA=tA;pred._tB=tB;state.lastPrediction=pred;
-    document.getElementById('predictionSection').style.display='block';
-    renderPrediction(pred);
-    document.getElementById('predictionOutput').scrollIntoView({behavior:'smooth'});
-    btn.disabled=false;btn.textContent='GENERATE PREDICTION';
-  },50);
-}
-
-function savePrediction(){
-  if(!state.lastPrediction)return;
-  const d=state.lastPrediction;
-  addMatch({id:genId(),date:new Date().toISOString(),teamA:d._tA,teamB:d._tB,htPred:d.htPrediction,ftPred:d.ftPrediction,classification:d.classification,confidence:d.confidence,top3:d.top3.map(s=>s.score).join(', '),keyPattern:d.keyPattern,primaryLine:d.betting.primaryLine,bettingRisk:d.betting.risk,safeRange:d.betting.safeRange,trapWarning:d.trapWarning,htActual:null,ftActual:null,status:'pending'});
-  showToast('Saved — Elo updates when result entered');
-  document.getElementById('saveBtn').disabled=true;state.lastPrediction=null;
-}
-
 // ═══════════════════════════════════════
-// RESULTS & DATABASE
+// RESULTS & DATABASE PAGES
 // ═══════════════════════════════════════
 function renderResults(){
   const db=loadDB();const pend=db.filter(m=>m.status==='pending'),done=db.filter(m=>m.status==='result').slice(0,50);
@@ -680,21 +740,15 @@ function renderDatabase(){
   const db=loadDB(),wr=db.filter(m=>m.ftActual);
   const tots=wr.map(m=>{const g=parseScore(m.ftActual);return g?g.total:null}).filter(Boolean);
   const gAvg=tots.length?avg(tots):null,gStd=tots.length>1?stdDev(tots):null;
-  const accs=wr.filter(m=>m.ftPred).map(m=>calcAcc(m)).filter(a=>a!==null);
-  const avgAcc=accs.length?Math.round(avg(accs)):null;
   const eloAll=getAllElo();
   const eloSorted=Object.entries(eloAll).sort((a,b)=>b[1]-a[1]);
   
   document.getElementById('totalBadge').textContent=`${db.length} MATCHES`;
-  document.getElementById('eloRankings').innerHTML=eloSorted.map(([name,rating],i)=>{
-    const tm=getTeam(name);
-    const change=rating-ELO_DEFAULT;
-    return`<div class="elo-row"><div style="display:flex;align-items:center;gap:8px"><span style="font-family:var(--fm);font-size:10px;color:var(--mut);width:20px">#${i+1}</span><span class="elo-name">${tm.emoji} ${tm.fullName}</span></div><div><span class="elo-rating" style="color:${rating>ELO_DEFAULT?'var(--grn)':rating<ELO_DEFAULT?'var(--red)':'var(--mut)'}">${rating}</span><span class="elo-change" style="color:${change>0?'var(--grn)':change<0?'var(--red)':'var(--mut)'}">${change>0?'+'+change:change<0?change:'NEW'}</span></div></div>`;
-  }).join('')||`<div class="empty-state"><div class="empty-icon">📊</div><div class="empty-text">PLAY MATCHES TO BUILD ELO</div></div>`;
-  
-  document.getElementById('globalStats').innerHTML=`<div class="stat-card"><div class="stat-value">${db.length}</div><div class="stat-label">TOTAL</div></div><div class="stat-card"><div class="stat-value" style="color:var(--grn)">${wr.length}</div><div class="stat-label">RESULTS</div></div><div class="stat-card"><div class="stat-value" style="color:var(--yel)">${gAvg?.toFixed(1)||'—'}</div><div class="stat-label">AVG GOALS</div></div><div class="stat-card"><div class="stat-value" style="color:var(--blu)">${avgAcc!==null?avgAcc+'%':'—'}</div><div class="stat-label">ACCURACY</div></div>`;
+  document.getElementById('eloRankings').innerHTML=eloSorted.map(([name,rating],i)=>{const tm=getTeam(name);const change=rating-ELO_DEFAULT;return`<div class="elo-row"><div style="display:flex;align-items:center;gap:8px"><span style="font-family:var(--fm);font-size:10px;color:var(--mut);width:20px">#${i+1}</span><span class="elo-name">${tm.emoji} ${tm.fullName}</span></div><div><span class="elo-rating" style="color:${rating>ELO_DEFAULT?'var(--grn)':rating<ELO_DEFAULT?'var(--red)':'var(--mut)'}">${rating}</span><span class="elo-change" style="color:${change>0?'var(--grn)':change<0?'var(--red)':'var(--mut)'}">${change>0?'+'+change:change<0?change:'NEW'}</span></div></div>`}).join('')||`<div class="empty-state"><div class="empty-icon">📊</div><div class="empty-text">PLAY MATCHES TO BUILD ELO</div></div>`;
+  document.getElementById('globalStats').innerHTML=`<div class="stat-card"><div class="stat-value">${db.length}</div><div class="stat-label">TOTAL</div></div><div class="stat-card"><div class="stat-value" style="color:var(--grn)">${wr.length}</div><div class="stat-label">RESULTS</div></div><div class="stat-card"><div class="stat-value" style="color:var(--yel)">${gAvg?.toFixed(1)||'—'}</div><div class="stat-label">AVG GOALS</div></div>`;
   document.getElementById('ouGrid').innerHTML=[6.5,7.5,8.5,9.5,10.5,11.5,12.5,13.5,14.5,15.5,16.5,17.5,18.5].map(l=>{const h=tots.filter(t=>t>l).length;const p=tots.length?Math.round(h/tots.length*100):null;return`<div class="ou-box"><div style="font-family:var(--fm);font-size:7px;color:var(--grn)">OVR ${l}</div><div style="font-family:var(--fh);font-size:22px;font-weight:700;color:${p===null?'var(--mut)':p>=65?'var(--grn)':p>=50?'var(--yel)':'var(--red)'}">${p!==null?p+'%':'—'}</div></div>`}).join('');
-  
+  const ts={};wr.forEach(m=>{const g=parseScore(m.ftActual);if(!g)return;[[m.teamA,g.a,g.b],[m.teamB,g.b,g.a]].forEach(([t,sc,cn])=>{if(!ts[t])ts[t]={sc:[],cn:[]};ts[t].sc.push(sc);ts[t].cn.push(cn)})});
+  document.getElementById('teamAverages').innerHTML=Object.entries(ts).sort(([,a],[,b])=>avg(b.sc)-avg(a.sc)).map(([name,v])=>{const tm=getTeam(name);return`<div style="background:var(--sur);border:1px solid var(--bdr);border-radius:10px;padding:11px 14px;margin-bottom:7px;display:flex;align-items:center;justify-content:space-between"><div><div style="font-family:var(--fh);font-size:16px;font-weight:700">${tm.emoji} ${tm.fullName}</div><div style="font-family:var(--fm);font-size:8px;color:var(--mut)">${v.sc.length} games</div></div><div class="flex gap-6"><div style="text-align:center"><div style="font-family:var(--fh);font-size:20px;font-weight:700;color:var(--grn)">${avg(v.sc).toFixed(1)}</div><div style="font-family:var(--fm);font-size:7px;color:var(--mut)">SCORED</div></div><div style="text-align:center"><div style="font-family:var(--fh);font-size:20px;font-weight:700;color:var(--red)">${avg(v.cn).toFixed(1)}</div><div style="font-family:var(--fm);font-size:7px;color:var(--mut)">CONCEDED</div></div></div></div>`}).join('')||'';
   document.getElementById('historyList').innerHTML=db.slice(0,40).map(m=>{const acc=calcAcc(m);const tmA=getTeam(m.teamA),tmB=getTeam(m.teamB);return`<div class="history-item"><div style="font-family:var(--fh);font-size:17px;font-weight:700;margin-bottom:6px">${tmA.fullName} vs ${tmB.fullName}</div><div class="flex gap-6">${m.status==='pending'?'<span class="badge bg-y">PENDING</span>':''}${acc!==null?`<span class="badge ${acc>=70?'bg-g':acc>=40?'bg-y':'bg-r'}">${acc}%</span>`:''}<span style="font-family:var(--fm);font-size:8px;color:var(--mut)">${fmtDate(m.date)}</span><button class="btn btn-r btn-sm" style="padding:3px 8px;font-size:8px" onclick="deleteMatch('${m.id}')">✕</button></div></div>`}).join('')||`<div class="empty-state"><div class="empty-icon">📂</div><div class="empty-text">NO DATA</div></div>`;
 }
 

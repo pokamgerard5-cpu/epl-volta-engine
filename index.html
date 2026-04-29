@@ -4,7 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no">
 <meta name="theme-color" content="#060911">
-<title>EPL 4v4 · VOLTA ENGINE v4 ULTRA</title>
+<title>EPL 4v4 · VOLTA ENGINE v5</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@300;400;600;700;900&family=JetBrains+Mono:wght@400;600;700&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
@@ -119,6 +119,11 @@ nav{position:fixed;bottom:0;left:0;right:0;z-index:100;background:rgba(6,9,17,.9
 .t3-rank{font-size:18px;width:24px;flex-shrink:0;text-align:center}
 .t3-score{font-family:var(--fh);font-size:30px;font-weight:900;flex:1}
 .t3-item.win .t3-score{color:var(--grn)}
+.t3-pct{font-family:var(--fm);font-size:10px;color:var(--grn);margin-top:2px}
+.poisson-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(70px,1fr));gap:4px;margin-bottom:12px}
+.poisson-cell{background:var(--bg);border-radius:6px;padding:6px 4px;text-align:center}
+.poisson-score{font-family:var(--fm);font-size:9px;color:var(--txt)}
+.poisson-pct{font-family:var(--fm);font-size:7px;color:var(--grn);margin-top:2px}
 .bet-card{background:var(--sur2);border:1px solid var(--bdr);border-radius:13px;padding:14px;margin-bottom:12px}
 .bet-header{display:flex;align-items:flex-end;justify-content:space-between;margin-bottom:14px;gap:10px}
 .bet-line{font-family:var(--fh);font-size:36px;font-weight:900;line-height:1}
@@ -133,6 +138,13 @@ nav{position:fixed;bottom:0;left:0;right:0;z-index:100;background:rgba(6,9,17,.9
 .conf-bar{height:100%;border-radius:3px}
 .save-bar{background:var(--sur);border:1px solid var(--bdr);border-radius:11px;padding:12px 14px;display:flex;align-items:center;justify-content:space-between;margin-bottom:12px}
 .ft-reasoning-block{background:var(--bg);border-radius:9px;padding:9px 11px;font-family:var(--fm);font-size:9px;color:var(--txt);line-height:1.8;margin-top:10px;border-left:2px solid var(--grn)}
+.ai-insight{background:rgba(171,71,188,.06);border:1px solid rgba(171,71,188,.25);border-radius:11px;padding:12px 14px;margin-bottom:12px}
+.ai-insight-title{font-family:var(--fh);font-size:14px;font-weight:700;color:#ab47bc;margin-bottom:6px;display:flex;align-items:center;gap:6px}
+.ai-insight-text{font-family:var(--fb);font-size:12px;color:var(--txt);line-height:1.7}
+.elo-row{display:flex;align-items:center;justify-content:space-between;padding:8px 0;border-bottom:1px solid var(--bdr)}
+.elo-name{font-family:var(--fh);font-size:13px;font-weight:600}
+.elo-rating{font-family:var(--fm);font-size:11px;font-weight:700}
+.elo-change{font-family:var(--fm);font-size:8px;margin-left:4px}
 .stat-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:14px}
 .stat-card{background:var(--sur);border:1px solid var(--bdr);border-radius:12px;padding:14px 12px}
 .stat-value{font-family:var(--fh);font-size:36px;font-weight:900}
@@ -150,6 +162,11 @@ nav{position:fixed;bottom:0;left:0;right:0;z-index:100;background:rgba(6,9,17,.9
 .flex{display:flex}
 .flex-wrap{flex-wrap:wrap}
 .gap-6{gap:6px}
+.loading-dots{display:inline-flex;gap:3px}
+.loading-dots span{width:5px;height:5px;background:var(--grn);border-radius:50%;animation:bounce 1.4s infinite}
+.loading-dots span:nth-child(2){animation-delay:.2s}
+.loading-dots span:nth-child(3){animation-delay:.4s}
+@keyframes bounce{0%,80%,100%{opacity:.3;transform:scale(.8)}40%{opacity:1;transform:scale(1.2)}}
 </style>
 </head>
 <body>
@@ -177,7 +194,7 @@ nav{position:fixed;bottom:0;left:0;right:0;z-index:100;background:rgba(6,9,17,.9
 <div class="toast" id="toast"></div>
 
 <div class="page on" id="page-predict">
-  <div class="hdr"><div class="hdr-l"><div class="ht">EPL 4v4</div><div class="hs">ENGINE v4 · ULTRA</div></div><span class="badge bg-g" id="miniBadge">0 MATCHES</span></div>
+  <div class="hdr"><div class="hdr-l"><div class="ht">EPL 4v4</div><div class="hs">ENGINE v5 · ELO + POISSON</div></div><span class="badge bg-g" id="miniBadge">0 MATCHES</span></div>
   <div class="sec">
     <div class="arena"><div class="arena-grid"><div class="team-side"><button class="team-btn" id="btnA" onclick="openPicker('A')"><span class="tb-emoji" id="emojiA">⚽</span><span class="tb-abbr" id="abbrA">HOME</span></button><div class="tn placeholder" id="nameA">TAP TO SELECT</div></div><div class="vs-col"><div class="vs-div"></div><div class="vs-txt">VS</div><div class="vs-div"></div></div><div class="team-side"><button class="team-btn" id="btnB" onclick="openPicker('B')"><span class="tb-emoji" id="emojiB">⚽</span><span class="tb-abbr" id="abbrB">AWAY</span></button><div class="tn placeholder" id="nameB">TAP TO SELECT</div></div></div></div>
     <button class="pred-btn" id="predictBtn" onclick="runPrediction()">GENERATE PREDICTION</button>
@@ -187,7 +204,7 @@ nav{position:fixed;bottom:0;left:0;right:0;z-index:100;background:rgba(6,9,17,.9
 
 <div class="page" id="page-results"><div class="hdr"><div class="hdr-l"><div class="ht">RESULTS</div><div class="hs">TRACKING</div></div><span class="badge bg-y" id="pendingBadge">0 PENDING</span></div><div class="sec"><div class="sl">PENDING</div><div id="pendingList"></div><div class="sl">COMPLETED</div><div id="completedList"></div></div></div>
 
-<div class="page" id="page-db"><div class="hdr"><div class="hdr-l"><div class="ht">DATABASE</div><div class="hs">INTELLIGENCE</div></div><span class="badge bg-g" id="totalBadge">0 MATCHES</span></div><div class="sec"><div class="sl">GLOBAL STATS</div><div class="stat-grid" id="globalStats"></div><div class="sl">OVER / UNDER</div><div class="ou-grid" id="ouGrid"></div><div class="sl">TEAM AVERAGES</div><div id="teamAverages"></div><div class="sl">HISTORY</div><div id="historyList"></div></div></div>
+<div class="page" id="page-db"><div class="hdr"><div class="hdr-l"><div class="ht">DATABASE</div><div class="hs">INTELLIGENCE</div></div><span class="badge bg-g" id="totalBadge">0 MATCHES</span></div><div class="sec"><div class="sl">ELO RATINGS</div><div id="eloRankings"></div><div class="sl">GLOBAL STATS</div><div class="stat-grid" id="globalStats"></div><div class="sl">OVER / UNDER</div><div class="ou-grid" id="ouGrid"></div><div class="sl">TEAM AVERAGES</div><div id="teamAverages"></div><div class="sl">HISTORY</div><div id="historyList"></div></div></div>
 
 <nav>
   <button class="nav-btn on" id="nav-predict" onclick="switchPage('predict')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M13 10V3L4 14h7v7l9-11h-7z" stroke-linecap="round"/></svg>PREDICT</button>
@@ -232,29 +249,8 @@ TEAMS.forEach(t => {
   NAME_MAP[t.abbr.toLowerCase()] = t.name;
   NAME_MAP[t.fullName.toLowerCase().replace(/\s+/g,'')] = t.name;
 });
-// Extra aliases
-NAME_MAP['aston villa']='AstonVilla';NAME_MAP['man city']='ManCity';NAME_MAP['man utd']='ManUtd';
-NAME_MAP['man united']='ManUtd';NAME_MAP['manchester city']='ManCity';NAME_MAP['manchester united']='ManUtd';
-NAME_MAP['luton']='LutonTown';NAME_MAP['luton town']='LutonTown';
-NAME_MAP['newcastle united']='Newcastle';NAME_MAP['nottingham forest']='NottinghamForest';
-NAME_MAP['sheffield united']='SheffieldUtd';NAME_MAP['sheffield']='SheffieldUtd';
-NAME_MAP['tottenham hotspur']='Tottenham';NAME_MAP['spurs']='Tottenham';
-NAME_MAP['west ham']='WestHam';NAME_MAP['west ham united']='WestHam';
-NAME_MAP['wolverhampton wanderers']='Wolves';NAME_MAP['wolverhampton']='Wolves';
-NAME_MAP['brighton & hove albion']='Brighton';NAME_MAP['crystal palace']='CrystalPalace';
-NAME_MAP['nottingham']='NottinghamForest';
-
-function normalizeTeamName(input) {
-  if (!input || typeof input !== 'string') return null;
-  const cleaned = input.trim();
-  if (NAME_MAP[cleaned]) return NAME_MAP[cleaned];
-  const lower = cleaned.toLowerCase();
-  if (NAME_MAP[lower]) return NAME_MAP[lower];
-  const compact = lower.replace(/\s+/g,'');
-  if (NAME_MAP[compact]) return NAME_MAP[compact];
-  const found = TEAMS.find(t => t.name.toLowerCase() === lower || t.fullName.toLowerCase() === lower);
-  return found ? found.name : null;
-}
+['aston villa','man city','man utd','man united','manchester city','manchester united','luton','luton town','newcastle united','nottingham forest','sheffield united','sheffield','tottenham hotspur','spurs','west ham','west ham united','wolverhampton wanderers','wolverhampton','brighton & hove albion','crystal palace','nottingham'].forEach(a=>{NAME_MAP[a]=NAME_MAP[a.replace(/\s+/g,'')]||null});
+function normalizeTeamName(input){if(!input||typeof input!=='string')return null;const c=input.trim();if(NAME_MAP[c])return NAME_MAP[c];const l=c.toLowerCase();if(NAME_MAP[l])return NAME_MAP[l];const co=l.replace(/\s+/g,'');if(NAME_MAP[co])return NAME_MAP[co];const f=TEAMS.find(t=>t.name.toLowerCase()===l||t.fullName.toLowerCase()===l);return f?f.name:null}
 
 // ═══════════════════════════════════════
 // UTILITIES
@@ -266,31 +262,188 @@ const parseScore=s=>{try{const[a,b]=String(s).split('-').map(Number);if(isNaN(a)
 const genId=()=>Date.now().toString(36)+Math.random().toString(36).slice(2,8);
 
 // ═══════════════════════════════════════
-// DATABASE
+// FIX 1: PERSISTENT ELO RATING SYSTEM
 // ═══════════════════════════════════════
-const DB_KEY='epl4v4:v4:matches';
-function loadDB(){try{return JSON.parse(localStorage.getItem(DB_KEY)||'[]')}catch{return[]}}
-function saveDB(db){try{localStorage.setItem(DB_KEY,JSON.stringify(db));return true}catch{return false}}
-function addMatch(m){const db=loadDB();db.unshift(m);if(saveDB(db))refreshCounters()}
-function updateMatch(id,u){const db=loadDB();const i=db.findIndex(m=>m.id===id);if(i>=0){db[i]={...db[i],...u};saveDB(db);refreshCounters()}}
-function deleteMatch(id){const db=loadDB();saveDB(db.filter(m=>m.id!==id));refreshCounters()}
+const ELO_KEY='epl4v4:v5:elo';
+const ELO_DEFAULT=1500;
+const ELO_K=32;
+
+function loadElo(){try{return JSON.parse(localStorage.getItem(ELO_KEY)||'{}')}catch{return{}}}
+function saveElo(elo){localStorage.setItem(ELO_KEY,JSON.stringify(elo))}
+
+function getElo(teamName){const elo=loadElo();return elo[teamName]||ELO_DEFAULT}
+function getAllElo(){const elo=loadElo();TEAMS.forEach(t=>{if(!elo[t.name])elo[t.name]=ELO_DEFAULT});return elo}
+
+function updateElo(teamA,teamB,scoreA,scoreB){
+  const elo=loadElo();
+  const rA=elo[teamA]||ELO_DEFAULT,rB=elo[teamB]||ELO_DEFAULT;
+  const expectedA=1/(1+Math.pow(10,(rB-rA)/400));
+  const expectedB=1-expectedA;
+  const goalDiff=Math.abs(scoreA-scoreB);
+  const marginMult=clamp(1+goalDiff*0.15,1,2.5);
+  const actualA=scoreA>scoreB?1:scoreA<scoreB?0:0.5;
+  elo[teamA]=Math.round(rA+ELO_K*marginMult*(actualA-expectedA));
+  elo[teamB]=Math.round(rB+ELO_K*marginMult*((1-actualA)-expectedB));
+  saveElo(elo);
+  return{rA:elo[teamA],rB:elo[teamB],changeA:elo[teamA]-rA,changeB:elo[teamB]-rB};
+}
+
+function eloToExpectedGoals(rA,rB,leagueAvg){
+  const eloDiff=rA-rB;
+  const expectedWinPct=1/(1+Math.pow(10,-eloDiff/400));
+  const baseTotal=leagueAvg||8;
+  const split=0.5+(expectedWinPct-0.5)*0.6;
+  const totalA=baseTotal*split;
+  const totalB=baseTotal*(1-split);
+  return{lambdaA:totalA,lambdaB:totalB};
+}
 
 // ═══════════════════════════════════════
-// DATA RECOVERY
+// FIX 2: POISSON DISTRIBUTION
 // ═══════════════════════════════════════
+function poissonPMF(k,lambda){
+  if(lambda<=0)return k===0?1:0;
+  let logP=-lambda+k*Math.log(lambda);
+  for(let i=2;i<=k;i++)logP-=Math.log(i);
+  return Math.exp(logP);
+}
+
+function poissonScoreProb(lambdaA,lambdaB,maxGoals=15){
+  const probs=[];
+  let totalProb=0;
+  for(let a=0;a<=maxGoals;a++){
+    for(let b=0;b<=maxGoals;b++){
+      const p=poissonPMF(a,lambdaA)*poissonPMF(b,lambdaB);
+      if(p>0.0001){probs.push({a,b,score:`${a}-${b}`,prob:p,total:a+b});totalProb+=p}
+    }
+  }
+  probs.sort((a,b)=>b.prob-a.prob);
+  return{probs:probs.slice(0,20),totalProb,expectedTotal:probs.reduce((s,p)=>s+p.total*p.prob,0)/Math.max(0.001,totalProb)};
+}
+
+// ═══════════════════════════════════════
+// FIX 3: HOME/AWAY SPLIT
+// ═══════════════════════════════════════
+function buildSplitProfile(teamName,allMatches){
+  const homeSc=[],homeCn=[],awaySc=[],awayCn=[];
+  allMatches.filter(m=>m.ftActual).forEach(m=>{
+    const g=parseScore(m.ftActual);if(!g)return;
+    if(m.teamA===teamName){homeSc.push(g.a);homeCn.push(g.b)}
+    if(m.teamB===teamName){awaySc.push(g.b);awayCn.push(g.a)}
+  });
+  return{
+    homeAvgScored:homeSc.length?avg(homeSc):0,homeAvgConceded:homeCn.length?avg(homeCn):0,
+    awayAvgScored:awaySc.length?avg(awaySc):0,awayAvgConceded:awayCn.length?avg(awayCn):0,
+    homeGames:homeSc.length,awayGames:awaySc.length,
+    homeAdvantage:homeSc.length&&awaySc.length?avg(homeSc)-avg(awaySc):0
+  };
+}
+
+// ═══════════════════════════════════════
+// FIX 4: INDEPENDENT CONFIDENCE CALIBRATOR
+// ═══════════════════════════════════════
+function calibrateConfidence(allMatches){
+  const completed=allMatches.filter(m=>m.ftPred&&m.ftActual);
+  if(completed.length<5)return 60;
+  
+  const accuracies=completed.map(m=>{
+    const p=parseScore(m.ftPred),a=parseScore(m.ftActual);
+    if(!p||!a)return null;
+    const diff=Math.abs(p.a-a.a)+Math.abs(p.b-a.b);
+    return diff===0?100:diff===1?83:diff===2?66:diff===3?49:diff===4?32:15;
+  }).filter(a=>a!==null);
+  
+  if(!accuracies.length)return 60;
+  
+  // Use median instead of mean for robustness
+  const sorted=[...accuracies].sort((a,b)=>a-b);
+  const median=sorted[Math.floor(sorted.length/2)];
+  const iqr=sorted[Math.floor(sorted.length*0.75)]-sorted[Math.floor(sorted.length*0.25)];
+  
+  // Confidence = median accuracy adjusted by spread
+  return clamp(Math.round(median-iqr*0.3),35,85);
+}
+
+// ═══════════════════════════════════════
+// FIX 5: AI SYNTHESIS LAYER
+// ═══════════════════════════════════════
+function generateAISynthesis(teamA,teamB,pA,pB,h2h,poissonResult,eloA,eloB,homeAdv){
+  const topScores=poissonResult.probs.slice(0,5);
+  const eloGap=eloA-eloB;
+  const eloFavorite=eloGap>50?teamA:eloGap<-50?teamB:null;
+  
+  let insight=`[AI SYNTHESIS] `;
+  
+  // Elo-based insight
+  if(eloFavorite){
+    const favName=eloFavorite===teamA?teamA:teamB;
+    const gap=Math.abs(eloGap);
+    insight+=`Elo ratings show ${favName} as ${gap>150?'strong':gap>80?'clear':'slight'} favorite (${gap} point gap). `;
+  }else{
+    insight+=`Elo ratings are nearly even (${Math.abs(eloGap)} point gap) — this is a toss-up. `;
+  }
+  
+  // Poisson insight
+  const topScore=topScores[0];
+  const probSum=topScores.slice(0,3).reduce((s,p)=>s+p.prob,0);
+  insight+=`Poisson model gives ${(topScore.prob*100).toFixed(1)}% to ${topScore.score}. Top 3 scorelines capture ${(probSum*100).toFixed(0)}% of probability mass. `;
+  
+  // Scoring environment
+  const expectedTotal=poissonResult.expectedTotal;
+  if(expectedTotal>12)insight+=`This projects as a high-scoring affair (expected ${expectedTotal.toFixed(1)} total). `;
+  else if(expectedTotal>8)insight+=`Moderate scoring expected (${expectedTotal.toFixed(1)} total). `;
+  else insight+=`Low-scoring match projected (${expectedTotal.toFixed(1)} total). `;
+  
+  // Home advantage
+  if(homeAdv>0.5)insight+=`${teamA} shows significant home advantage (+${homeAdv.toFixed(1)} goals/game at home). `;
+  else if(homeAdv<-0.5)insight+=`${teamA} actually performs worse at home (unusual pattern). `;
+  
+  // H2H insight
+  if(h2h.length>=3){
+    const h2hAvg=avg(h2h.map(h=>h.total));
+    insight+=`H2H history (${h2h.length} meetings, avg ${h2hAvg.toFixed(1)} total) ${h2hAvg>expectedTotal+2?'suggests higher scoring than model predicts':h2hAvg<expectedTotal-2?'suggests lower scoring than model predicts':'aligns with model projection'}. `;
+  }
+  
+  // Betting recommendation
+  const overProb=poissonResult.probs.filter(p=>p.total>10.5).reduce((s,p)=>s+p.prob,0);
+  const underProb=1-overProb;
+  insight+=`Betting edge: ${overProb>0.55?`Over 10.5 shows value (${(overProb*100).toFixed(0)}% probability)` :underProb>0.55?`Under 10.5 shows value (${(underProb*100).toFixed(0)}% probability)`:'No clear Over/Under edge — lines are efficient.'}`;
+  
+  return insight;
+}
+
+// ═══════════════════════════════════════
+// DATABASE
+// ═══════════════════════════════════════
+const DB_KEY='epl4v4:v5:matches';
+function loadDB(){try{return JSON.parse(localStorage.getItem(DB_KEY)||'[]')}catch{return[]}}
+function saveDB(db){try{localStorage.setItem(DB_KEY,JSON.stringify(db));return true}catch{return false}}
+function addMatch(m){const db=loadDB();db.unshift(m);if(saveDB(db)){updateEloFromMatch(m);refreshCounters()}}
+function updateMatch(id,u){const db=loadDB();const i=db.findIndex(m=>m.id===id);if(i>=0){db[i]={...db[i],...u};saveDB(db);if(u.ftActual)updateEloFromMatch(db[i]);refreshCounters()}}
+function deleteMatch(id){const db=loadDB();saveDB(db.filter(m=>m.id!==id));rebuildAllElo();refreshCounters()}
+
+function updateEloFromMatch(m){
+  if(!m.ftActual)return;
+  const g=parseScore(m.ftActual);if(!g)return;
+  updateElo(m.teamA,m.teamB,g.a,g.b);
+}
+
+function rebuildAllElo(){
+  const elo={};TEAMS.forEach(t=>elo[t.name]=ELO_DEFAULT);
+  saveElo(elo);
+  const db=loadDB().filter(m=>m.ftActual).reverse();
+  db.forEach(m=>{const g=parseScore(m.ftActual);if(g)updateElo(m.teamA,m.teamB,g.a,g.b)});
+}
+
 (function recoverData(){
   const current=loadDB();
   const existingIds=new Set(current.map(m=>m.id));
-  let recovered=0,normalized=0;
-  current.forEach(m=>{
-    if(m.teamA){const na=normalizeTeamName(m.teamA);if(na&&na!==m.teamA){m.teamA=na;normalized++;}}
-    if(m.teamB){const nb=normalizeTeamName(m.teamB);if(nb&&nb!==m.teamB){m.teamB=nb;normalized++;}}
+  let recovered=0;
+  ['epl4v4:v4:matches','epl4v4:v3:matches','epl4v4:v2:matches','epl4v4:v1:matches','epl4v4:matches'].forEach(key=>{
+    try{const old=JSON.parse(localStorage.getItem(key)||'[]');if(Array.isArray(old))old.forEach(m=>{if(m.id&&!existingIds.has(m.id)){if(m.teamA)m.teamA=normalizeTeamName(m.teamA)||m.teamA;if(m.teamB)m.teamB=normalizeTeamName(m.teamB)||m.teamB;current.push(m);existingIds.add(m.id);recovered++}})}catch(e){}
   });
-  const oldKeys=['epl4v4:v3:matches','epl4v4:v2:matches','epl4v4:v1:matches','epl4v4:matches'];
-  oldKeys.forEach(key=>{
-    try{const old=JSON.parse(localStorage.getItem(key)||'[]');if(Array.isArray(old))old.forEach(m=>{if(m.id&&!existingIds.has(m.id)){if(m.teamA)m.teamA=normalizeTeamName(m.teamA)||m.teamA;if(m.teamB)m.teamB=normalizeTeamName(m.teamB)||m.teamB;current.push(m);existingIds.add(m.id);recovered++;}})}catch(e){}
-  });
-  if(recovered>0||normalized>0){saveDB(current);console.log('Recovered '+recovered+' matches, normalized '+normalized+' names');}
+  if(recovered>0){saveDB(current);console.log('Recovered '+recovered+' matches')}
+  rebuildAllElo();
 })();
 
 // ═══════════════════════════════════════
@@ -309,213 +462,109 @@ function selectTeam(name){const other=state.activeSide==='A'?'B':'A';if(state.pi
 function updateTeamUI(side){const t=TEAMS.find(x=>x.name===state.picks[side]);if(!t)return;const btn=document.getElementById('btn'+side);btn.classList.add('sel');btn.style.backgroundColor=t.color+'18';btn.style.borderColor=t.color;document.getElementById('emoji'+side).textContent=t.emoji;document.getElementById('abbr'+side).textContent=t.abbr;document.getElementById('abbr'+side).style.color=t.color;document.getElementById('name'+side).textContent=t.fullName;document.getElementById('name'+side).classList.remove('placeholder')}
 
 // ═══════════════════════════════════════
-// ULTRA PREDICTION ENGINE v4
+// PREDICTION ENGINE v5
 // ═══════════════════════════════════════
-
 function buildTeamProfile(teamName,allMatches){
   const wr=allMatches.filter(m=>m.ftActual);
   const scored=[],conceded=[],totals=[],allScores=[],htRatios=[];
   wr.forEach(m=>{
     const g=parseScore(m.ftActual);if(!g)return;
     const ht=parseScore(m.htActual);
-    if(m.teamA===teamName){
-      scored.push(g.a);conceded.push(g.b);totals.push(g.total);
-      allScores.push({s:g.a,c:g.b,date:m.date});
-      if(ht&&g.total>0)htRatios.push(ht.total/g.total);
-    }
-    if(m.teamB===teamName){
-      scored.push(g.b);conceded.push(g.a);totals.push(g.total);
-      allScores.push({s:g.b,c:g.a,date:m.date});
-      if(ht&&g.total>0)htRatios.push(ht.total/g.total);
-    }
+    if(m.teamA===teamName){scored.push(g.a);conceded.push(g.b);totals.push(g.total);allScores.push({s:g.a,c:g.b,date:m.date});if(ht&&g.total>0)htRatios.push(ht.total/g.total)}
+    if(m.teamB===teamName){scored.push(g.b);conceded.push(g.a);totals.push(g.total);allScores.push({s:g.b,c:g.a,date:m.date});if(ht&&g.total>0)htRatios.push(ht.total/g.total)}
   });
   const n=scored.length;
   if(!n)return{games:0,avgScored:0,avgConceded:0,avgTotal:0,stdScored:0,stdConceded:0,cvScored:1,cvConceded:1,attack:'medium',defense:'medium weakness',style:'balanced',trend:'→ stable',consistency:'unknown',defReliability:'unknown',formMult:1,defFormMult:1,htRatio:0.45,streak:0,streakType:null,scorePatterns:{}};
-  const avgSc=avg(scored),avgCn=avg(conceded),avgTot=avg(totals);
-  const stdSc=stdDev(scored),stdCn=stdDev(conceded);
+  const avgSc=avg(scored),avgCn=avg(conceded),avgTot=avg(totals),stdSc=stdDev(scored),stdCn=stdDev(conceded);
   const cvSc=avgSc>0?stdSc/avgSc:1,cvCn=avgCn>0?stdCn/avgCn:1;
   const attack=avgSc>=5?'elite':avgSc>=3.5?'high':avgSc>=2?'medium':'low';
   const defense=avgCn>=5?'high weakness':avgCn>=3?'medium weakness':'low weakness';
   const style=stdSc>2.5?'chaotic':stdSc>1.5?'aggressive':'balanced';
-  
-  // FIX 6: Streak detection
   let streak=0,streakType=null;
   const recent=allScores.slice(-5);
-  for(let i=recent.length-1;i>=0;i--){
-    const r=recent[i],result=r.s>r.c?'W':r.s<r.c?'L':'D';
-    if(!streakType)streakType=result;
-    if(result===streakType)streak++;else break;
-  }
-  
-  // FIX 1: Use actual averages when available
-  const effectiveAttack=avgSc>0?avgSc:(attack==='elite'?6.5:attack==='high'?4.5:attack==='medium'?3.0:1.8);
-  const effectiveDefense=avgCn>0?avgCn:(defense==='high weakness'?5:defense==='medium weakness'?3.5:2);
-  
+  for(let i=recent.length-1;i>=0;i--){const r=recent[i],result=r.s>r.c?'W':r.s<r.c?'L':'D';if(!streakType)streakType=result;if(result===streakType)streak++;else break}
   const last5=allScores.slice(-5);
   const recentAvg=last5.length?avg(last5.map(s=>s.s)):avgSc;
   const recentCn=last5.length?avg(last5.map(s=>s.c)):avgCn;
   const formMult=recentAvg>avgSc+.5?1.1:recentAvg<avgSc-.5?0.9:1;
   const defFormMult=recentCn>avgCn+.5?1.1:recentCn<avgCn-.5?0.9:1;
-  
-  // FIX 6: Streak multiplier
   const streakMult=streak>=3?1.15:streak>=2?1.05:1;
-  
   const trend=recentAvg>avgSc+.8?'↑ improving':recentAvg<avgSc-.8?'↓ declining':'→ stable';
   const consistency=cvSc<0.3?'consistent':cvSc<0.6?'moderate':'volatile';
   const defReliability=cvCn<0.3?'high':cvCn<0.6?'medium':'low';
-  
-  // FIX 8: Team-specific HT ratio
   const htRatio=htRatios.length?avg(htRatios):0.45;
-  
-  // FIX 5: Team-specific score patterns
-  const scorePatterns={};
-  allScores.forEach(s=>{const k=`${s.s}-${s.c}`;scorePatterns[k]=(scorePatterns[k]||0)+1});
-  
-  return{games:n,avgScored:avgSc,avgConceded:avgCn,avgTotal:avgTot,stdScored:stdSc,stdConceded:stdCn,cvScored:cvSc,cvConceded:cvCn,attack,defense,style,trend,consistency,defReliability,formMult,defFormMult,streak,streakType,streakMult,htRatio,effectiveAttack,effectiveDefense,scorePatterns,recentAvg,recentCn};
+  const scorePatterns={};allScores.forEach(s=>{const k=`${s.s}-${s.c}`;scorePatterns[k]=(scorePatterns[k]||0)+1});
+  return{games:n,avgScored:avgSc,avgConceded:avgCn,avgTotal:avgTot,stdScored:stdSc,stdConceded:stdCn,cvScored:cvSc,cvConceded:cvCn,attack,defense,style,trend,consistency,defReliability,formMult,defFormMult,streak,streakType,streakMult,htRatio,scorePatterns,recentAvg,recentCn};
 }
 
-// FIX 3: Time-decay weighted H2H
-function getWeightedH2H(tA,tB,allMatches){
-  const h2hRaw=allMatches.filter(m=>m.ftActual&&((m.teamA===tA&&m.teamB===tB)||(m.teamA===tB&&m.teamB===tA)));
-  if(!h2hRaw.length)return{matches:[],avgTotal:0,weight:0,topScore:null};
-  
-  const now=Date.now();
-  let totalWeight=0,weightedSum=0;
-  const weightedMatches=[];
-  
-  h2hRaw.forEach(m=>{
-    const g=parseScore(m.ftActual);if(!g)return;
-    const daysOld=(now-new Date(m.date||now).getTime())/(1000*60*60*24);
-    const weight=Math.exp(-daysOld/30);
-    weightedSum+=g.total*weight;
-    totalWeight+=weight;
-    weightedMatches.push({a:g.a,b:g.b,total:g.total,weight,date:m.date});
-  });
-  
-  const avgTotal=totalWeight>0?weightedSum/totalWeight:0;
-  
-  // Most common H2H score
-  const dist={};
-  weightedMatches.forEach(m=>{const k=`${m.a}-${m.b}`;dist[k]=(dist[k]||0)+1});
-  const topEntry=Object.entries(dist).sort((a,b)=>b[1]-a[1])[0];
-  const topScore=topEntry&&topEntry[1]>=2?parseScore(topEntry[0]):null;
-  
-  return{matches:weightedMatches,avgTotal,weight:h2hRaw.length,topScore};
-}
-
-// FIX 5: Team-specific score distribution
-function getTeamScorePatterns(teamName,allMatches){
-  const patterns={};
-  allMatches.filter(m=>m.ftActual&&(m.teamA===teamName||m.teamB===teamName)).forEach(m=>{
-    const g=parseScore(m.ftActual);if(!g)return;
-    const key=m.teamA===teamName?`${g.a}-${g.b}`:`${g.b}-${g.a}`;
-    patterns[key]=(patterns[key]||0)+1;
-  });
-  return patterns;
-}
-
-function getScoreFrequencies(allMatches){
-  const dist={};
-  allMatches.filter(m=>m.ftActual).forEach(m=>{
-    const g=parseScore(m.ftActual);if(!g)return;
-    const k=`${g.a}-${g.b}`;dist[k]=(dist[k]||0)+1;
-  });
-  return Object.entries(dist).sort((a,b)=>b[1]-a[1]).slice(0,10).map(([s,c])=>({score:s,count:c,parts:parseScore(s)}));
+function getH2H(tA,tB,allMatches){
+  return allMatches.filter(m=>m.ftActual&&((m.teamA===tA&&m.teamB===tB)||(m.teamA===tB&&m.teamB===tA)))
+    .map(m=>{const g=parseScore(m.ftActual);return g?{a:g.a,b:g.b,total:g.total,date:m.date}:null}).filter(Boolean);
 }
 
 function generatePrediction(teamA,teamB,allMatches,resultsOnly){
   const pA=buildTeamProfile(teamA,allMatches),pB=buildTeamProfile(teamB,allMatches);
-  const h2hData=getWeightedH2H(teamA,teamB,allMatches);
-  const freqScores=getScoreFrequencies(resultsOnly);
-  const teamAPatterns=getTeamScorePatterns(teamA,resultsOnly);
-  const teamBPatterns=getTeamScorePatterns(teamB,resultsOnly);
+  const h2h=getH2H(teamA,teamB,allMatches);
+  const splitA=buildSplitProfile(teamA,allMatches);
   
   const allTots=resultsOnly.map(m=>{const g=parseScore(m.ftActual);return g?g.total:null}).filter(Boolean);
   const gAvg=allTots.length?avg(allTots):8;
   const gStd=allTots.length>1?stdDev(allTots):3;
   
-  // FIX 1: Use actual averages instead of static categories
-  const atkA=pA.games>=3?pA.effectiveAttack:(pA.attack==='elite'?6.5:pA.attack==='high'?4.5:pA.attack==='medium'?3.0:1.8);
-  const atkB=pB.games>=3?pB.effectiveAttack:(pB.attack==='elite'?6.5:pB.attack==='high'?4.5:pB.attack==='medium'?3.0:1.8);
-  const defA=pA.games>=3?pA.effectiveDefense:(pA.defense==='high weakness'?5:pA.defense==='medium weakness'?3.5:2);
-  const defB=pB.games>=3?pB.effectiveDefense:(pB.defense==='high weakness'?5:pB.defense==='medium weakness'?3.5:2);
+  // FIX 1: Get Elo ratings
+  const eloAll=getAllElo();
+  const eloA=eloAll[teamA]||ELO_DEFAULT,eloB=eloAll[teamB]||ELO_DEFAULT;
   
-  // FIX 4: Opponent strength adjustment
-  const leagueAvgDef=allTots.length?avg(allTots)/2:4;
-  const oppAdjustA=clamp(leagueAvgDef/Math.max(0.5,defB),0.7,1.3);
-  const oppAdjustB=clamp(leagueAvgDef/Math.max(0.5,defA),0.7,1.3);
+  // FIX 3: Home/away adjustment
+  const homeAdvantage=splitA.homeAvgScored>0?splitA.homeAvgScored-(pA.avgScored||splitA.homeAvgScored):0.3;
+  const eloAdjustedA=eloA+Math.round(homeAdvantage*25);
   
-  // Base calculation with all multipliers
-  let rawA=(atkA*pA.formMult*pA.streakMult*oppAdjustA+defB*pB.defFormMult)/2;
-  let rawB=(atkB*pB.formMult*pB.streakMult*oppAdjustB+defA*pA.defFormMult)/2;
+  // FIX 1: Elo-based expected goals
+  const eloGoals=eloToExpectedGoals(eloAdjustedA,eloB,gAvg);
   
-  // FIX 2: Multi-factor correlation
-  const expectedTotal=pA.avgScored+pB.avgScored;
-  const deviation=expectedTotal-gAvg;
-  const corrFactor=1+(deviation/Math.max(1,gAvg))*0.3;
-  rawA*=corrFactor;rawB*=corrFactor;
+  // FIX 2: Poisson distribution
+  const poissonResult=poissonScoreProb(eloGoals.lambdaA,eloGoals.lambdaB);
+  const expectedTotal=poissonResult.expectedTotal;
   
-  let total=rawA+rawB;
+  // Top scores from Poisson
+  const topPoisson=poissonResult.probs.slice(0,3);
+  const bestScore=topPoisson[0];
   
-  // FIX 3: Time-decay H2H blending
-  if(h2hData.matches.length){
-    const h2hWeight=h2hData.weight>=6?0.5:h2hData.weight>=3?0.4:0.3;
-    total=total*(1-h2hWeight)+h2hData.avgTotal*h2hWeight;
-    if(h2hData.topScore)total=total*.7+h2hData.topScore.total*.3;
-  }
-  
-  // Dynamic regression
-  const dataStrength=Math.min(1,(pA.games+pB.games)/20);
-  const regWeight=0.3*(1-dataStrength)+0.1*dataStrength;
-  total=total*(1-regWeight)+gAvg*regWeight;
-  
-  // Score distribution anchoring
-  if(freqScores.length>=3){
-    const closest=freqScores.reduce((b,c)=>Math.abs(c.parts.total-total)<Math.abs(b.parts.total-total)?c:b,freqScores[0]);
-    const distWeight=Math.min(0.2,freqScores.length/50);
-    total=total*(1-distWeight)+closest.parts.total*distWeight;
-  }
-  
-  const ratio=total/(rawA+rawB);
-  rawA*=ratio;rawB*=ratio;
-  let ftA=Math.round(rawA),ftB=Math.round(rawB);
+  // Base goals
+  let ftA=bestScore.a,ftB=bestScore.b;
   const ftTotal=ftA+ftB;
   
-  // FIX 5: Team-specific score pattern matching
-  let suggestedA=ftA,suggestedB=ftB;
-  const combinedPatterns={};
-  Object.entries(teamAPatterns).forEach(([k,v])=>{combinedPatterns[k]=(combinedPatterns[k]||0)+v});
-  Object.entries(teamBPatterns).forEach(([k,v])=>{combinedPatterns[k]=(combinedPatterns[k]||0)+v});
-  
-  // Find best matching score from team patterns
-  const patternEntries=Object.entries(combinedPatterns).sort((a,b)=>b[1]-a[1]);
-  const exactMatch=patternEntries.find(([k])=>parseScore(k)?.total===ftTotal);
-  if(exactMatch&&combinedPatterns[exactMatch[0]]>=2){
-    const ps=parseScore(exactMatch[0]);if(ps){suggestedA=ps.a;suggestedB=ps.b}
-  }else if(freqScores.length){
-    const globalMatch=freqScores.find(s=>s.parts.total===ftTotal&&s.count>=2);
-    if(globalMatch){suggestedA=globalMatch.parts.a;suggestedB=globalMatch.parts.b}
+  // H2H blending
+  if(h2h.length){
+    const h2hTotals=h2h.map(h=>h.total);
+    const h2hAvg=avg(h2hTotals);
+    const weight=h2h.length>=6?0.5:h2h.length>=3?0.4:0.3;
+    const blendedTotal=expectedTotal*(1-weight)+h2hAvg*weight;
+    const r=blendedTotal/expectedTotal;
+    const adjA=Math.round(bestScore.a*r),adjB=Math.round(bestScore.b*r);
+    ftA=adjA;ftB=adjB;
   }
   
   // Top 3 scores
-  const scores=[
-    {a:suggestedA,b:suggestedB,label:'Most Likely'},
-    {a:clamp(Math.round(suggestedA*((ftTotal+1)/ftTotal)),0,99),b:clamp(ftTotal+1-Math.round(suggestedA*((ftTotal+1)/ftTotal)),0,99),label:'High Probability'},
-    {a:clamp(Math.round(suggestedA*((ftTotal+2)/ftTotal)),0,99),b:clamp(ftTotal+2-Math.round(suggestedA*((ftTotal+2)/ftTotal)),0,99),label:'Variance'}
-  ];
+  const scores=topPoisson.map((p,i)=>({a:p.a,b:p.b,label:i===0?'Most Likely':i===1?'High Probability':'Value Pick',prob:p.prob}));
   
-  // FIX 8: Team-specific HT ratios
-  const htRatioA=pA.htRatio||0.45,htRatioB=pB.htRatio||0.45;
-  const htMultiplier=(htRatioA+htRatioB)/2;
-  const htA=Math.round(suggestedA*htMultiplier),htB=Math.round(suggestedB*htMultiplier);
+  // HT
+  const htRatioA=pA.htRatio||0.45,htMultiplier=(htRatioA+(pB.htRatio||0.45))/2;
+  const htA=Math.round(ftA*htMultiplier),htB=Math.round(ftB*htMultiplier);
   
   // Flow
   const flow={
-    early:`${teamA} ${pA.streak>=3?'riding a '+pA.streak+' game streak, ':''}${pA.attack==='elite'||pA.attack==='high'?'presses high looking for early breakthrough':'starts cautiously probing'} while ${teamB} ${pB.style==='chaotic'?'responds with chaotic energy':'maintains defensive discipline'}. ${htA+htB>5?'Fast start expected.':'Tactical opening.'}`,
-    mid:`Mid-phase: ${ftTotal>10?'both teams exchanging chances':ftTotal>7?'balanced possession':'defenses in control'}. ${pA.style==='chaotic'||pB.style==='chaotic'?'Structure cracking.':'Shape holding.'}`,
-    chaos:`Late phase ${ftTotal>12?'erupts with rapid exchanges — defenses exhausted':ftTotal>8?'brings urgency but few chances':'fades with defenses dominant'}. ${pA.defReliability==='low'||pB.defReliability==='low'?'HIGH collapse risk.':''}`,
-    dominant:pA.avgScored>pB.avgScored+1?teamA:pB.avgScored>pA.avgScored+1?teamB:'contested'
+    early:`${teamA} (Elo: ${eloA}) ${pA.attack==='elite'||pA.attack==='high'?'presses high looking for early breakthrough':'starts cautiously'} while ${teamB} (Elo: ${eloB}) ${pB.style==='chaotic'?'responds with chaotic energy':'maintains defensive discipline'}. ${homeAdvantage>0.5?teamA+' benefits from home advantage (+'+homeAdvantage.toFixed(1)+' goals/game).':''}`,
+    mid:`Mid-phase: ${ftTotal>10?'both teams exchanging chances':ftTotal>7?'balanced possession':'defenses in control'}. Elo gap: ${Math.abs(eloA-eloB)} points.`,
+    chaos:`Late phase ${ftTotal>12?'erupts with rapid exchanges':ftTotal>8?'brings urgency but few chances':'fades with defenses dominant'}. ${pA.defReliability==='low'||pB.defReliability==='low'?'HIGH collapse risk.':''}`,
+    dominant:eloA>eloB+50?teamA:eloB>eloA+50?teamB:'contested'
   };
+  
+  // FIX 4: Independent confidence
+  const conf=calibrateConfidence(resultsOnly);
+  
+  // FIX 5: AI Synthesis
+  const aiSynthesis=generateAISynthesis(teamA,teamB,pA,pB,h2h,poissonResult,eloA,eloB,homeAdvantage);
   
   // Betting
   const ouPct=l=>allTots.length?Math.round(allTots.filter(t=>t>l).length/allTots.length*100):0;
@@ -527,53 +576,31 @@ function generatePrediction(teamA,teamB,allMatches,resultsOnly){
   });
   const primary=bo.p>=bu.p?`Over ${bo.l}`:`Under ${bu.l}`;
   const primaryRate=Math.max(bo.p,bu.p);
-  const secondary=bo.p>=bu.p?`Under ${bu.l}`:`Over ${bo.l}`;
-  const secondaryRate=Math.min(bo.p,bu.p);
-  
-  // FIX 7: Self-calibrating confidence
-  const completedWithPredictions=resultsOnly.filter(m=>m.ftPred&&m.ftActual);
-  let calibratedConf=60;
-  if(completedWithPredictions.length>=5){
-    const accuracies=completedWithPredictions.map(m=>calcAcc(m)).filter(a=>a!==null);
-    if(accuracies.length){calibratedConf=Math.round(avg(accuracies)-stdDev(accuracies)*0.3)}
-  }
-  
-  const dp=pA.games+pB.games+h2hData.weight*2;
-  let conf=calibratedConf;
-  if(dp>30)conf+=10;else if(dp>15)conf+=5;else if(dp>8)conf+=2;else if(dp<5)conf-=10;
-  if(pA.consistency==='consistent'&&pB.consistency==='consistent')conf+=4;
-  if(pA.defReliability==='low'||pB.defReliability==='low')conf-=4;
-  if(gStd<2)conf+=4;else if(gStd>5)conf-=6;
-  if(h2hData.weight>=4)conf+=4;
-  conf=clamp(conf,40,88);
   
   const traps=[];
-  if(pA.games<3)traps.push(`${teamA}: ${pA.games} games (thin data)`);
-  if(pB.games<3)traps.push(`${teamB}: ${pB.games} games (thin data)`);
-  if(pA.cvScored>1||pB.cvScored>1)traps.push('High scoring volatility');
-  if(h2hData.matches.length&&Math.abs(h2hData.avgTotal-ftTotal)>3)traps.push('H2H vs model conflict');
-  if(ftTotal>gAvg+2.5*gStd&&gStd>0)traps.push('Outlier prediction — above 2.5σ');
-  if(pA.streak>=3||pB.streak>=3)traps.push(`${pA.streak>=3?teamA:teamB} on ${Math.max(pA.streak,pB.streak)} game streak — momentum factor active`);
+  if(pA.games<3)traps.push(`${teamA}: ${pA.games} games`);
+  if(pB.games<3)traps.push(`${teamB}: ${pB.games} games`);
+  if(Math.abs(eloA-eloB)>200)traps.push(`Large Elo gap (${Math.abs(eloA-eloB)}) — potential mismatch`);
   
   const clsf=ftTotal>15?'Chaos':ftTotal>11?'Open':ftTotal>7?'Balanced':'Closed';
-  
-  const teamAName=getTeam(teamA).fullName,teamBName=getTeam(teamB).fullName;
+  const teamAN=getTeam(teamA).fullName,teamBN=getTeam(teamB).fullName;
   
   return{
-    teamA:{name:teamA,displayName:teamAName,attack:pA.attack,defense:pA.defense,style:pA.style,trend:pA.trend,consistency:pA.consistency,defReliability:pA.defReliability,form:pA.streakMult>1?`🔥 ${pA.streak}W STREAK`:pA.formMult>1?'🔥 HOT':pA.formMult<1?'❄ COLD':'➖ AVG',stats:{games:pA.games,avgScored:pA.avgScored,avgConceded:pA.avgConceded}},
-    teamB:{name:teamB,displayName:teamBName,attack:pB.attack,defense:pB.defense,style:pB.style,trend:pB.trend,consistency:pB.consistency,defReliability:pB.defReliability,form:pB.streakMult>1?`🔥 ${pB.streak}W STREAK`:pB.formMult>1?'🔥 HOT':pB.formMult<1?'❄ COLD':'➖ AVG',stats:{games:pB.games,avgScored:pB.avgScored,avgConceded:pB.avgConceded}},
-    classification:clsf,
-    classificationReason:ftTotal>15?`Chaos (${ftTotal} goals) — both defenses extremely vulnerable. Streak factors amplifying scoring.`:ftTotal>11?`Open (${ftTotal} goals) — attacking intent from both sides. Opponent adjustment +${((oppAdjustA-1)*100).toFixed(0)}%/+${((oppAdjustB-1)*100).toFixed(0)}%.`:ftTotal>7?`Balanced (${ftTotal} goals) — moderate scoring expected.`: `Closed (${ftTotal} goals) — defensive battle.`,
-    flow,htPrediction:`${htA}-${htB}`,secondHalf:{teamA:suggestedA-htA,teamB:suggestedB-htB},
-    ftPrediction:`${suggestedA}-${suggestedB}`,
-    ftReasoning:`[v4 ULTRA] Step 1: Actual averages — ${teamAName} scores ${pA.avgScored.toFixed(1)}/g, concedes ${pA.avgConceded.toFixed(1)}/g. ${teamBName} scores ${pB.avgScored.toFixed(1)}/g, concedes ${pB.avgConceded.toFixed(1)}/g. Step 2: Opponent adjustment (${teamAName} ×${oppAdjustA.toFixed(2)}, ${teamBName} ×${oppAdjustB.toFixed(2)}). Step 3: Correlation factor ${corrFactor.toFixed(2)}. Step 4: Time-decay H2H (${h2hData.weight} meetings, weight ${h2hData.weight>=6?50:h2hData.weight>=3?40:30}%). Step 5: Streak multipliers (${teamAName}: ${pA.streakMult.toFixed(2)}, ${teamBName}: ${pB.streakMult.toFixed(2)}). Step 6: Team-specific patterns matched. Step 7: HT ratios (${teamAName}: ${(pA.htRatio*100).toFixed(0)}%, ${teamBName}: ${(pB.htRatio*100).toFixed(0)}%). Final: ${suggestedA}-${suggestedB} (${ftTotal} total).`,
-    top3:scores.map(s=>({score:`${s.a}-${s.b}`,label:s.label,reason:s.label==='Most Likely'?'Data-driven projection with team patterns':s.label==='High Probability'?'±1 goal variance':'±2 goal chaos scenario'})),
-    keyPattern:h2hData.weight>=3?`H2H: ${h2hData.weight} meetings, time-weighted avg ${h2hData.avgTotal.toFixed(1)} total`:freqScores.length>=5?`Score distribution (${freqScores.length} unique patterns) + team-specific analysis`:`Team profiles: ${teamAName}(${pA.attack}/${pA.defense}) vs ${teamBName}(${pB.attack}/${pB.defense})`,
-    momentum:pA.streakMult>1&&pB.streakMult>1?`Both riding streaks — ${teamAName}:${pA.streak}W, ${teamBName}:${pB.streak}W`:pA.streakMult>1?`${teamAName} on ${pA.streak}W streak`:pB.streakMult>1?`${teamBName} on ${pB.streak}W streak`:'No significant streaks',
+    teamA:{name:teamA,displayName:teamAN,attack:pA.attack,defense:pA.defense,style:pA.style,trend:pA.trend,elo:eloA,stats:{games:pA.games,avgScored:pA.avgScored,avgConceded:pA.avgConceded}},
+    teamB:{name:teamB,displayName:teamBN,attack:pB.attack,defense:pB.defense,style:pB.style,trend:pB.trend,elo:eloB,stats:{games:pB.games,avgScored:pB.avgScored,avgConceded:pB.avgConceded}},
+    classification:clsf,classificationReason:`Elo: ${teamAN} ${eloA} vs ${teamBN} ${eloB} (${eloA>eloB?'+'+Math.abs(eloA-eloB):eloB>eloA?'-'+Math.abs(eloA-eloB):'EVEN'}). Poisson λ: ${eloGoals.lambdaA.toFixed(1)}/${eloGoals.lambdaB.toFixed(1)}. Expected total: ${expectedTotal.toFixed(1)}.`,
+    flow,htPrediction:`${htA}-${htB}`,secondHalf:{teamA:ftA-htA,teamB:ftB-htB},
+    ftPrediction:`${ftA}-${ftB}`,
+    ftReasoning:`[v5 ELO+POISSON] Elo ratings: ${teamAN} ${eloA} (${eloA>ELO_DEFAULT?'+'+Math.round(eloA-ELO_DEFAULT):eloA<ELO_DEFAULT?Math.round(eloA-ELO_DEFAULT):'BASE'}) vs ${teamBN} ${eloB}. Home advantage: +${homeAdvantage.toFixed(1)} goals for ${teamAN}. Poisson λA=${eloGoals.lambdaA.toFixed(1)}, λB=${eloGoals.lambdaB.toFixed(1)}. Top scoreline probability: ${(bestScore.prob*100).toFixed(1)}%. H2H: ${h2h.length} meetings. Final: ${ftA}-${ftB}.`,
+    top3:scores.map(s=>({score:`${s.a}-${s.b}`,label:s.label,prob:s.prob,reason:`Poisson probability: ${(s.prob*100).toFixed(1)}%`})),
+    poissonProbs:poissonResult.probs.slice(0,12),
+    aiSynthesis,
+    keyPattern:`Elo-driven Poisson model — ${teamAN} λ=${eloGoals.lambdaA.toFixed(1)}, ${teamBN} λ=${eloGoals.lambdaB.toFixed(1)}`,
+    momentum:`Elo gap: ${Math.abs(eloA-eloB)} points. ${eloA>eloB+100?teamAN+' heavily favored':eloB>eloA+100?teamBN+' heavily favored':'Competitive match expected'}`,
     trapWarning:traps.length?traps.join(' | '):null,
-    betting:{primaryLine:primary,primaryHitRate:primaryRate+'%',secondaryLine:secondary,secondaryHitRate:secondaryRate+'%',safeRange:`${Math.max(0,ftTotal-2)}-${ftTotal+2} goals`,risk:primaryRate>=68?'LOW':primaryRate>=55?'MEDIUM':'HIGH',strategy:primaryRate>=68?'Safe play — strong statistical backing':primaryRate>=55?'Value bet — moderate confidence':'Aggressive — high variance expected',bettingNote:`Based on ${resultsOnly.length} results. ${primary} (${primaryRate}%) aligned with predicted ${ftTotal} total. Secondary: ${secondary} (${secondaryRate}%). ${h2hData.weight?`H2H time-weighted avg: ${h2hData.avgTotal.toFixed(1)}.`:''} Confidence calibrated from ${completedWithPredictions.length} historical predictions.`},
+    betting:{primaryLine:primary,primaryHitRate:primaryRate+'%',safeRange:`${Math.max(0,ftTotal-2)}-${ftTotal+2} goals`,risk:primaryRate>=68?'LOW':primaryRate>=55?'MEDIUM':'HIGH',strategy:primaryRate>=68?'Safe play':primaryRate>=55?'Value bet':'Aggressive',bettingNote:`Poisson gives ${(topPoisson[0].prob*100).toFixed(1)}% to exact score ${topPoisson[0].score}. Over 10.5: ${(poissonResult.probs.filter(p=>p.total>10.5).reduce((s,p)=>s+p.prob,0)*100).toFixed(0)}% probability. ${h2h.length?`H2H avg: ${avg(h2h.map(h=>h.total)).toFixed(1)}.`:''}`},
     confidence:conf,
-    confidenceReason:`Calibrated base: ${calibratedConf}% (from ${completedWithPredictions.length} historical predictions)${dp>30?' +10 (rich data)':dp>15?' +5 (good data)':dp>8?' +2 (moderate)':dp<5?' -10 (sparse)':''}${pA.consistency==='consistent'&&pB.consistency==='consistent'?' +4 (consistent)':''}${pA.defReliability==='low'||pB.defReliability==='low'?' -4 (unreliable D)':''}${gStd<2?' +4 (stable league)':gStd>5?' -6 (chaotic)':''}${h2hData.weight>=4?' +4 (H2H rich)':''} = ${conf}%`
+    confidenceReason:`Independent calibration from ${resultsOnly.filter(m=>m.ftPred&&m.ftActual).length} historical predictions. Median accuracy: ${conf}%.`
   };
 }
 
@@ -591,15 +618,27 @@ function renderPrediction(d){
   const bet=d.betting||{},flow=d.flow||{},conf=d.confidence||50;
   
   document.getElementById('predictionOutput').innerHTML=`
-    <div class="sb"><div class="sb-side"><div class="sb-club" style="color:${tmA.color}">${tmA.emoji} ${tmA.abbr}</div><div class="sb-name">${tmA.fullName}</div></div><div class="sb-center"><div class="sb-ft">${ft.a}–${ft.b}</div><div class="sb-label">PREDICTED FT</div><div class="sb-ht-info">HT: ${d.htPrediction} · 2H: ${d.secondHalf.teamA}-${d.secondHalf.teamB}</div></div><div class="sb-side right"><div class="sb-club" style="color:${tmB.color}">${tmB.emoji} ${tmB.abbr}</div><div class="sb-name">${tmB.fullName}</div></div></div>
+    <div class="sb"><div class="sb-side"><div class="sb-club" style="color:${tmA.color}">${tmA.emoji} ${tmA.abbr}</div><div class="sb-name">${tmA.fullName}</div><div style="font-family:var(--fm);font-size:9px;color:var(--mut)">Elo: ${d.teamA.elo}</div></div><div class="sb-center"><div class="sb-ft">${ft.a}–${ft.b}</div><div class="sb-label">PREDICTED FT</div><div class="sb-ht-info">HT: ${d.htPrediction} · 2H: ${d.secondHalf.teamA}-${d.secondHalf.teamB}</div></div><div class="sb-side right"><div class="sb-club" style="color:${tmB.color}">${tmB.emoji} ${tmB.abbr}</div><div class="sb-name">${tmB.fullName}</div><div style="font-family:var(--fm);font-size:9px;color:var(--mut);text-align:right">Elo: ${d.teamB.elo}</div></div></div>
+    
+    <div class="ai-insight"><div class="ai-insight-title">🧠 AI SYNTHESIS</div><div class="ai-insight-text">${d.aiSynthesis}</div></div>
+    
     <div class="card"><div class="card-head"><div class="card-title" style="color:${clsColor(d.classification)}">${d.classification.toUpperCase()} MATCH</div><span class="badge ${clsBadge(d.classification)}">${ft.a+ft.b} GOALS</span></div><div class="card-body"><div style="font-size:12px;color:var(--mut);line-height:1.7">${d.classificationReason}</div><div class="ft-reasoning-block">${d.ftReasoning}</div></div></div>
-    <div class="prof-grid">${[d.teamA,d.teamB].map(t=>{const tm=getTeam(t.name);return`<div class="prof-card"><div style="font-family:var(--fh);font-size:14px;font-weight:700;margin-bottom:10px">${tm.emoji} ${tm.fullName} ${t.form?`<span class="badge ${t.form.includes('HOT')||t.form.includes('STREAK')?'bg-g':t.form.includes('COLD')?'bg-r':'bg'}">${t.form}</span>`:''}</div><div class="prof-row"><div class="prof-lbl"><span>ATK</span><span style="color:var(--grn)">${t.attack} (${t.stats.avgScored.toFixed(1)}/g)</span></div><div class="prof-bar"><div class="prof-fill" style="width:${t.attack==='elite'?93:t.attack==='high'?72:t.attack==='medium'?46:22}%;background:var(--grn)"></div></div></div><div class="prof-row"><div class="prof-lbl"><span>DEF</span><span style="color:${t.defense.includes('high')?'var(--red)':t.defense.includes('medium')?'var(--yel)':'var(--grn)'}">${t.defense} (${t.stats.avgConceded.toFixed(1)}/g)</span></div><div class="prof-bar"><div class="prof-fill" style="width:${t.defense.includes('high')?88:t.defense.includes('medium')?56:26}%;background:${t.defense.includes('high')?'var(--red)':t.defense.includes('medium')?'var(--yel)':'var(--grn)'}"></div></div></div><div class="flex gap-6" style="margin-top:6px"><span class="badge bg">${t.style}</span><span class="badge bg">${t.consistency}</span><span class="badge bg">D:${t.defReliability}</span></div></div>`}).join('')}</div>
+    
+    <div class="card"><div class="card-head"><div class="card-title">POISSON SCORE DISTRIBUTION</div></div><div class="card-body"><div class="poisson-grid">${d.poissonProbs?.map(p=>`<div class="poisson-cell" style="background:${p.prob>0.05?'rgba(0,232,122,.1)':'var(--bg)'};border:1px solid ${p.prob>0.05?'rgba(0,232,122,.3)':'var(--bdr)'}"><div class="poisson-score">${p.score}</div><div class="poisson-pct">${(p.prob*100).toFixed(1)}%</div></div>`).join('')||''}</div></div></div>
+    
+    <div class="prof-grid">${[d.teamA,d.teamB].map(t=>{const tm=getTeam(t.name);return`<div class="prof-card"><div style="font-family:var(--fh);font-size:14px;font-weight:700;margin-bottom:10px">${tm.emoji} ${tm.fullName} <span class="badge bg-g" style="font-size:7px">Elo: ${t.elo}</span></div><div class="prof-row"><div class="prof-lbl"><span>ATK</span><span style="color:var(--grn)">${t.attack} (${t.stats.avgScored.toFixed(1)}/g)</span></div><div class="prof-bar"><div class="prof-fill" style="width:${t.attack==='elite'?93:t.attack==='high'?72:t.attack==='medium'?46:22}%;background:var(--grn)"></div></div></div><div class="prof-row"><div class="prof-lbl"><span>DEF</span><span style="color:${t.defense.includes('high')?'var(--red)':t.defense.includes('medium')?'var(--yel)':'var(--grn)'}">${t.defense} (${t.stats.avgConceded.toFixed(1)}/g)</span></div><div class="prof-bar"><div class="prof-fill" style="width:${t.defense.includes('high')?88:t.defense.includes('medium')?56:26}%;background:${t.defense.includes('high')?'var(--red)':t.defense.includes('medium')?'var(--yel)':'var(--grn)'}"></div></div></div></div>`}).join('')}</div>
+    
     <div class="card"><div class="card-head"><div class="card-title">MATCH FLOW</div>${flow.dominant?`<span class="badge bg-g">${getTeam(flow.dominant).fullName}</span>`:''}</div><div class="card-body"><div style="display:flex;flex-direction:column;gap:6px">${flow.early?`<div style="background:var(--sur2);padding:10px 12px;border-radius:9px;display:flex;gap:10px"><span style="font-family:var(--fm);font-size:8px;color:var(--grn);width:48px">0–30%</span><span style="font-size:12px">${flow.early}</span></div>`:''}${flow.mid?`<div style="background:var(--sur2);padding:10px 12px;border-radius:9px;display:flex;gap:10px"><span style="font-family:var(--fm);font-size:8px;color:var(--grn);width:48px">30–70%</span><span style="font-size:12px">${flow.mid}</span></div>`:''}${flow.chaos?`<div style="background:var(--sur2);padding:10px 12px;border-radius:9px;display:flex;gap:10px"><span style="font-family:var(--fm);font-size:8px;color:var(--grn);width:48px">70–100%</span><span style="font-size:12px">${flow.chaos}</span></div>`:''}</div></div></div>
-    <div class="card"><div class="card-head"><div class="card-title">TOP 3 SCORELINES</div></div><div class="card-body"><div class="t3-list">${d.top3.map((s,i)=>`<div class="t3-item${i===0?' win':''}"><div class="t3-rank">${['🥇','🥈','🥉'][i]}</div><div class="t3-score">${s.score}</div><div style="text-align:right"><span class="badge ${i===0?'bg-g':i===1?'bg-y':'bg'}">${s.label}</span><div style="font-family:var(--fm);font-size:7.5px;color:var(--mut);margin-top:2px">${s.reason}</div></div></div>`).join('')}</div></div>
+    
+    <div class="card"><div class="card-head"><div class="card-title">TOP 3 SCORELINES</div></div><div class="card-body"><div class="t3-list">${d.top3.map((s,i)=>`<div class="t3-item${i===0?' win':''}"><div class="t3-rank">${['🥇','🥈','🥉'][i]}</div><div class="t3-score">${s.score}</div><div style="text-align:right"><span class="badge ${i===0?'bg-g':i===1?'bg-y':'bg'}">${s.label}</span><div class="t3-pct">${(s.prob*100).toFixed(1)}%</div><div style="font-family:var(--fm);font-size:7.5px;color:var(--mut);margin-top:2px">${s.reason}</div></div></div>`).join('')}</div></div>
+    
     ${d.trapWarning?`<div style="background:rgba(255,82,82,.05);border:1px solid rgba(255,82,82,.2);border-radius:11px;padding:12px 14px;margin-bottom:12px"><div style="font-family:var(--fh);font-size:17px;font-weight:700;color:var(--red);margin-bottom:4px">⚠ TRAP MATCH</div><div style="font-size:12px;color:rgba(255,82,82,.75)">${d.trapWarning}</div></div>`:''}
+    
     <div class="bet-card"><div class="bet-header"><div><div style="font-family:var(--fm);font-size:7px;color:var(--mut);margin-bottom:4px">PRIMARY SIGNAL</div><div class="bet-line" style="color:${bet.primaryLine?.startsWith('Under')?'var(--blu)':'var(--grn)'}">${bet.primaryLine}</div><div style="font-family:var(--fm);font-size:9px;color:var(--mut);margin-top:4px">${bet.primaryHitRate} hit rate</div></div><span class="badge ${bet.risk==='HIGH'?'bg-r':bet.risk==='MEDIUM'?'bg-y':'bg-g'}">${bet.risk} RISK</span></div><div class="bet-grid"><div class="bet-item"><div class="bet-item-label">SAFE RANGE</div><div class="bet-item-value" style="color:var(--grn)">${bet.safeRange}</div></div><div class="bet-item"><div class="bet-item-label">STRATEGY</div><div class="bet-item-value" style="color:var(--yel)">${bet.strategy}</div></div><div class="bet-item"><div class="bet-item-label">TOTAL</div><div class="bet-item-value">${ft.a+ft.b} goals</div></div></div><div style="margin-top:12px;padding:8px 11px;background:var(--bg);border-radius:8px;font-size:11px;color:var(--mut);line-height:1.7">${bet.bettingNote}</div></div>
+    
     <div class="conf-card"><div class="conf-header"><div><div style="font-family:var(--fm);font-size:7px;color:var(--mut);margin-bottom:4px">CONFIDENCE</div><div class="conf-pct" style="color:${confColor(conf)}">${conf}%</div></div><span class="badge ${conf>=75?'bg-g':conf>=60?'bg-y':conf>=45?'bg-o':'bg-r'}">${conf>=75?'HIGH':conf>=60?'MODERATE':conf>=45?'LOW':'VERY LOW'}</span></div><div class="conf-bar-wrap"><div class="conf-bar" style="width:${conf}%;background:${confColor(conf)}"></div></div><div style="font-size:12px;color:var(--mut);line-height:1.7">${d.confidenceReason}</div></div>
-    <div class="save-bar"><div><div style="font-family:var(--fh);font-size:14px;font-weight:700">SAVE PREDICTION</div><div style="font-family:var(--fm);font-size:7.5px;color:var(--mut)">LOG RESULT TO TRAIN v4</div></div><button class="btn btn-g btn-sm" id="saveBtn" onclick="savePrediction()">SAVE</button></div>
+    
+    <div class="save-bar"><div><div style="font-family:var(--fh);font-size:14px;font-weight:700">SAVE PREDICTION</div><div style="font-family:var(--fm);font-size:7.5px;color:var(--mut)">UPDATES ELO RATINGS</div></div><button class="btn btn-g btn-sm" id="saveBtn" onclick="savePrediction()">SAVE</button></div>
   `;
 }
 
@@ -622,10 +661,14 @@ function runPrediction(){
 function savePrediction(){
   if(!state.lastPrediction)return;
   const d=state.lastPrediction;
-  addMatch({id:genId(),date:new Date().toISOString(),teamA:d._tA,teamB:d._tB,htPred:d.htPrediction,ftPred:d.ftPrediction,classification:d.classification,confidence:d.confidence,top3:d.top3.map(s=>s.score).join(', '),keyPattern:d.keyPattern,primaryLine:d.betting.primaryLine,secondaryLine:d.betting.secondaryLine,bettingRisk:d.betting.risk,safeRange:d.betting.safeRange,trapWarning:d.trapWarning,htActual:null,ftActual:null,status:'pending'});
-  showToast('Saved!');document.getElementById('saveBtn').disabled=true;state.lastPrediction=null;
+  addMatch({id:genId(),date:new Date().toISOString(),teamA:d._tA,teamB:d._tB,htPred:d.htPrediction,ftPred:d.ftPrediction,classification:d.classification,confidence:d.confidence,top3:d.top3.map(s=>s.score).join(', '),keyPattern:d.keyPattern,primaryLine:d.betting.primaryLine,bettingRisk:d.betting.risk,safeRange:d.betting.safeRange,trapWarning:d.trapWarning,htActual:null,ftActual:null,status:'pending'});
+  showToast('Saved — Elo updates when result entered');
+  document.getElementById('saveBtn').disabled=true;state.lastPrediction=null;
 }
 
+// ═══════════════════════════════════════
+// RESULTS & DATABASE
+// ═══════════════════════════════════════
 function renderResults(){
   const db=loadDB();const pend=db.filter(m=>m.status==='pending'),done=db.filter(m=>m.status==='result').slice(0,50);
   document.getElementById('pendingBadge').textContent=`${pend.length} PENDING`;
@@ -639,18 +682,25 @@ function renderDatabase(){
   const gAvg=tots.length?avg(tots):null,gStd=tots.length>1?stdDev(tots):null;
   const accs=wr.filter(m=>m.ftPred).map(m=>calcAcc(m)).filter(a=>a!==null);
   const avgAcc=accs.length?Math.round(avg(accs)):null;
+  const eloAll=getAllElo();
+  const eloSorted=Object.entries(eloAll).sort((a,b)=>b[1]-a[1]);
+  
   document.getElementById('totalBadge').textContent=`${db.length} MATCHES`;
-  document.getElementById('globalStats').innerHTML=`<div class="stat-card"><div class="stat-value">${db.length}</div><div class="stat-label">TOTAL</div></div><div class="stat-card"><div class="stat-value" style="color:var(--grn)">${wr.length}</div><div class="stat-label">RESULTS</div></div><div class="stat-card"><div class="stat-value" style="color:var(--yel)">${gAvg?.toFixed(1)||'—'}</div><div class="stat-label">AVG GOALS</div></div><div class="stat-card"><div class="stat-value" style="color:var(--blu)">${avgAcc!==null?avgAcc+'%':'—'}</div><div class="stat-label">ACCURACY</div></div><div class="stat-card"><div class="stat-value" style="font-size:24px">${tots.length?Math.min(...tots)+'–'+Math.max(...tots):'—'}</div><div class="stat-label">RANGE</div></div><div class="stat-card"><div class="stat-value" style="color:var(--orn)">${gStd?'±'+gStd.toFixed(1):'—'}</div><div class="stat-label">STD DEV</div></div>`;
-  document.getElementById('ouGrid').innerHTML=[6.5,7.5,8.5,9.5,10.5,11.5,12.5,13.5,14.5,15.5,16.5,17.5,18.5].map(l=>{const h=tots.filter(t=>t>l).length;const p=tots.length?Math.round(h/tots.length*100):null;return`<div class="ou-box"><div style="font-family:var(--fm);font-size:7px;color:var(--grn)">OVR ${l}</div><div style="font-family:var(--fh);font-size:22px;font-weight:700;color:${p===null?'var(--mut)':p>=65?'var(--grn)':p>=50?'var(--yel)':'var(--red)'}">${p!==null?p+'%':'—'}</div><div style="height:1px;background:var(--bdr);margin:4px 0"></div><div style="font-family:var(--fm);font-size:7px;color:var(--blu)">UND ${l}</div><div style="font-family:var(--fh);font-size:22px;font-weight:700;color:${p===null?'var(--mut)':(100-p)>=65?'var(--grn)':(100-p)>=50?'var(--yel)':'var(--red)'}">${p!==null?(100-p)+'%':'—'}</div></div>`}).join('');
-  const ts={};wr.forEach(m=>{const g=parseScore(m.ftActual);if(!g)return;[[m.teamA,g.a,g.b],[m.teamB,g.b,g.a]].forEach(([t,sc,cn])=>{if(!ts[t])ts[t]={sc:[],cn:[]};ts[t].sc.push(sc);ts[t].cn.push(cn)})});
-  const sorted=Object.entries(ts).filter(([,v])=>v.sc.length>=1).sort(([,a],[,b])=>avg(b.sc)-avg(a.sc));
-  document.getElementById('teamAverages').innerHTML=sorted.length?sorted.map(([name,v])=>{const tm=getTeam(name);return`<div style="background:var(--sur);border:1px solid var(--bdr);border-radius:10px;padding:11px 14px;margin-bottom:7px;display:flex;align-items:center;justify-content:space-between"><div><div style="font-family:var(--fh);font-size:16px;font-weight:700">${tm.emoji} ${tm.fullName}</div><div style="font-family:var(--fm);font-size:8px;color:var(--mut)">${v.sc.length} games</div></div><div class="flex gap-6"><div style="text-align:center"><div style="font-family:var(--fh);font-size:20px;font-weight:700;color:var(--grn)">${avg(v.sc).toFixed(1)}</div><div style="font-family:var(--fm);font-size:7px;color:var(--mut)">SCORED</div></div><div style="text-align:center"><div style="font-family:var(--fh);font-size:20px;font-weight:700;color:var(--red)">${avg(v.cn).toFixed(1)}</div><div style="font-family:var(--fm);font-size:7px;color:var(--mut)">CONCEDED</div></div></div></div>`}).join(''):`<div class="empty-state"><div class="empty-icon">📊</div><div class="empty-text">NEED RESULTS</div></div>`;
-  document.getElementById('historyList').innerHTML=db.slice(0,60).map(m=>{const acc=calcAcc(m);const tmA=getTeam(m.teamA),tmB=getTeam(m.teamB);return`<div class="history-item"><div style="font-family:var(--fh);font-size:17px;font-weight:700;margin-bottom:6px">${tmA.fullName} vs ${tmB.fullName}</div><div class="flex gap-6" style="margin-bottom:6px"><span style="font-family:var(--fm);font-size:9.5px"><span style="color:var(--mut)">PRED </span>${m.ftPred||'?'}</span>${m.ftActual?`<span style="font-family:var(--fm);font-size:9.5px"><span style="color:var(--mut)">ACT </span><span style="color:var(--grn)">${m.ftActual}</span></span>`:''}</div><div class="flex gap-6">${m.status==='pending'?'<span class="badge bg-y">PENDING</span>':''}${acc!==null?`<span class="badge ${acc>=70?'bg-g':acc>=40?'bg-y':'bg-r'}">${acc}%</span>`:''}<span style="font-family:var(--fm);font-size:8px;color:var(--mut)">${fmtDate(m.date)}</span><button class="btn btn-r btn-sm" style="padding:3px 8px;font-size:8px" onclick="deleteMatch('${m.id}')">✕</button></div></div>`}).join('')||`<div class="empty-state"><div class="empty-icon">📂</div><div class="empty-text">NO DATA</div></div>`;
+  document.getElementById('eloRankings').innerHTML=eloSorted.map(([name,rating],i)=>{
+    const tm=getTeam(name);
+    const change=rating-ELO_DEFAULT;
+    return`<div class="elo-row"><div style="display:flex;align-items:center;gap:8px"><span style="font-family:var(--fm);font-size:10px;color:var(--mut);width:20px">#${i+1}</span><span class="elo-name">${tm.emoji} ${tm.fullName}</span></div><div><span class="elo-rating" style="color:${rating>ELO_DEFAULT?'var(--grn)':rating<ELO_DEFAULT?'var(--red)':'var(--mut)'}">${rating}</span><span class="elo-change" style="color:${change>0?'var(--grn)':change<0?'var(--red)':'var(--mut)'}">${change>0?'+'+change:change<0?change:'NEW'}</span></div></div>`;
+  }).join('')||`<div class="empty-state"><div class="empty-icon">📊</div><div class="empty-text">PLAY MATCHES TO BUILD ELO</div></div>`;
+  
+  document.getElementById('globalStats').innerHTML=`<div class="stat-card"><div class="stat-value">${db.length}</div><div class="stat-label">TOTAL</div></div><div class="stat-card"><div class="stat-value" style="color:var(--grn)">${wr.length}</div><div class="stat-label">RESULTS</div></div><div class="stat-card"><div class="stat-value" style="color:var(--yel)">${gAvg?.toFixed(1)||'—'}</div><div class="stat-label">AVG GOALS</div></div><div class="stat-card"><div class="stat-value" style="color:var(--blu)">${avgAcc!==null?avgAcc+'%':'—'}</div><div class="stat-label">ACCURACY</div></div>`;
+  document.getElementById('ouGrid').innerHTML=[6.5,7.5,8.5,9.5,10.5,11.5,12.5,13.5,14.5,15.5,16.5,17.5,18.5].map(l=>{const h=tots.filter(t=>t>l).length;const p=tots.length?Math.round(h/tots.length*100):null;return`<div class="ou-box"><div style="font-family:var(--fm);font-size:7px;color:var(--grn)">OVR ${l}</div><div style="font-family:var(--fh);font-size:22px;font-weight:700;color:${p===null?'var(--mut)':p>=65?'var(--grn)':p>=50?'var(--yel)':'var(--red)'}">${p!==null?p+'%':'—'}</div></div>`}).join('');
+  
+  document.getElementById('historyList').innerHTML=db.slice(0,40).map(m=>{const acc=calcAcc(m);const tmA=getTeam(m.teamA),tmB=getTeam(m.teamB);return`<div class="history-item"><div style="font-family:var(--fh);font-size:17px;font-weight:700;margin-bottom:6px">${tmA.fullName} vs ${tmB.fullName}</div><div class="flex gap-6">${m.status==='pending'?'<span class="badge bg-y">PENDING</span>':''}${acc!==null?`<span class="badge ${acc>=70?'bg-g':acc>=40?'bg-y':'bg-r'}">${acc}%</span>`:''}<span style="font-family:var(--fm);font-size:8px;color:var(--mut)">${fmtDate(m.date)}</span><button class="btn btn-r btn-sm" style="padding:3px 8px;font-size:8px" onclick="deleteMatch('${m.id}')">✕</button></div></div>`}).join('')||`<div class="empty-state"><div class="empty-icon">📂</div><div class="empty-text">NO DATA</div></div>`;
 }
 
 function openResultModal(id){const m=loadDB().find(x=>x.id===id);if(!m)return;state.activeModalId=id;const tmA=getTeam(m.teamA),tmB=getTeam(m.teamB);document.getElementById('modalTitle').textContent=`${tmA.fullName} vs ${tmB.fullName}`;document.getElementById('modalSubtitle').textContent=`PRED: ${m.ftPred||'?'}`;document.getElementById('ftALabel').textContent=tmA.fullName;document.getElementById('ftBLabel').textContent=tmB.fullName;['ftA','ftB','htA','htB'].forEach(el=>document.getElementById(el).value='');document.getElementById('resultModal').classList.add('on')}
 function closeResultModal(){document.getElementById('resultModal').classList.remove('on');state.activeModalId=null}
-function saveResultEntry(){if(!state.activeModalId)return;const ftA=document.getElementById('ftA').value,ftB=document.getElementById('ftB').value;if(ftA===''||ftB===''){showToast('Enter FT score');return}const htA=document.getElementById('htA').value,htB=document.getElementById('htB').value;updateMatch(state.activeModalId,{ftActual:`${ftA}-${ftB}`,htActual:(htA!==''&&htB!=='')?`${htA}-${htB}`:null,status:'result'});closeResultModal();showToast('Result saved');if(state.currentPage==='results')renderResults();if(state.currentPage==='db')renderDatabase()}
+function saveResultEntry(){if(!state.activeModalId)return;const ftA=document.getElementById('ftA').value,ftB=document.getElementById('ftB').value;if(ftA===''||ftB===''){showToast('Enter FT score');return}const htA=document.getElementById('htA').value,htB=document.getElementById('htB').value;updateMatch(state.activeModalId,{ftActual:`${ftA}-${ftB}`,htActual:(htA!==''&&htB!=='')?`${htA}-${htB}`:null,status:'result'});closeResultModal();showToast('Result saved — Elo updated!');if(state.currentPage==='results')renderResults();if(state.currentPage==='db')renderDatabase()}
 
 function switchPage(page){document.querySelectorAll('.page').forEach(el=>el.classList.remove('on'));document.querySelectorAll('.nav-btn').forEach(el=>el.classList.remove('on'));document.getElementById('page-'+page).classList.add('on');document.getElementById('nav-'+page).classList.add('on');state.currentPage=page;location.hash=page;if(page==='results')renderResults();if(page==='db')renderDatabase()}
 function calcAcc(m){if(!m.ftPred||!m.ftActual)return null;const p=parseScore(m.ftPred),a=parseScore(m.ftActual);if(!p||!a)return null;const diff=Math.abs(p.a-a.a)+Math.abs(p.b-a.b);const sc=diff===0?100:diff===1?83:diff===2?66:diff===3?49:diff===4?32:15;return Math.min(100,sc+((p.a>p.b&&a.a>a.b)||(p.a<p.b&&a.a<a.b)||(p.a===p.b&&a.a===a.b)?5:0))}

@@ -4,8 +4,9 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no">
 <meta name="theme-color" content="#060911">
-<title>EPL 4v4 · VOLTA ENGINE v10</title>
+<title>VOLTA 4v4 · ENGINE v11</title>
 <style>
+@import url('https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@400;600;700;900&family=JetBrains+Mono:wght@400;500;700&family=Inter:wght@400;500;600;700&display=swap');
 :root{
   --bg:#060911;--bg2:#0b0e1b;--sur:#101422;--sur2:#151929;
   --bdr:#1c2238;--bdr2:#263050;
@@ -52,12 +53,18 @@ nav{position:fixed;bottom:0;left:0;right:0;z-index:100;background:rgba(6,9,17,.9
 .api-input:focus{border-color:var(--pur)}
 .api-input::placeholder{color:var(--mut)}
 
-/* MARKET INPUTS */
 .market-row{display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;margin-bottom:10px}
 .market-input{background:var(--sur2);border:1px solid var(--bdr2);border-radius:10px;padding:10px 8px;font-family:var(--fm);font-size:9px;color:var(--txt);outline:none;text-align:center}
 .market-input:focus{border-color:var(--blu)}
 .market-input::placeholder{color:var(--mut);font-size:8px}
 .market-label{font-family:var(--fm);font-size:6.5px;color:var(--mut);letter-spacing:1px;text-align:center;margin-bottom:4px}
+
+/* PLAYER INPUTS */
+.player-row{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:8px}
+.player-input{background:var(--sur2);border:1px solid var(--bdr2);border-radius:10px;padding:10px 12px;font-family:var(--fm);font-size:11px;color:var(--txt);outline:none}
+.player-input:focus{border-color:var(--pur)}
+.player-input::placeholder{color:var(--mut);font-size:9px}
+.player-label{font-family:var(--fm);font-size:6.5px;color:var(--mut);letter-spacing:1px;margin-bottom:4px}
 
 .arena{background:var(--sur);border:1px solid var(--bdr);border-radius:16px;overflow:hidden;margin-bottom:14px}
 .arena-grid{display:grid;grid-template-columns:1fr 52px 1fr;align-items:center;padding:20px 16px}
@@ -105,7 +112,6 @@ nav{position:fixed;bottom:0;left:0;right:0;z-index:100;background:rgba(6,9,17,.9
 .rec-value{background:rgba(255,213,79,.12);color:#ffd54f;border:1px solid rgba(255,213,79,.3)}
 .rec-avoid{background:rgba(255,82,82,.1);color:#ff5252;border:1px solid rgba(255,82,82,.2)}
 
-/* VALUE TAG */
 .value-tag{display:inline-block;padding:4px 10px;border-radius:12px;font-family:var(--fm);font-size:9px;font-weight:700}
 .value-positive{background:rgba(0,232,122,.15);color:#00e87a}
 .value-negative{background:rgba(255,82,82,.1);color:#ff5252}
@@ -172,6 +178,30 @@ nav{position:fixed;bottom:0;left:0;right:0;z-index:100;background:rgba(6,9,17,.9
 .conf-bar-wrap{height:6px;background:var(--bg);border-radius:3px;overflow:hidden;margin-bottom:10px}
 .conf-bar{height:100%;border-radius:3px}
 
+/* PLAYSTYLE TAGS */
+.ps-tag{display:inline-block;padding:3px 8px;border-radius:6px;font-family:var(--fm);font-size:8px;font-weight:700;letter-spacing:1px;text-transform:uppercase}
+.ps-skill{background:rgba(171,71,188,.15);color:#ab47bc}
+.ps-park{background:rgba(41,182,246,.15);color:#29b6f6}
+.ps-counter{background:rgba(255,112,67,.15);color:#ff7043}
+.ps-poss{background:rgba(0,232,122,.15);color:#00e87a}
+.ps-balanced{background:rgba(255,213,79,.15);color:#ffd54f}
+
+/* TIME BUCKET */
+.time-bucket{display:grid;grid-template-columns:repeat(3,1fr);gap:6px;margin-bottom:12px}
+.bucket-card{background:var(--bg);border:1px solid var(--bdr);border-radius:10px;padding:10px;text-align:center}
+.bucket-label{font-family:var(--fm);font-size:6px;color:var(--mut);letter-spacing:1px;margin-bottom:4px}
+.bucket-goals{font-family:var(--fh);font-size:22px;font-weight:900}
+.bucket-note{font-family:var(--fm);font-size:7px;color:var(--mut);margin-top:2px}
+
+/* PLAYER CARD */
+.player-card{background:var(--sur2);border:1px solid var(--bdr);border-radius:11px;padding:12px 14px;margin-bottom:8px}
+.player-header{display:flex;align-items:center;gap:10px;margin-bottom:8px}
+.player-avatar{width:36px;height:36px;border-radius:10px;background:var(--bg);display:flex;align-items:center;justify-content:center;font-size:18px;border:1px solid var(--bdr2)}
+.player-info{flex:1}
+.player-name{font-family:var(--fh);font-size:16px;font-weight:700}
+.player-stats{font-family:var(--fm);font-size:8px;color:var(--mut)}
+.player-elo{font-family:var(--fh);font-size:20px;font-weight:900;color:var(--grn)}
+
 .flex{display:flex}.flex-wrap{flex-wrap:wrap}.gap-6{gap:6px}
 .empty-state{display:flex;flex-direction:column;align-items:center;justify-content:center;padding:40px 24px;gap:12px}
 .empty-icon{font-size:40px;opacity:.15}
@@ -184,13 +214,24 @@ nav{position:fixed;bottom:0;left:0;right:0;z-index:100;background:rgba(6,9,17,.9
 <!-- PREDICT PAGE -->
 <div class="page on" id="page-predict">
   <div class="hdr">
-    <div class="hdr-l"><div class="ht">EPL 4v4</div><div class="hs">ENGINE v10 · VALUE FINDER</div></div>
+    <div class="hdr-l"><div class="ht">VOLTA 4v4</div><div class="hs">ENGINE v11 · PLAYER-FIRST</div></div>
     <span class="badge bg-g" id="miniBadge">0 MATCHES</span>
   </div>
   <div class="sec">
     <div class="api-row">
       <input class="api-input" id="apiKeyInput" type="password" placeholder="🔑 Anthropic API key (optional)...">
       <span id="apiKeyStatus" class="badge bg">NO AI</span>
+    </div>
+    
+    <!-- PLAYER TAGS INPUT -->
+    <div class="sl">PLAYER TAGS (Gamertags)</div>
+    <div class="player-row">
+      <div><div class="player-label">HOME PLAYER 1</div><input class="player-input" id="pA1" placeholder="e.g. xXProSniperXx"></div>
+      <div><div class="player-label">HOME PLAYER 2</div><input class="player-input" id="pA2" placeholder="e.g. SkillKing99"></div>
+    </div>
+    <div class="player-row">
+      <div><div class="player-label">AWAY PLAYER 1</div><input class="player-input" id="pB1" placeholder="e.g. CounterRush"></div>
+      <div><div class="player-label">AWAY PLAYER 2</div><input class="player-input" id="pB2" placeholder="e.g. ParkBus2024"></div>
     </div>
     
     <!-- MARKET ODDS INPUTS -->
@@ -238,6 +279,7 @@ nav{position:fixed;bottom:0;left:0;right:0;z-index:100;background:rgba(6,9,17,.9
 <div class="page" id="page-db">
   <div class="hdr"><div class="hdr-l"><div class="ht">DATABASE</div><div class="hs">INTELLIGENCE</div></div><span class="badge bg-g" id="totalBadge">0 MATCHES</span></div>
   <div class="sec">
+    <div class="sl">PLAYER RANKINGS</div><div id="playerRankings"></div>
     <div class="sl">PERFORMANCE</div><div id="performanceStats"></div>
     <div class="sl">MODEL HEALTH</div><div id="modelHealth"></div>
     <div class="sl">ELO RATINGS</div><div id="eloRankings"></div>
@@ -264,19 +306,42 @@ nav{position:fixed;bottom:0;left:0;right:0;z-index:100;background:rgba(6,9,17,.9
     <div class="modal-handle"></div>
     <div style="font-family:var(--fh);font-size:22px;font-weight:700;margin-bottom:4px" id="modalTitle">ENTER RESULT</div>
     <div style="font-family:var(--fm);font-size:9px;color:var(--mut);margin-bottom:16px" id="modalSubtitle"></div>
+    
+    <!-- VOLTA-SPECIFIC: Time bucket scores instead of HT -->
     <div style="font-family:var(--fm);font-size:8px;letter-spacing:2px;color:var(--mut);margin-bottom:8px">FULL TIME</div>
     <div class="modal-scores">
       <div><div style="font-family:var(--fm);font-size:8px;color:var(--mut);margin-bottom:4px" id="ftALabel">HOME</div><input class="score-input" type="number" id="ftA" min="0" max="99" placeholder="0"></div>
       <div style="font-family:var(--fh);font-size:24px;color:var(--mut);text-align:center">–</div>
       <div><div style="font-family:var(--fm);font-size:8px;color:var(--mut);margin-bottom:4px" id="ftBLabel">AWAY</div><input class="score-input" type="number" id="ftB" min="0" max="99" placeholder="0"></div>
     </div>
-    <div style="font-family:var(--fm);font-size:8px;letter-spacing:2px;color:var(--mut);margin:16px 0 8px">HALF TIME</div>
+    
+    <!-- VOLTA: Optional time buckets -->
+    <div style="font-family:var(--fm);font-size:8px;letter-spacing:2px;color:var(--mut);margin:16px 0 8px">TIME BUCKETS (Optional)</div>
     <div class="modal-scores">
-      <div><div style="font-family:var(--fm);font-size:8px;color:var(--mut);margin-bottom:4px">HOME</div><input class="score-input-sm" type="number" id="htA" min="0" max="50" placeholder="—"></div>
+      <div><div style="font-family:var(--fm);font-size:7px;color:var(--mut);margin-bottom:4px">0-2 MIN</div><input class="score-input-sm" type="number" id="tbA1" min="0" max="50" placeholder="—"></div>
       <div style="font-family:var(--fh);font-size:24px;color:var(--mut);text-align:center">–</div>
-      <div><div style="font-family:var(--fm);font-size:8px;color:var(--mut);margin-bottom:4px">AWAY</div><input class="score-input-sm" type="number" id="htB" min="0" max="50" placeholder="—"></div>
+      <div><div style="font-family:var(--fm);font-size:7px;color:var(--mut);margin-bottom:4px">0-2 MIN</div><input class="score-input-sm" type="number" id="tbB1" min="0" max="50" placeholder="—"></div>
     </div>
-    <div style="font-family:var(--fm);font-size:7px;color:var(--mut);margin-top:4px;text-align:center">Leave blank if unknown</div>
+    <div class="modal-scores" style="margin-top:8px">
+      <div><div style="font-family:var(--fm);font-size:7px;color:var(--mut);margin-bottom:4px">2-7 MIN</div><input class="score-input-sm" type="number" id="tbA2" min="0" max="50" placeholder="—"></div>
+      <div style="font-family:var(--fh);font-size:24px;color:var(--mut);text-align:center">–</div>
+      <div><div style="font-family:var(--fm);font-size:7px;color:var(--mut);margin-bottom:4px">2-7 MIN</div><input class="score-input-sm" type="number" id="tbB2" min="0" max="50" placeholder="—"></div>
+    </div>
+    <div class="modal-scores" style="margin-top:8px">
+      <div><div style="font-family:var(--fm);font-size:7px;color:var(--mut);margin-bottom:4px">7-10 MIN</div><input class="score-input-sm" type="number" id="tbA3" min="0" max="50" placeholder="—"></div>
+      <div style="font-family:var(--fh);font-size:24px;color:var(--mut);text-align:center">–</div>
+      <div><div style="font-family:var(--fm);font-size:7px;color:var(--mut);margin-bottom:4px">7-10 MIN</div><input class="score-input-sm" type="number" id="tbB3" min="0" max="50" placeholder="—"></div>
+    </div>
+    
+    <!-- VOLTA: Rage quit & playstyle -->
+    <div style="margin-top:16px">
+      <label style="display:flex;align-items:center;gap:8px;cursor:pointer;margin-bottom:8px">
+        <input type="checkbox" id="rageQuit" style="width:16px;height:16px;accent-color:var(--red)">
+        <span style="font-family:var(--fm);font-size:10px;color:var(--red)">⚠️ Rage Quit / Early End</span>
+      </label>
+    </div>
+    
+    <div style="font-family:var(--fm);font-size:7px;color:var(--mut);margin-top:4px;text-align:center">Leave time buckets blank if unknown</div>
     <div style="display:flex;gap:8px;margin-top:16px">
       <button class="btn btn-ghost" style="flex:1;height:48px;font-size:15px" onclick="closeResultModal()">CANCEL</button>
       <button class="btn btn-g" style="flex:1;height:48px;font-size:15px" onclick="saveResult()">SAVE RESULT</button>
@@ -294,7 +359,9 @@ nav{position:fixed;bottom:0;left:0;right:0;z-index:100;background:rgba(6,9,17,.9
 </div>
 
 <script>
-// ════════════════ CORE DATA ════════════════
+// ════════════════ VOLTA ENGINE v11 ════════════════
+// BACKWARD COMPATIBLE: Reads v10 data, writes v11 format
+
 var TEAMS = [
   {name:'Arsenal',emoji:'🔴',color:'#EF0107',abbr:'ARS',full:'Arsenal'},
   {name:'AstonVilla',emoji:'🟣',color:'#95BFE5',abbr:'AVL',full:'Aston Villa'},
@@ -318,9 +385,16 @@ var TEAMS = [
   {name:'Wolves',emoji:'🐺',color:'#FDB913',abbr:'WOL',full:'Wolverhampton Wanderers'}
 ];
 
-var DB_KEY='epl4v4:v10:matches',ELO_KEY='epl4v4:v10:elo',ELO_K_KEY='epl4v4:v10:elok',API_KEY='epl4v4:apikey';
+// ════════════════ STORAGE KEYS (v11) ════════════════
+var DB_KEY='epl4v4:v11:matches', DB_KEY_LEGACY='epl4v4:v10:matches';
+var ELO_KEY='epl4v4:v11:elo', ELO_KEY_LEGACY='epl4v4:v10:elo';
+var ELO_K_KEY='epl4v4:v11:elok', ELO_K_KEY_LEGACY='epl4v4:v10:elok';
+var PLAYERS_KEY='epl4v4:v11:players';
+var API_KEY='epl4v4:apikey';
+
 var state={page:'predict',pickA:null,pickB:null,lastPred:null,resultId:null,teamSide:null};
 
+// ════════════════ UTILS ════════════════
 function avg(a){return a.length?a.reduce(function(s,v){return s+v},0)/a.length:0}
 function stdDev(a){if(a.length<2)return 0;var m=avg(a);return Math.sqrt(a.reduce(function(s,v){return s+Math.pow(v-m,2)},0)/a.length)}
 function clamp(v,l,h){return Math.max(l,Math.min(h,v))}
@@ -329,6 +403,55 @@ function id(){return Date.now().toString(36)+Math.random().toString(36).slice(2,
 function getT(n){var f=TEAMS.find(function(t){return t.name===n});return f||{emoji:'⚽',color:'#4a5878',abbr:'?',full:n||'Unknown'}}
 function fmt(d){try{return new Date(d).toLocaleDateString('en-GB',{day:'2-digit',month:'short',hour:'2-digit',minute:'2-digit'})}catch(e){return d||'—'}}
 
+// ════════════════ DATA MIGRATION (v10 → v11) ════════════════
+function migrateV10toV11(){
+  var migrated=0;
+  // Migrate matches
+  var legacyDB=localStorage.getItem(DB_KEY_LEGACY);
+  if(legacyDB){
+    try{
+      var oldMatches=JSON.parse(legacyDB);
+      var current=loadDB();
+      var existingIds={};
+      current.forEach(function(m){existingIds[m.id]=true});
+      oldMatches.forEach(function(m){
+        if(!m.id)m.id=id();
+        if(existingIds[m.id])return;
+        existingIds[m.id]=true;
+        // Add v11 fields with defaults
+        if(!m.playersA)m.playersA=[];
+        if(!m.playersB)m.playersB=[];
+        if(!m.rageQuit)m.rageQuit=false;
+        if(!m.timeBuckets)m.timeBuckets=null;
+        if(!m.playstyleA)m.playstyleA='balanced';
+        if(!m.playstyleB)m.playstyleB='balanced';
+        current.push(m);
+        migrated++;
+      });
+      saveDB(current);
+    }catch(e){}
+  }
+  // Migrate Elo
+  var legacyElo=localStorage.getItem(ELO_KEY_LEGACY);
+  if(legacyElo){
+    try{
+      var oldElo=JSON.parse(legacyElo);
+      var currentElo=loadElo();
+      Object.keys(oldElo).forEach(function(k){
+        if(!currentElo[k])currentElo[k]=oldElo[k];
+      });
+      saveElo(currentElo);
+    }catch(e){}
+  }
+  // Migrate K
+  var legacyK=localStorage.getItem(ELO_K_KEY_LEGACY);
+  if(legacyK && !localStorage.getItem(ELO_K_KEY)){
+    localStorage.setItem(ELO_K_KEY,legacyK);
+  }
+  return migrated;
+}
+
+// ════════════════ STORAGE ════════════════
 function loadDB(){try{var d=localStorage.getItem(DB_KEY);return d?JSON.parse(d):[]}catch(e){return[]}}
 function saveDB(db){try{localStorage.setItem(DB_KEY,JSON.stringify(db));return true}catch(e){return false}}
 function loadElo(){try{var d=localStorage.getItem(ELO_KEY);return d?JSON.parse(d):{}}catch(e){return{}}}
@@ -337,243 +460,785 @@ function getElo(){var e=loadElo();TEAMS.forEach(function(t){if(!e[t.name])e[t.na
 function getOptK(){try{return parseInt(localStorage.getItem(ELO_K_KEY))||32}catch(e){return 32}}
 function saveOptK(k){localStorage.setItem(ELO_K_KEY,Math.round(k).toString())}
 
+// ════════════════ PLAYER SYSTEM ════════════════
+function loadPlayers(){try{var d=localStorage.getItem(PLAYERS_KEY);return d?JSON.parse(d):{}}catch(e){return{}}}
+function savePlayers(p){try{localStorage.setItem(PLAYERS_KEY,JSON.stringify(p))}catch(e){}}
+
+function getPlayer(tag){
+  if(!tag)return null;
+  var p=loadPlayers();
+  var key=tag.trim().toLowerCase();
+  return p[key]||null;
+}
+
+function createPlayer(tag){
+  if(!tag)return null;
+  var p=loadPlayers();
+  var key=tag.trim().toLowerCase();
+  if(!p[key]){
+    p[key]={
+      tag:tag.trim(),
+      created:new Date().toISOString(),
+      games:0,
+      wins:0,
+      losses:0,
+      draws:0,
+      goalsFor:0,
+      goalsAgainst:0,
+      elo:1500,
+      playstyle:'balanced',
+      skillMovesPerGame:0,
+      rageQuitRate:0,
+      formStreak:0,
+      streakType:null,
+      lastPlayed:null,
+      teammates:{},
+      vsRecord:{}
+    };
+    savePlayers(p);
+  }
+  return p[key];
+}
+
+function updatePlayerStats(tag,goalsFor,goalsAgainst,win,teammates,opponents){
+  if(!tag)return;
+  var p=loadPlayers();
+  var key=tag.trim().toLowerCase();
+  if(!p[key])createPlayer(tag);
+  var player=p[key];
+  
+  player.games++;
+  player.goalsFor+=goalsFor;
+  player.goalsAgainst+=goalsAgainst;
+  player.lastPlayed=new Date().toISOString();
+  
+  if(win==='W')player.wins++;
+  else if(win==='L')player.losses++;
+  else player.draws++;
+  
+  // Update streak
+  var result=win;
+  if(!player.streakType){player.streakType=result;player.formStreak=1;}
+  else if(player.streakType===result){player.formStreak++;}
+  else{player.streakType=result;player.formStreak=1;}
+  
+  // Teammate chemistry
+  if(teammates){teammates.forEach(function(t){
+    if(t===tag)return;
+    var tKey=t.trim().toLowerCase();
+    if(!player.teammates[tKey])player.teammates[tKey]={games:0,wins:0};
+    player.teammates[tKey].games++;
+    if(win==='W')player.teammates[tKey].wins++;
+  });}
+  
+  // Vs record
+  if(opponents){opponents.forEach(function(o){
+    var oKey=o.trim().toLowerCase();
+    if(!player.vsRecord[oKey])player.vsRecord[oKey]={games:0,wins:0};
+    player.vsRecord[oKey].games++;
+    if(win==='W')player.vsRecord[oKey].wins++;
+  });}
+  
+  // Classify playstyle
+  player.playstyle=classifyPlaystyle(player);
+  
+  savePlayers(p);
+}
+
+function classifyPlaystyle(player){
+  if(player.games<3)return'balanced';
+  var gpg=player.goalsFor/player.games;
+  var cpg=player.goalsAgainst/player.games;
+  var gd=gpg-cpg;
+  
+  if(gpg>6 && cpg>4)return'skill_spammer';
+  if(gpg<3 && cpg<3)return'park_bus';
+  if(gpg>5 && gd>2)return'counter_rush';
+  if(gpg>4 && cpg>2 && gd<1)return'possession';
+  return'balanced';
+}
+
+function getPlayerElo(tag){
+  var p=getPlayer(tag);
+  return p?p.elo:1500;
+}
+
+function updatePlayerElo(tag,opponentElo,sa,sb){
+  if(!tag)return;
+  var p=loadPlayers();
+  var key=tag.trim().toLowerCase();
+  if(!p[key])createPlayer(tag);
+  var player=p[key];
+  
+  var ra=player.elo||1500;
+  var ea=1/(1+Math.pow(10,(opponentElo-ra)/400));
+  var aa=sa>sb?1:sa<sb?0:0.5;
+  var gd=Math.abs(sa-sb);
+  var mm=Math.min(1+gd*0.15,2.5);
+  var K=Math.max(16,48-player.games); // Higher K for new players
+  
+  player.elo=Math.round(ra+K*mm*(aa-ea));
+  savePlayers(p);
+}
+
+function getTeamPlayerElo(players){
+  if(!players||!players.length)return 1500;
+  var total=0,count=0;
+  players.forEach(function(tag){
+    var p=getPlayer(tag);
+    if(p){total+=p.elo;count++;}
+  });
+  return count>0?Math.round(total/count):1500;
+}
+
+function getTeamPlaystyle(players){
+  if(!players||!players.length)return'balanced';
+  var styles={};
+  players.forEach(function(tag){
+    var p=getPlayer(tag);
+    if(p){styles[p.playstyle]=(styles[p.playstyle]||0)+1;}
+  });
+  var max=0,dominant='balanced';
+  Object.keys(styles).forEach(function(s){
+    if(styles[s]>max){max=styles[s];dominant=s;}
+  });
+  return dominant;
+}
+
+function getChemistryMultiplier(players){
+  if(!players||players.length<2)return 1.0;
+  var p1=getPlayer(players[0]),p2=getPlayer(players[1]);
+  if(!p1||!p2)return 1.0;
+  var tKey=players[1].trim().toLowerCase();
+  var chem=p1.teammates[tKey];
+  if(!chem||chem.games<2)return 1.0;
+  var winRate=chem.wins/chem.games;
+  return 0.9+winRate*0.2; // 0.9 to 1.1 range
+}
+
+// ════════════════ DATA RECOVERY (all versions) ════════════════
 function recoverData(){
   var current=loadDB();var ids={};current.forEach(function(m){ids[m.id]=true});var recovered=0;
-  var keys=['epl4v4:v9:matches','epl4v4:v8:matches','epl4v4:v7:matches','epl4v4:v6:matches','epl4v4:v5:matches','epl4v4:v4:matches','epl4v4:v3:matches','epl4v4:v2:matches','epl4v4:v1:matches','epl4v4:matches','epl4v4:results'];
-  keys.forEach(function(key){try{var raw=localStorage.getItem(key);if(!raw)return;var data=JSON.parse(raw);if(!Array.isArray(data))return;data.forEach(function(m){if(!m.id)m.id=id();if(ids[m.id])return;ids[m.id]=true;if(!m.date)m.date=new Date().toISOString();if(!m.status)m.status=m.ftActual?'result':'pending';if(m.teamA){var na=normalizeName(m.teamA);if(na)m.teamA=na}if(m.teamB){var nb=normalizeName(m.teamB);if(nb)m.teamB=nb}current.push(m);recovered++})}catch(e){}});
-  if(recovered>0){saveDB(current)}return recovered;
-}
-function normalizeName(input){if(!input)return null;var c=input.trim();var found=TEAMS.find(function(t){return t.name===c||t.full===c||t.abbr===c});if(found)return found.name;var l=c.toLowerCase().replace(/\s+/g,'');found=TEAMS.find(function(t){return t.name.toLowerCase()===l||t.full.toLowerCase().replace(/\s+/g,'')===l});return found?found.name:null}
-
-function backtestEloK(matches,k){var temp={};TEAMS.forEach(function(t){temp[t.name]=1500});var correct=0,total=0;var sorted=[].concat(matches).sort(function(a,b){return new Date(a.date)-new Date(b.date)});sorted.forEach(function(m){var g=parseScore(m.ftActual);if(!g)return;var ra=temp[m.teamA]||1500,rb=temp[m.teamB]||1500;var ea=1/(1+Math.pow(10,(rb-ra)/400));var pw=ea>0.55?'H':ea<0.45?'A':'D';var aw=g.a>g.b?'H':g.a<g.b?'A':'D';if(pw===aw)correct++;total++;var aa=g.a>g.b?1:g.a<g.b?0:0.5;var gd=Math.abs(g.a-g.b);var mm=Math.min(1+gd*0.15,2.5);temp[m.teamA]=Math.round(ra+k*mm*(aa-ea));temp[m.teamB]=Math.round(rb+k*mm*((1-aa)-(1-ea)))});return total>0?(correct/total)*100:0}
-function optimizeEloK(results){if(results.length<15)return 32;var bestK=32,bestAcc=0;for(var k=16;k<=56;k+=4){var acc=backtestEloK(results,k);if(acc>bestAcc){bestAcc=acc;bestK=k}}saveOptK(bestK);return bestK}
-function updateElo(a,b,sa,sb){var e=loadElo();var ra=e[a]||1500,rb=e[b]||1500;var ea=1/(1+Math.pow(10,(rb-ra)/400));var aa=sa>sb?1:sa<sb?0:0.5;var gd=Math.abs(sa-sb);var mm=Math.min(1+gd*0.15,2.5);var K=getOptK();e[a]=Math.round(ra+K*mm*(aa-ea));e[b]=Math.round(rb+K*mm*((1-aa)-(1-ea)));saveElo(e)}
-function rebuildElo(){var e={};TEAMS.forEach(function(t){e[t.name]=1500});saveElo(e);var db=loadDB().filter(function(m){return m.ftActual}).reverse();db.forEach(function(m){var g=parseScore(m.ftActual);if(g)updateElo(m.teamA,m.teamB,g.a,g.b)})}
-
-function calibrateRho(resultsOnly){if(resultsOnly.length<10)return-0.08;var tots=resultsOnly.map(function(m){return parseScore(m.ftActual)}).filter(Boolean);var lowCount=tots.filter(function(g){return g.a<=3&&g.b<=3}).length;return clamp(-lowCount/tots.length*0.3,-0.12,-0.02)}
-function poissonPMF(k,lam){if(lam<=0)return k===0?1:0;if(k>25)return 0;var lp=-lam+k*Math.log(lam);for(var i=2;i<=k;i++)lp-=Math.log(i);return Math.exp(lp)}
-function dixonColes(a,b,lA,lB,rho){if(a===0&&b===0)return 1-lA*lB*rho;if(a===0&&b===1)return 1+lA*rho;if(a===1&&b===0)return 1+lB*rho;if(a===1&&b===1)return 1-rho;return 1}
-
-function poissonProbs(lamA,lamB,maxG,rho){maxG=maxG||18;rho=rho||-0.06;var probs=[],total=0,hw=0,dr=0,aw=0;for(var a=0;a<=maxG;a++){for(var b=0;b<=maxG;b++){var raw=poissonPMF(a,lamA)*poissonPMF(b,lamB);var dc=dixonColes(a,b,lamA,lamB,rho);var p=Math.max(0,raw*dc);if(p>1e-8){probs.push({a:a,b:b,score:a+'-'+b,prob:p,total:a+b});total+=p;if(a>b)hw+=p;else if(a===b)dr+=p;else aw+=p}}}if(total<=0)return null;probs.forEach(function(p){p.prob/=total});probs.sort(function(a,b){return b.prob-a.prob});return{probs:probs.slice(0,15),homeWin:hw/total,draw:dr/total,awayWin:aw/total,expTotal:probs.reduce(function(s,p){return s+p.total*p.prob},0)}}
-
-function buildTeamProfile(teamName,allMatches){
-  var wr=allMatches.filter(function(m){return m.ftActual});var scored=[],conceded=[],totals=[],allScores=[],htRatios=[],htScored=[],htConceded=[];
-  wr.forEach(function(m){var g=parseScore(m.ftActual);if(!g)return;var ht=parseScore(m.htActual);
-    if(m.teamA===teamName){scored.push(g.a);conceded.push(g.b);totals.push(g.total);allScores.push({s:g.a,c:g.b,date:m.date});if(ht){htRatios.push(ht.total/g.total);htScored.push(ht.a);htConceded.push(ht.b)}}
-    if(m.teamB===teamName){scored.push(g.b);conceded.push(g.a);totals.push(g.total);allScores.push({s:g.b,c:g.a,date:m.date});if(ht){htRatios.push(ht.total/g.total);htScored.push(ht.b);htConceded.push(ht.a)}}
+  var keys=['epl4v4:v11:matches','epl4v4:v10:matches','epl4v4:v9:matches','epl4v4:v8:matches','epl4v4:v7:matches','epl4v4:v6:matches','epl4v4:v5:matches','epl4v4:v4:matches','epl4v4:v3:matches','epl4v4:v2:matches','epl4v4:v1:matches','epl4v4:matches','epl4v4:results'];
+  keys.forEach(function(key){
+    try{
+      var raw=localStorage.getItem(key);if(!raw)return;
+      var data=JSON.parse(raw);if(!Array.isArray(data))return;
+      data.forEach(function(m){
+        if(!m.id)m.id=id();
+        if(ids[m.id])return;
+        ids[m.id]=true;
+        if(!m.date)m.date=new Date().toISOString();
+        if(!m.status)m.status=m.ftActual?'result':'pending';
+        if(m.teamA){var na=normalizeName(m.teamA);if(na)m.teamA=na}
+        if(m.teamB){var nb=normalizeName(m.teamB);if(nb)m.teamB=nb}
+        // Ensure v11 fields exist
+        if(!m.playersA)m.playersA=[];
+        if(!m.playersB)m.playersB=[];
+        if(!m.rageQuit)m.rageQuit=false;
+        if(!m.timeBuckets)m.timeBuckets=null;
+        current.push(m);recovered++;
+      });
+    }catch(e){}
   });
-  var n=scored.length;if(!n)return{games:0,avgScored:0,avgConceded:0,avgTotal:0,stdScored:0,stdConceded:0,cvScored:1,cvConceded:1,attack:'medium',defense:'medium weakness',style:'balanced',trend:'→ stable',consistency:'unknown',defReliability:'unknown',formMult:1,defFormMult:1,htRatio:0.45,htAvgScored:0,htAvgConceded:0,streak:0,streakType:null,streakMult:1,recentAvg:0,recentCn:0,secondHalfPct:0.55};
+  if(recovered>0){saveDB(current)}
+  return recovered;
+}
+
+function normalizeName(input){
+  if(!input)return null;var c=input.trim();
+  var found=TEAMS.find(function(t){return t.name===c||t.full===c||t.abbr===c});
+  if(found)return found.name;
+  var l=c.toLowerCase().replace(/\s+/g,'');
+  found=TEAMS.find(function(t){return t.name.toLowerCase()===l||t.full.toLowerCase().replace(/\s+/g,'')===l});
+  return found?found.name:null;
+}
+
+// ════════════════ ELO (Team-level, kept for compatibility) ════════════════
+function backtestEloK(matches,k){
+  var temp={};TEAMS.forEach(function(t){temp[t.name]=1500});
+  var correct=0,total=0;
+  var sorted=[].concat(matches).sort(function(a,b){return new Date(a.date)-new Date(b.date)});
+  sorted.forEach(function(m){
+    var g=parseScore(m.ftActual);if(!g)return;
+    var ra=temp[m.teamA]||1500,rb=temp[m.teamB]||1500;
+    var ea=1/(1+Math.pow(10,(rb-ra)/400));
+    var pw=ea>0.55?'H':ea<0.45?'A':'D';
+    var aw=g.a>g.b?'H':g.a<g.b?'A':'D';
+    if(pw===aw)correct++;total++;
+    var aa=g.a>g.b?1:g.a<g.b?0:0.5;
+    var gd=Math.abs(g.a-g.b);
+    var mm=Math.min(1+gd*0.15,2.5);
+    temp[m.teamA]=Math.round(ra+k*mm*(aa-ea));
+    temp[m.teamB]=Math.round(rb+k*mm*((1-aa)-(1-ea)));
+  });
+  return total>0?(correct/total)*100:0;
+}
+
+function optimizeEloK(results){
+  if(results.length<15)return 32;
+  var bestK=32,bestAcc=0;
+  for(var k=16;k<=56;k+=4){
+    var acc=backtestEloK(results,k);
+    if(acc>bestAcc){bestAcc=acc;bestK=k}
+  }
+  saveOptK(bestK);
+  return bestK;
+}
+
+function updateElo(a,b,sa,sb){
+  var e=loadElo();
+  var ra=e[a]||1500,rb=e[b]||1500;
+  var ea=1/(1+Math.pow(10,(rb-ra)/400));
+  var aa=sa>sb?1:sa<sb?0:0.5;
+  var gd=Math.abs(sa-sb);
+  var mm=Math.min(1+gd*0.15,2.5);
+  var K=getOptK();
+  // Cap goal diff at 3 for Volta (rage quits distort large scores)
+  var cappedGd=Math.min(gd,3);
+  var cappedMm=Math.min(1+cappedGd*0.15,2.5);
+  e[a]=Math.round(ra+K*cappedMm*(aa-ea));
+  e[b]=Math.round(rb+K*cappedMm*((1-aa)-(1-ea)));
+  saveElo(e);
+}
+
+function rebuildElo(){
+  var e={};TEAMS.forEach(function(t){e[t.name]=1500});saveElo(e);
+  var db=loadDB().filter(function(m){return m.ftActual&&!m.rageQuit}).reverse();
+  db.forEach(function(m){
+    var g=parseScore(m.ftActual);
+    if(g)updateElo(m.teamA,m.teamB,g.a,g.b);
+  });
+}
+
+// ════════════════ VOLTA-SPECIFIC: Negative Binomial ════════════════
+function nbinomPMF(k,r,p){
+  // Negative binomial: variance > mean (overdispersed, perfect for Volta)
+  if(k<0||r<=0||p<=0||p>1)return 0;
+  // Use log-gamma for numerical stability
+  var lgr=lnGamma(k+r),lgrk=lnGamma(r),lgk1=lnGamma(k+1);
+  var lp=lgr-lgrk-lgk1+r*Math.log(p)+k*Math.log(1-p);
+  return Math.exp(lp);
+}
+
+function lnGamma(z){
+  // Lanczos approximation
+  if(z<0.5)return Math.log(Math.PI/Math.sin(Math.PI*z))-lnGamma(1-z);
+  var g=7;
+  var p=[0.99999999999980993,676.5203681218851,-1259.1392167224028,771.32342877765313,-176.61502916214059,12.507343278686905,-0.13857109526572012,9.9843695780195716e-6,1.5056327351493116e-7];
+  var x=p[0];
+  for(var i=1;i<p.length;i++)x+=p[i]/(z+i);
+  var t=z+g+0.5;
+  return 0.5*Math.log(2*Math.PI)+(z+0.5)*Math.log(t)-t+Math.log(x)-Math.log(z);
+}
+
+function voltaProbs(lamA,lamB,maxG,playstyleA,playstyleB){
+  // Volta: minimum 1.5 goals per side (almost impossible to score less in 10 min)
+  // Higher variance than Poisson
+  maxG=maxG||18;
+  
+  var rA=Math.max(1.5,lamA); // dispersion parameter
+  var rB=Math.max(1.5,lamB);
+  var pA=rA/(rA+lamA); // success prob
+  var pB=rB/(rB+lamB);
+  
+  // Playstyle interaction effects
+  var interactA=1.0,interactB=1.0;
+  if(playstyleA==='skill_spammer'&&playstyleB==='park_bus'){interactA=0.6;interactB=1.1;}
+  if(playstyleA==='counter_rush'&&playstyleB==='possession'){interactA=1.4;interactB=0.8;}
+  if(playstyleA==='park_bus'&&playstyleB==='counter_rush'){interactA=0.7;interactB=1.3;}
+  
+  rA*=interactA;rB*=interactB;
+  
+  var probs=[],total=0,hw=0,dr=0,aw=0;
+  for(var a=0;a<=maxG;a++){
+    for(var b=0;b<=maxG;b++){
+      var pa=nbinomPMF(a,rA,pA);
+      var pb=nbinomPMF(b,rB,pB);
+      var p=pa*pb;
+      if(p>1e-8){
+        probs.push({a:a,b:b,score:a+'-'+b,prob:p,total:a+b});
+        total+=p;
+        if(a>b)hw+=p;else if(a===b)dr+=p;else aw+=p;
+      }
+    }
+  }
+  if(total<=0)return null;
+  probs.forEach(function(p){p.prob/=total});
+  probs.sort(function(a,b){return b.prob-a.prob});
+  return{
+    probs:probs.slice(0,15),
+    homeWin:hw/total,
+    draw:dr/total,
+    awayWin:aw/total,
+    expTotal:probs.reduce(function(s,p){return s+p.total*p.prob},0)
+  };
+}
+
+// ════════════════ VOLTA: Time Bucket Model ════════════════
+function predictTimeBuckets(totalA,totalB,playstyleA,playstyleB){
+  // Volta 10-min match: 0-2 min (blitz), 2-7 min (main), 7-10 min (chaos)
+  var baseRatio=[0.25,0.50,0.25]; // default distribution
+  
+  // Adjust by playstyle
+  if(playstyleA==='counter_rush'||playstyleB==='counter_rush'){
+    baseRatio=[0.35,0.45,0.20]; // rushers score early
+  }
+  if(playstyleA==='skill_spammer'||playstyleB==='skill_spammer'){
+    baseRatio=[0.20,0.40,0.40]; // skill moves shine in chaos period
+  }
+  if(playstyleA==='park_bus'&&playstyleB==='park_bus'){
+    baseRatio=[0.15,0.55,0.30]; // slow start, few goals
+  }
+  
+  // Final minute spike (FIFA hidden mechanic)
+  baseRatio[2]+=0.05;baseRatio[1]-=0.05;
+  
+  return{
+    bucket0_2:{a:Math.round(totalA*baseRatio[0]),b:Math.round(totalB*baseRatio[0])},
+    bucket2_7:{a:Math.round(totalA*baseRatio[1]),b:Math.round(totalB*baseRatio[1])},
+    bucket7_10:{a:Math.round(totalA*baseRatio[2]),b:Math.round(totalB*baseRatio[2])}
+  };
+}
+
+// ════════════════ TEAM PROFILE (updated for Volta) ════════════════
+function buildTeamProfile(teamName,allMatches){
+  var wr=allMatches.filter(function(m){return m.ftActual&&!m.rageQuit});
+  var scored=[],conceded=[],totals=[],allScores=[];
+  
+  wr.forEach(function(m){
+    var g=parseScore(m.ftActual);if(!g)return;
+    if(m.teamA===teamName){scored.push(g.a);conceded.push(g.b);totals.push(g.total);allScores.push({s:g.a,c:g.b,date:m.date});}
+    if(m.teamB===teamName){scored.push(g.b);conceded.push(g.a);totals.push(g.total);allScores.push({s:g.b,c:g.a,date:m.date});}
+  });
+  
+  var n=scored.length;
+  if(!n)return{
+    games:0,avgScored:0,avgConceded:0,avgTotal:0,stdScored:0,stdConceded:0,
+    cvScored:1,cvConceded:1,attack:'medium',defense:'medium weakness',
+    style:'balanced',trend:'→ stable',consistency:'unknown',
+    formMult:1,streakMult:1,recentAvg:0,recentCn:0
+  };
+  
   var as=avg(scored),ac=avg(conceded),at=avg(totals),ss=stdDev(scored),scs=stdDev(conceded);
   var cvSc=as>0?ss/as:1,cvCn=ac>0?scs/ac:1;
+  
   var attack=as>=5?'elite':as>=3.5?'high':as>=2?'medium':'low';
   var defense=ac>=5?'high weakness':ac>=3?'medium weakness':'low weakness';
   var style=ss>2.5?'chaotic':ss>1.5?'aggressive':'balanced';
-  var recentSc3=allScores.slice(-3).map(function(s){return s.s});
-  var olderSc3=allScores.slice(-7,-3).map(function(s){return s.s});
-  var trend=olderSc3.length>=2?(avg(recentSc3)>avg(olderSc3)+0.5?'↑ rising':avg(recentSc3)<avg(olderSc3)-0.5?'↓ falling':'→ stable'):'→ stable';
-  var consistency=cvSc<0.3?'consistent':cvSc<0.6?'moderate':'volatile';
-  var defReliability=cvCn<0.3?'high':cvCn<0.6?'medium':'low';
-  var streak=0,streakType=null;var recent=allScores.slice(-5);
-  for(var i=recent.length-1;i>=0;i--){var r=recent[i],result=r.s>r.c?'W':r.s<r.c?'L':'D';if(!streakType)streakType=result;if(result===streakType)streak++;else break}
-  var last5=allScores.slice(-5);var recentAvg=last5.length?avg(last5.map(function(s){return s.s})):as;
+  
+  var last5=allScores.slice(-5);
+  var recentAvg=last5.length?avg(last5.map(function(s){return s.s})):as;
   var recentCn=last5.length?avg(last5.map(function(s){return s.c})):ac;
-  var streakMult=streakType==='W'&&streak>=3?1.15:streakType==='W'&&streak>=2?1.07:streakType==='L'&&streak>=3?0.85:streakType==='L'&&streak>=2?0.93:1;
-  var htRatio=htRatios.length?avg(htRatios):0.45;
-  var htAvgSc=htScored.length?avg(htScored):(as*htRatio);
-  var htAvgCn=htConceded.length?avg(htConceded):(ac*htRatio);
-  var shPct=htRatios.length?(1-avg(htRatios)):0.55;
-  return{games:n,avgScored:as,avgConceded:ac,avgTotal:at,stdScored:ss,stdConceded:scs,cvScored:cvSc,cvConceded:cvCn,attack:attack,defense:defense,style:style,trend:trend,consistency:consistency,defReliability:defReliability,formMult:recentAvg>as+.5?1.1:recentAvg<as-.5?0.9:1,defFormMult:recentCn>ac+.5?1.1:recentCn<ac-.5?0.9:1,streak:streak,streakType:streakType,streakMult:streakMult,htRatio:htRatio,htAvgScored:htAvgSc,htAvgConceded:htAvgCn,secondHalfPct:shPct,recentAvg:recentAvg,recentCn:recentCn};
+  
+  var streak=0,streakType=null;
+  var recent=allScores.slice(-5);
+  for(var i=recent.length-1;i>=0;i--){
+    var r=recent[i],result=r.s>r.c?'W':r.s<r.c?'L':'D';
+    if(!streakType)streakType=result;
+    if(result===streakType)streak++;else break;
+  }
+  
+  var streakMult=streakType==='W'&&streak>=3?1.15:streakType==='W'&&streak>=2?1.07:
+                 streakType==='L'&&streak>=3?0.85:streakType==='L'&&streak>=2?0.93:1;
+  
+  // Volta: 3-day half-life (players play 10+ matches/day)
+  var now=Date.now();
+  var weightedScores=allScores.map(function(s){
+    var days=(now-new Date(s.date).getTime())/86400000;
+    var w=Math.exp(-Math.log(2)*days/3); // 3-day half-life
+    return{s:s.s,c:s.c,weight:w};
+  });
+  var wTotal=weightedScores.reduce(function(s,v){return s+v.weight},0);
+  var wAvg=wTotal>0?weightedScores.reduce(function(s,v){return s+v.s*v.weight},0)/wTotal:as;
+  
+  return{
+    games:n,avgScored:as,avgConceded:ac,avgTotal:at,
+    stdScored:ss,stdConceded:scs,cvScored:cvSc,cvConceded:cvCn,
+    attack:attack,defense:defense,style:style,
+    trend:recentAvg>as+0.5?'↑ rising':recentAvg<as-0.5?'↓ falling':'→ stable',
+    consistency:cvSc<0.3?'consistent':cvSc<0.6?'moderate':'volatile',
+    formMult:wAvg>as+0.3?1.1:wAvg<as-0.3?0.9:1,
+    streak:streak,streakType:streakType,streakMult:streakMult,
+    recentAvg:recentAvg,recentCn:recentCn
+  };
 }
 
 function getWeightedH2H(tA,tB,allMatches){
-  var raw=allMatches.filter(function(m){return m.ftActual&&((m.teamA===tA&&m.teamB===tB)||(m.teamA===tB&&m.teamB===tA))}).map(function(m){var g=parseScore(m.ftActual);if(!g)return null;var ht=parseScore(m.htActual);var days=(Date.now()-new Date(m.date||Date.now()).getTime())/(86400000);var w=Math.exp(-Math.log(2)*days/21);var venueMatch=m.teamA===tA;w*=venueMatch?1.4:0.7;return{a:g.a,b:g.b,total:g.total,weight:w,date:m.date,ht:ht}}).filter(Boolean);
-  if(!raw.length)return{matches:[],weightedAvgTotal:0,htWeightedAvg:0,count:0,totalWeight:0};
+  var raw=allMatches.filter(function(m){
+    return m.ftActual&&!m.rageQuit&&((m.teamA===tA&&m.teamB===tB)||(m.teamA===tB&&m.teamB===tA))
+  }).map(function(m){
+    var g=parseScore(m.ftActual);if(!g)return null;
+    var days=(Date.now()-new Date(m.date||Date.now()).getTime())/86400000;
+    var w=Math.exp(-Math.log(2)*days/3); // 3-day half-life for Volta
+    var venueMatch=m.teamA===tA;
+    w*=venueMatch?1.1:0.9; // Reduced home advantage for Volta
+    return{a:g.a,b:g.b,total:g.total,weight:w,date:m.date};
+  }).filter(Boolean);
+  
+  if(!raw.length)return{matches:[],weightedAvgTotal:0,count:0,totalWeight:0};
   var tw=raw.reduce(function(s,h){return s+h.weight},0);
   var wTot=tw>0?raw.reduce(function(s,h){return s+h.total*h.weight},0)/tw:0;
-  var htTot=raw.filter(function(h){return h.ht}).length>0?(function(){var htw=raw.filter(function(h){return h.ht}).reduce(function(s,h){return s+h.weight},0);return htw>0?raw.filter(function(h){return h.ht}).reduce(function(s,h){return s+h.ht.total*h.weight},0)/htw:null})():null;
-  return{matches:raw,weightedAvgTotal:wTot,htWeightedAvg:htTot,count:raw.length,totalWeight:tw};
+  return{matches:raw,weightedAvgTotal:wTot,count:raw.length,totalWeight:tw};
 }
 
-function buildSplitProfile(teamName,allMatches){var hs=[],hc=[],hht=[],aas=[],acn=[],aht=[];allMatches.filter(function(m){return m.ftActual}).forEach(function(m){var g=parseScore(m.ftActual);if(!g)return;var ht=parseScore(m.htActual);if(m.teamA===teamName){hs.push(g.a);hc.push(g.b);if(ht)hht.push(ht.total)}if(m.teamB===teamName){aas.push(g.b);acn.push(g.a);if(ht)aht.push(ht.total)}});return{homeAvgScored:hs.length?avg(hs):0,homeAvgConceded:hc.length?avg(hc):0,awayAvgScored:aas.length?avg(aas):0,awayAvgConceded:acn.length?avg(acn):0,homeHTAvg:hht.length?avg(hht):null,awayHTAvg:aht.length?avg(aht):null,homeGames:hs.length,awayGames:aas.length,homeAdvantage:(hs.length&&aas.length)?avg(hs)-avg(aas):0}}
-function computeTeamSpecificAvg(teamName,resultsOnly){var g=resultsOnly.filter(function(m){var g=parseScore(m.ftActual);return g&&(m.teamA===teamName||m.teamB===teamName)}).map(function(m){return parseScore(m.ftActual).total});return g.length>=3?avg(g):null}
+function buildSplitProfile(teamName,allMatches){
+  // Volta: home/away means almost nothing, but keep for compatibility
+  var hs=[],hc=[],aas=[],acn=[];
+  allMatches.filter(function(m){return m.ftActual&&!m.rageQuit}).forEach(function(m){
+    var g=parseScore(m.ftActual);if(!g)return;
+    if(m.teamA===teamName){hs.push(g.a);hc.push(g.b);}
+    if(m.teamB===teamName){aas.push(g.b);acn.push(g.a);}
+  });
+  return{
+    homeAvgScored:hs.length?avg(hs):0,homeAvgConceded:hc.length?avg(hc):0,
+    awayAvgScored:aas.length?avg(aas):0,awayAvgConceded:acn.length?avg(acn):0,
+    homeGames:hs.length,awayGames:aas.length,
+    homeAdvantage:(hs.length&&aas.length)?avg(hs)-avg(aas):0
+  };
+}
 
-function computeBlendedLambdas(pA,pB,splitA,splitB,eloA,eloB,gAvg,teamAvgA,teamAvgB){
-  var leaguePerA=Math.max(0.5,teamAvgA||(gAvg/2));var leaguePerB=Math.max(0.5,teamAvgB||(gAvg/2));
-  var shrinkA=Math.min(pA.games/8,1);var shrinkB=Math.min(pB.games/8,1);
-  var rawAtkA=pA.games>=3?pA.avgScored:leaguePerA;var rawAtkB=pB.games>=3?pB.avgScored:leaguePerB;
-  var blendedAtkA=rawAtkA*shrinkA+leaguePerA*(1-shrinkA);var blendedAtkB=rawAtkB*shrinkB+leaguePerB*(1-shrinkB);
-  var rawDefA=pA.games>=3?pA.avgConceded:leaguePerA;var rawDefB=pB.games>=3?pB.avgConceded:leaguePerB;
-  var blendedDefA=rawDefA*shrinkA+leaguePerA*(1-shrinkA);var blendedDefB=rawDefB*shrinkB+leaguePerB*(1-shrinkB);
-  var atkStrA=blendedAtkA/leaguePerA;var defStrA=blendedDefA/leaguePerA;
-  var atkStrB=blendedAtkB/leaguePerB;var defStrB=blendedDefB/leaguePerB;
+function computeTeamSpecificAvg(teamName,resultsOnly){
+  var g=resultsOnly.filter(function(m){
+    var g=parseScore(m.ftActual);
+    return g&&!m.rageQuit&&(m.teamA===teamName||m.teamB===teamName);
+  }).map(function(m){return parseScore(m.ftActual).total});
+  return g.length>=3?avg(g):null;
+}
+
+// ════════════════ BLENDED LAMBDAS (Player-Aware) ════════════════
+function computeBlendedLambdas(pA,pB,splitA,splitB,eloA,eloB,playerEloA,playerEloB,gAvg,teamAvgA,teamAvgB,chemA,chemB){
+  var leaguePerA=Math.max(1.5,teamAvgA||(gAvg/2));
+  var leaguePerB=Math.max(1.5,teamAvgB||(gAvg/2));
+  
+  var shrinkA=Math.min(pA.games/8,1);
+  var shrinkB=Math.min(pB.games/8,1);
+  
+  var rawAtkA=pA.games>=3?pA.avgScored:leaguePerA;
+  var rawAtkB=pB.games>=3?pB.avgScored:leaguePerB;
+  
+  var blendedAtkA=rawAtkA*shrinkA+leaguePerA*(1-shrinkA);
+  var blendedAtkB=rawAtkB*shrinkB+leaguePerB*(1-shrinkB);
+  
+  var rawDefA=pA.games>=3?pA.avgConceded:leaguePerA;
+  var rawDefB=pB.games>=3?pB.avgConceded:leaguePerB;
+  
+  var blendedDefA=rawDefA*shrinkA+leaguePerA*(1-shrinkA);
+  var blendedDefB=rawDefB*shrinkB+leaguePerB*(1-shrinkB);
+  
+  var atkStrA=blendedAtkA/leaguePerA;
+  var defStrA=blendedDefA/leaguePerA;
+  var atkStrB=blendedAtkB/leaguePerB;
+  var defStrB=blendedDefB/leaguePerB;
+  
+  // Volta: reduced home advantage
   var homeAtkA=splitA.homeGames>=2?splitA.homeAvgScored/leaguePerA:atkStrA;
   var awayAtkB=splitB.awayGames>=2?splitB.awayAvgScored/leaguePerB:atkStrB;
   var homeDefA=splitA.homeGames>=2?splitA.homeAvgConceded/leaguePerA:defStrA;
   var awayDefB=splitB.awayGames>=2?splitB.awayAvgConceded/leaguePerB:defStrB;
-  var statLamA=clamp(homeAtkA*awayDefB*leaguePerA*pA.formMult*pA.streakMult,0.5,25);
-  var statLamB=clamp(awayAtkB*homeDefA*leaguePerB*pB.formMult*pB.streakMult,0.5,25);
-  var eloDiff=eloA-eloB;var eloExpA=1/(1+Math.pow(10,-eloDiff/400));
-  var eloLamA=(teamAvgA||gAvg)*(0.5+(eloExpA-0.5)*0.6);var eloLamB=(teamAvgB||gAvg)-eloLamA;
-  var dataWeight=clamp((pA.games+pB.games)/20,0.1,0.8);var eloWeight=1-dataWeight;
-  return{lA:clamp(statLamA*dataWeight+eloLamA*eloWeight,0.3,25),lB:clamp(statLamB*dataWeight+eloLamB*eloWeight,0.3,25),dataWeight:dataWeight,eloWeight:eloWeight};
+  
+  var statLamA=clamp(homeAtkA*awayDefB*leaguePerA*pA.formMult*pA.streakMult*chemA,1.0,25);
+  var statLamB=clamp(awayAtkB*homeDefA*leaguePerB*pB.formMult*pB.streakMult*chemB,1.0,25);
+  
+  // Player Elo integration (60% player, 40% team for Volta)
+  var playerDiff=playerEloA-playerEloB;
+  var playerExpA=1/(1+Math.pow(10,-playerDiff/400));
+  var playerLamA=(teamAvgA||gAvg)*(0.5+(playerExpA-0.5)*0.8);
+  var playerLamB=(teamAvgB||gAvg)-playerLamA;
+  
+  // Team Elo (legacy, reduced weight)
+  var eloDiff=eloA-eloB;
+  var eloExpA=1/(1+Math.pow(10,-eloDiff/400));
+  var eloLamA=(teamAvgA||gAvg)*(0.5+(eloExpA-0.5)*0.4);
+  var eloLamB=(teamAvgB||gAvg)-eloLamA;
+  
+  var dataWeight=clamp((pA.games+pB.games)/20,0.1,0.6);
+  var playerWeight=0.5;
+  var teamWeight=0.5;
+  
+  return{
+    lA:clamp(statLamA*dataWeight+playerLamA*playerWeight*(1-dataWeight)+eloLamA*teamWeight*(1-dataWeight),1.0,25),
+    lB:clamp(statLamB*dataWeight+playerLamB*playerWeight*(1-dataWeight)+eloLamB*teamWeight*(1-dataWeight),1.0,25),
+    dataWeight:dataWeight,playerWeight:playerWeight,teamWeight:teamWeight
+  };
 }
 
-// ════════════════ IMPROVEMENT 4: Better confidence calculation ════════════════
-function calculateConfidence(pois,pA,pB){
-  // Entropy-based: lower entropy = higher confidence
+// ════════════════ CONFIDENCE (Volta-Adjusted) ════════════════
+function calculateConfidence(pois,pA,pB,playerDataA,playerDataB){
   var entropy=0;
   pois.probs.slice(0,10).forEach(function(p){if(p.prob>0)entropy-=p.prob*Math.log(p.prob)});
-  var entropyNorm=Math.min(1,entropy/2.5); // Normalize: 2.5 is high entropy cap
+  var entropyNorm=Math.min(1,entropy/2.5);
   var entropyScore=(1-entropyNorm)*100;
   
-  // Gap between top 2 probabilities
   var topGap=0;
   if(pois.probs.length>=2)topGap=(pois.probs[0].prob-pois.probs[1].prob)*100;
   
-  // Data sufficiency
-  var dataScore=Math.min(100,(pA.games+pB.games)*5);
+  // Data sufficiency (team + player games)
+  var teamGames=pA.games+pB.games;
+  var playerGames=0;
+  if(playerDataA)playerGames+=playerDataA.games;
+  if(playerDataB)playerGames+=playerDataB.games;
+  var dataScore=Math.min(100,(teamGames+playerGames)*3);
   
-  // Combined confidence
-  var conf=Math.round(entropyScore*0.4+topGap*2.5*0.3+dataScore*0.3);
+  // Player familiarity bonus
+  var familiarBonus=0;
+  if(playerDataA&&playerDataB&&playerDataA.games>=5&&playerDataB.games>=5)familiarBonus=10;
+  
+  var conf=Math.round(entropyScore*0.35+topGap*2.5*0.25+dataScore*0.3+familiarBonus*0.1);
   return clamp(conf,25,92);
 }
 
-// ════════════════ FULL PREDICTION WITH VALUE CALC ════════════════
-function makePrediction(teamA,teamB,marketOdds){
-  var db=loadDB();var resultsOnly=db.filter(function(m){return m.ftActual});
-  var pA=buildTeamProfile(teamA,db);var pB=buildTeamProfile(teamB,db);
-  var splitA=buildSplitProfile(teamA,db);var splitB=buildSplitProfile(teamB,db);
-  var h2hData=getWeightedH2H(teamA,teamB,db);var h2h=h2hData.matches;
-  var allTots=resultsOnly.map(function(m){var g=parseScore(m.ftActual);return g?g.total:null}).filter(function(t){return t!==null});
+// ════════════════ MAIN PREDICTION (Volta v11) ════════════════
+function makePrediction(teamA,teamB,playersA,playersB,marketOdds){
+  var db=loadDB();
+  var resultsOnly=db.filter(function(m){return m.ftActual&&!m.rageQuit});
+  
+  var pA=buildTeamProfile(teamA,db);
+  var pB=buildTeamProfile(teamB,db);
+  var splitA=buildSplitProfile(teamA,db);
+  var splitB=buildSplitProfile(teamB,db);
+  var h2hData=getWeightedH2H(teamA,teamB,db);
+  var h2h=h2hData.matches;
+  
+  var allTots=resultsOnly.map(function(m){
+    var g=parseScore(m.ftActual);
+    return g?g.total:null;
+  }).filter(function(t){return t!==null});
   var gAvg=allTots.length?avg(allTots):8;
-  var teamAvgA=computeTeamSpecificAvg(teamA,resultsOnly);var teamAvgB=computeTeamSpecificAvg(teamB,resultsOnly);
-  var eloAll=getElo();var eloA=eloAll[teamA]||1500;var eloB=eloAll[teamB]||1500;
-  var lambdas=computeBlendedLambdas(pA,pB,splitA,splitB,eloA,eloB,gAvg,teamAvgA,teamAvgB);
-  var rho=calibrateRho(resultsOnly);
-  var pois=poissonProbs(lambdas.lA,lambdas.lB,18,rho);
-  if(!pois)pois={probs:[{a:Math.round(lambdas.lA),b:Math.round(lambdas.lB),score:Math.round(lambdas.lA)+'-'+Math.round(lambdas.lB),prob:1,total:Math.round(lambdas.lA+lambdas.lB)}],homeWin:lambdas.lA>lambdas.lB?1:0,draw:lambdas.lA===lambdas.lB?1:0,awayWin:lambdas.lA<lambdas.lB?1:0,expTotal:lambdas.lA+lambdas.lB};
-  var top=pois.probs[0];var ftA=top.a,ftB=top.b;
-  if(h2h.length){var wgt=h2h.length>=6?0.5:h2h.length>=3?0.4:0.3;var bt=pois.expTotal*(1-wgt)+h2hData.weightedAvgTotal*wgt;var r=clamp(bt/Math.max(0.1,pois.expTotal),0.7,1.3);ftA=Math.round(top.a*r);ftB=Math.round(top.b*r)}
-  var htRatioA=pA.htRatio,htRatioB=pB.htRatio;var htMult=(htRatioA+htRatioB)/2;
-  if(h2hData.htWeightedAvg!==null&&h2h.length>=2){var h2hHtRatio=h2hData.htWeightedAvg/Math.max(0.1,h2hData.weightedAvgTotal);htMult=htMult*0.6+h2hHtRatio*0.4}
-  var htA=Math.round(ftA*htMult),htB=Math.round(ftB*htMult);
-  var shA=Math.max(0,ftA-htA),shB=Math.max(0,ftB-htB);
-  var tmA=getT(teamA),tmB=getT(teamB);var cls=ftA+ftB>15?'Chaos':ftA+ftB>11?'Open':ftA+ftB>7?'Balanced':'Closed';
   
-  // IMPROVEMENT 4: Better confidence
-  var confidence=calculateConfidence(pois,pA,pB);
+  var teamAvgA=computeTeamSpecificAvg(teamA,resultsOnly);
+  var teamAvgB=computeTeamSpecificAvg(teamB,resultsOnly);
   
-  var bestScore=top.score;var bestProb=top.prob;
-  var recType='VALUE';var recColor='#ffd54f';var recLabel='VALUE PLAY';
+  var eloAll=getElo();
+  var eloA=eloAll[teamA]||1500;
+  var eloB=eloAll[teamB]||1500;
+  
+  // Player system
+  var playerEloA=getTeamPlayerElo(playersA);
+  var playerEloB=getTeamPlayerElo(playersB);
+  var playstyleA=getTeamPlaystyle(playersA);
+  var playstyleB=getTeamPlaystyle(playersB);
+  var chemA=getChemistryMultiplier(playersA);
+  var chemB=getChemistryMultiplier(playersB);
+  
+  // Ensure players exist
+  if(playersA){playersA.forEach(function(tag){if(tag)createPlayer(tag);});}
+  if(playersB){playersB.forEach(function(tag){if(tag)createPlayer(tag);});}
+  
+  var lambdas=computeBlendedLambdas(pA,pB,splitA,splitB,eloA,eloB,playerEloA,playerEloB,gAvg,teamAvgA,teamAvgB,chemA,chemB);
+  
+  // Volta: Negative Binomial instead of Poisson
+  var volta=voltaProbs(lambdas.lA,lambdas.lB,18,playstyleA,playstyleB);
+  if(!volta)volta={
+    probs:[{a:Math.round(lambdas.lA),b:Math.round(lambdas.lB),score:Math.round(lambdas.lA)+'-'+Math.round(lambdas.lB),prob:1,total:Math.round(lambdas.lA+lambdas.lB)}],
+    homeWin:lambdas.lA>lambdas.lB?1:0,draw:lambdas.lA===lambdas.lB?1:0,awayWin:lambdas.lA<lambdas.lB?1:0,
+    expTotal:lambdas.lA+lambdas.lB
+  };
+  
+  var top=volta.probs[0];
+  var ftA=top.a,ftB=top.b;
+  
+  // H2H adjustment (reduced weight for Volta - player skill matters more)
+  if(h2h.length){
+    var wgt=h2h.length>=6?0.3:h2h.length>=3?0.2:0.15;
+    var bt=volta.expTotal*(1-wgt)+h2hData.weightedAvgTotal*wgt;
+    var r=clamp(bt/Math.max(0.1,volta.expTotal),0.8,1.2);
+    ftA=Math.round(top.a*r);
+    ftB=Math.round(top.b*r);
+  }
+  
+  // Volta: Time buckets instead of HT
+  var buckets=predictTimeBuckets(ftA,ftB,playstyleA,playstyleB);
+  
+  var tmA=getT(teamA),tmB=getT(teamB);
+  var cls=ftA+ftB>15?'Chaos':ftA+ftB>11?'Open':ftA+ftB>7?'Balanced':'Closed';
+  
+  // Player data for confidence
+  var playerDataA=playersA&&playersA[0]?getPlayer(playersA[0]):null;
+  var playerDataB=playersB&&playersB[0]?getPlayer(playersB[0]):null;
+  
+  var confidence=calculateConfidence(volta,pA,pB,playerDataA,playerDataB);
+  
+  var bestScore=top.score;
+  var bestProb=top.prob;
+  var recType='VALUE';
+  var recColor='#ffd54f';
+  var recLabel='VALUE PLAY';
   if(bestProb>0.2&&confidence>=65){recType='BEST';recColor='#00e87a';recLabel='🏆 BEST BET'}
   else if(bestProb<0.08||confidence<35){recType='AVOID';recColor='#ff5252';recLabel='⚠️ HIGH RISK'}
   
-  // Over/Under probability
   var totalGoals=ftA+ftB;
-  var overProb=0;pois.probs.forEach(function(p){if(p.total>10.5)overProb+=p.prob});
+  var overProb=0;
+  volta.probs.forEach(function(p){if(p.total>10.5)overProb+=p.prob});
   var underProb=1-overProb;
   
-  // IMPROVEMENT 1: Market value calculation
+  // Market value
   var valueSignals=[];
   if(marketOdds){
-    // Over 10.5 value
     if(marketOdds.over&&overProb>0){
       var overValue=(overProb*marketOdds.over)-1;
-      valueSignals.push({
-        market:'Over 10.5',
-        modelProb:overProb,
-        odds:marketOdds.over,
-        value:overValue,
-        type:overValue>0.05?'VALUE':overValue<-0.05?'NEGATIVE':'NEUTRAL'
-      });
+      valueSignals.push({market:'Over 10.5',modelProb:overProb,odds:marketOdds.over,value:overValue,type:overValue>0.05?'VALUE':overValue<-0.05?'NEGATIVE':'NEUTRAL'});
     }
-    // Under 10.5 value
     if(marketOdds.under&&underProb>0){
       var underValue=(underProb*marketOdds.under)-1;
-      valueSignals.push({
-        market:'Under 10.5',
-        modelProb:underProb,
-        odds:marketOdds.under,
-        value:underValue,
-        type:underValue>0.05?'VALUE':underValue<-0.05?'NEGATIVE':'NEUTRAL'
-      });
+      valueSignals.push({market:'Under 10.5',modelProb:underProb,odds:marketOdds.under,value:underValue,type:underValue>0.05?'VALUE':underValue<-0.05?'NEGATIVE':'NEUTRAL'});
     }
-    // Home win value
-    if(marketOdds.homeWin&&pois.homeWin>0){
-      var homeValue=(pois.homeWin*marketOdds.homeWin)-1;
-      valueSignals.push({
-        market:'Home Win',
-        modelProb:pois.homeWin,
-        odds:marketOdds.homeWin,
-        value:homeValue,
-        type:homeValue>0.05?'VALUE':homeValue<-0.05?'NEGATIVE':'NEUTRAL'
-      });
+    if(marketOdds.homeWin&&volta.homeWin>0){
+      var homeValue=(volta.homeWin*marketOdds.homeWin)-1;
+      valueSignals.push({market:'Home Win',modelProb:volta.homeWin,odds:marketOdds.homeWin,value:homeValue,type:homeValue>0.05?'VALUE':homeValue<-0.05?'NEGATIVE':'NEUTRAL'});
     }
   }
   
-  // IMPROVEMENT 3: Betting strategy logic
+  // Strategy
   var strategy={type:'',plays:[],reason:''};
   if(confidence>=70){
     strategy.type='SAFE';
-    strategy.plays.push({market:'Over/Under '+totalGoals.toFixed(1)+' goals',confidence:'HIGH',note:'Most reliable market in 4v4'});
+    strategy.plays.push({market:'Over/Under '+totalGoals.toFixed(1)+' goals',confidence:'HIGH',note:'Most reliable in Volta 4v4'});
     if(totalGoals>10.5)strategy.plays.push({market:'Over 10.5',confidence:'HIGH',note:overProb>0.55?'Strong signal':'Moderate signal'});
     else strategy.plays.push({market:'Under 10.5',confidence:'HIGH',note:underProb>0.55?'Strong signal':'Moderate signal'});
-    strategy.reason='High model confidence ('+confidence+'%). Over/Under is the safest 4v4 market.';
+    strategy.reason='High model confidence ('+confidence+'%). Player data strong.';
   }else if(confidence>=45){
     strategy.type='MEDIUM';
     var rangeLow=Math.max(0,totalGoals-2),rangeHigh=totalGoals+3;
     strategy.plays.push({market:'Total Goals Range '+rangeLow+'-'+rangeHigh,confidence:'MEDIUM',note:'Broader range for moderate confidence'});
     strategy.plays.push({market:'Over/Under '+totalGoals.toFixed(1),confidence:'MEDIUM',note:'Reduced stake recommended'});
-    strategy.reason='Moderate confidence ('+confidence+'%). Consider range betting or reduced stakes.';
+    strategy.reason='Moderate confidence ('+confidence+'%). Consider range betting.';
   }else{
     strategy.type='AVOID';
-    strategy.reason='Low confidence ('+confidence+'%). Model data insufficient. Best to observe or use minimum stake.';
+    strategy.reason='Low confidence ('+confidence+'%). Insufficient player/team data.';
   }
-  if(pA.games<3||pB.games<3){strategy.type='AVOID';strategy.reason='Insufficient team data. Wait for more results before betting.'}
+  if(pA.games<3||pB.games<3||(playerDataA&&playerDataA.games<3)||(playerDataB&&playerDataB.games<3)){
+    strategy.type='AVOID';
+    strategy.reason='Insufficient data. Wait for more Volta matches.';
+  }
   
-  var scoringPattern='',htPattern='';
+  var scoringPattern='';
   if(ftA>ftB+3)scoringPattern=teamA+' DOMINANT';
   else if(ftB>ftA+3)scoringPattern=teamB+' DOMINANT';
   else if(Math.abs(ftA-ftB)<=1)scoringPattern='TIGHT MATCH';
   else scoringPattern='COMPETITIVE';
-  if(htA>htB)htPattern=teamA+' likely to lead at HT';
-  else if(htB>htA)htPattern=teamB+' likely to lead at HT';
-  else htPattern='Even at HT';
   
   var K=getOptK();
+  
   return{
-    tA:teamA,tB:teamB,tmA:tmA,tmB:tmB,ft:ftA+'-'+ftB,ht:htA+'-'+htB,sh:{a:shA,b:shB},ftA:ftA,ftB:ftB,htA:htA,htB:htB,cls:cls,lamA:lambdas.lA,lamB:lambdas.lB,
-    wp:{h:(pois.homeWin*100).toFixed(1)+'%',d:(pois.draw*100).toFixed(1)+'%',a:(pois.awayWin*100).toFixed(1)+'%'},
-    top3:pois.probs.slice(0,3).map(function(p,i){return{score:p.score,prob:p.prob,label:i===0?'Most Likely':i===1?'High Prob':'Variance'}}),
-    poisProbs:pois.probs.slice(0,12),bestScore:bestScore,bestProb:bestProb,recType:recType,recColor:recColor,recLabel:recLabel,
-    scoringPattern:scoringPattern,htPattern:htPattern,totalGoals:totalGoals,overProb:overProb,underProb:underProb,
+    tA:teamA,tB:teamB,tmA:tmA,tmB:tmB,
+    ft:ftA+'-'+ftB,
+    buckets:buckets,
+    ftA:ftA,ftB:ftB,
+    cls:cls,
+    lamA:lambdas.lA,lamB:lambdas.lB,
+    wp:{h:(volta.homeWin*100).toFixed(1)+'%',d:(volta.draw*100).toFixed(1)+'%',a:(volta.awayWin*100).toFixed(1)+'%'},
+    top3:volta.probs.slice(0,3).map(function(p,i){return{score:p.score,prob:p.prob,label:i===0?'Most Likely':i===1?'High Prob':'Variance'}}),
+    poisProbs:volta.probs.slice(0,12),
+    bestScore:bestScore,bestProb:bestProb,
+    recType:recType,recColor:recColor,recLabel:recLabel,
+    scoringPattern:scoringPattern,totalGoals:totalGoals,
+    overProb:overProb,underProb:underProb,
     conf:confidence,cr:pA.games+'/'+pB.games+' games',
     valueSignals:valueSignals,strategy:strategy,
-    ai:'DC ρ='+rho.toFixed(3)+': '+tmA.full+' λ='+lambdas.lA.toFixed(2)+', '+tmB.full+' λ='+lambdas.lB.toFixed(2)+'. Expected '+pois.expTotal.toFixed(1)+' total. Confidence: '+confidence+'% (entropy+gap+data).',
-    fr:tmA.full+' ('+pA.games+'g) vs '+tmB.full+' ('+pB.games+'g). λA='+lambdas.lA.toFixed(2)+', λB='+lambdas.lB.toFixed(2)+'. ρ='+rho.toFixed(3)+'. Best: '+bestScore+' ('+(bestProb*100).toFixed(1)+'%).',
-    warn:(pA.games<3||pB.games<3?'Limited data. ':'')+(Math.abs(eloA-eloB)>200?'Elo gap >200. ':'')+(confidence<35?'Very low confidence. ':'')||null,
-    _pA:pA,_pB:pB,_splitA:splitA,_splitB:splitB,_h2h:h2hData,_pois:pois,_lambdas:lambdas,_gAvg:gAvg,_eloA:eloA,_eloB:eloB,_rho:rho,_optK:K
+    playstyleA:playstyleA,playstyleB:playstyleB,
+    playerEloA:playerEloA,playerEloB:playerEloB,
+    chemA:chemA,chemB:chemB,
+    playersA:playersA,playersB:playersB,
+    ai:'NB model: '+tmA.full+' λ='+lambdas.lA.toFixed(2)+', '+tmB.full+' λ='+lambdas.lB.toFixed(2)+'. Player Elo: '+playerEloA+' vs '+playerEloB+'. Chem: '+(chemA*chemB).toFixed(2)+'. Expected '+volta.expTotal.toFixed(1)+' total. Confidence: '+confidence+'%.',
+    fr:tmA.full+' ('+pA.games+'g) vs '+tmB.full+' ('+pB.games+'g). λA='+lambdas.lA.toFixed(2)+', λB='+lambdas.lB.toFixed(2)+'. Best: '+bestScore+' ('+(bestProb*100).toFixed(1)+'%).',
+    warn:(pA.games<3||pB.games<3?'Limited team data. ':'')+
+         ((playerDataA&&playerDataA.games<3)||(playerDataB&&playerDataB.games<3)?'New players detected. ':'')+
+         (Math.abs(playerEloA-playerEloB)>300?'Large player skill gap. ':'')+
+         (confidence<35?'Very low confidence. ':'')||null,
+    _pA:pA,_pB:pB,_splitA:splitA,_splitB:splitB,_h2h:h2hData,
+    _volta:volta,_lambdas:lambdas,_gAvg:gAvg,
+    _eloA:eloA,_eloB:eloB,_optK:K,
+    _playstyleA:playstyleA,_playstyleB:playstyleB
   };
 }
 
-// ════════════════ UI ════════════════
+// ════════════════ UI RENDERING ════════════════
 function runPrediction(){
-  var a=state.pickA,b=state.pickB;if(!a||!b){toast('Select both teams');return}
+  var a=state.pickA,b=state.pickB;
+  if(!a||!b){toast('Select both teams');return}
+  
+  // Read player tags
+  var pA1=document.getElementById('pA1').value.trim();
+  var pA2=document.getElementById('pA2').value.trim();
+  var pB1=document.getElementById('pB1').value.trim();
+  var pB2=document.getElementById('pB2').value.trim();
+  var playersA=[pA1,pA2].filter(function(x){return x});
+  var playersB=[pB1,pB2].filter(function(x){return x});
+  
   // Read market odds
   var marketOdds=null;
   var oo=parseFloat(document.getElementById('oddsOver').value);
   var ou=parseFloat(document.getElementById('oddsUnder').value);
   var oh=parseFloat(document.getElementById('oddsHome').value);
-  if(!isNaN(oo)||!isNaN(ou)||!isNaN(oh))marketOdds={over:!isNaN(oo)?oo:null,under:!isNaN(ou)?ou:null,homeWin:!isNaN(oh)?oh:null};
+  if(!isNaN(oo)||!isNaN(ou)||!isNaN(oh)){
+    marketOdds={over:!isNaN(oo)?oo:null,under:!isNaN(ou)?ou:null,homeWin:!isNaN(oh)?oh:null};
+  }
   
-  var btn=document.getElementById('predictBtn');btn.disabled=true;btn.textContent='COMPUTING...';
-  setTimeout(function(){try{var p=makePrediction(a,b,marketOdds);state.lastPred=p;document.getElementById('predictionSection').style.display='block';renderPrediction(p);document.getElementById('predictionOutput').scrollIntoView({behavior:'smooth'})}catch(e){toast('Error: '+e.message);console.error(e)}btn.disabled=false;btn.textContent='GENERATE PREDICTION'},100);
+  var btn=document.getElementById('predictBtn');
+  btn.disabled=true;btn.textContent='COMPUTING...';
+  
+  setTimeout(function(){
+    try{
+      var p=makePrediction(a,b,playersA,playersB,marketOdds);
+      state.lastPred=p;
+      document.getElementById('predictionSection').style.display='block';
+      renderPrediction(p);
+      document.getElementById('predictionOutput').scrollIntoView({behavior:'smooth'});
+    }catch(e){toast('Error: '+e.message);console.error(e)}
+    btn.disabled=false;btn.textContent='GENERATE PREDICTION';
+  },100);
 }
 
 function renderPrediction(p){
   var clsCol=p.cls==='Chaos'?'#ff5252':p.cls==='Open'?'#ff7043':p.cls==='Balanced'?'#ffd54f':'#29b6f6';
   var confCol=p.conf>=70?'#00e87a':p.conf>=50?'#ffd54f':'#ff7043';
   var h='';
+  
+  // Player info banner
+  if(p.playersA&&p.playersA.length||p.playersB&&p.playersB.length){
+    h+='<div style="background:var(--sur2);border:1px solid var(--bdr);border-radius:13px;padding:12px 14px;margin-bottom:12px">';
+    h+='<div style="font-family:var(--fh);font-size:12px;font-weight:700;color:var(--mut);margin-bottom:8px">PLAYERS</div>';
+    h+='<div style="display:grid;grid-template-columns:1fr 1fr;gap:8px">';
+    // Home players
+    h+='<div>';
+    if(p.playersA&&p.playersA.length){
+      p.playersA.forEach(function(tag){
+        var pl=getPlayer(tag);
+        var psClass='ps-'+(pl?pl.playstyle:'balanced');
+        var psLabel=pl?pl.playstyle.replace('_',' ').toUpperCase():'NEW';
+        h+='<div style="display:flex;align-items:center;gap:6px;margin-bottom:4px">';
+        h+='<span style="font-family:var(--fh);font-size:13px;font-weight:600">'+tag+'</span>';
+        h+='<span class="ps-tag '+psClass+'">'+psLabel+'</span>';
+        if(pl)h+='<span style="font-family:var(--fm);font-size:9px;color:var(--grn)">'+pl.elo+' Elo</span>';
+        h+='</div>';
+      });
+    }else{h+='<span style="font-size:11px;color:var(--mut)">No players entered</span>';}
+    h+='</div>';
+    // Away players
+    h+='<div style="text-align:right">';
+    if(p.playersB&&p.playersB.length){
+      p.playersB.forEach(function(tag){
+        var pl=getPlayer(tag);
+        var psClass='ps-'+(pl?pl.playstyle:'balanced');
+        var psLabel=pl?pl.playstyle.replace('_',' ').toUpperCase():'NEW';
+        h+='<div style="display:flex;align-items:center;gap:6px;margin-bottom:4px;justify-content:flex-end">';
+        if(pl)h+='<span style="font-family:var(--fm);font-size:9px;color:var(--grn)">'+pl.elo+' Elo</span>';
+        h+='<span class="ps-tag '+psClass+'">'+psLabel+'</span>';
+        h+='<span style="font-family:var(--fh);font-size:13px;font-weight:600">'+tag+'</span>';
+        h+='</div>';
+      });
+    }else{h+='<span style="font-size:11px;color:var(--mut)">No players entered</span>';}
+    h+='</div>';
+    h+='</div>';
+    // Chemistry
+    if(p.chemA!==1.0||p.chemB!==1.0){
+      h+='<div style="font-family:var(--fm);font-size:9px;color:var(--yel);margin-top:6px">';
+      h+='Chemistry: Home '+(p.chemA*100).toFixed(0)+'% | Away '+(p.chemB*100).toFixed(0)+'%';
+      h+='</div>';
+    }
+    h+='</div>';
+  }
   
   // RECOMMENDATION
   h+='<div style="background:'+p.recColor+'10;border:2px solid '+p.recColor+';border-radius:14px;padding:16px;margin-bottom:14px;text-align:center">';
@@ -582,7 +1247,7 @@ function renderPrediction(p){
   h+='<div style="font-family:var(--fm);font-size:10px;color:var(--mut);margin-top:4px">'+(p.bestProb*100).toFixed(1)+'% probability · '+p.conf+'% confidence</div>';
   h+='</div>';
   
-  // IMPROVEMENT 3: STRATEGY BOX
+  // STRATEGY BOX
   h+='<div style="background:'+(p.strategy.type==='SAFE'?'rgba(0,232,122,.06)':p.strategy.type==='MEDIUM'?'rgba(255,213,79,.06)':'rgba(255,82,82,.06)')+';border:1px solid '+(p.strategy.type==='SAFE'?'rgba(0,232,122,.3)':p.strategy.type==='MEDIUM'?'rgba(255,213,79,.3)':'rgba(255,82,82,.3)')+';border-radius:13px;padding:14px;margin-bottom:12px">';
   h+='<div style="font-family:var(--fh);font-size:16px;font-weight:700;margin-bottom:8px;color:'+(p.strategy.type==='SAFE'?'#00e87a':p.strategy.type==='MEDIUM'?'#ffd54f':'#ff5252')+'">🎯 BETTING STRATEGY: '+p.strategy.type+'</div>';
   h+='<div style="font-size:12px;color:var(--mut);margin-bottom:10px">'+p.strategy.reason+'</div>';
@@ -596,7 +1261,7 @@ function renderPrediction(p){
   }
   h+='</div>';
   
-  // IMPROVEMENT 1: VALUE SIGNALS
+  // VALUE SIGNALS
   if(p.valueSignals&&p.valueSignals.length>0){
     h+='<div class="card"><div class="card-head"><div class="card-title">💰 MARKET VALUE (vs 1xBet)</div></div><div class="card-body">';
     p.valueSignals.forEach(function(vs){
@@ -611,18 +1276,26 @@ function renderPrediction(p){
   }
   
   // SCOREBOARD
-  h+='<div class="sb"><div class="sb-side"><div class="sb-club" style="color:'+p.tmA.color+'">'+p.tmA.emoji+' '+p.tmA.abbr+'</div><div class="sb-name">'+p.tmA.full+'</div></div><div class="sb-center"><div class="sb-ft">'+p.ft+'</div><div class="sb-label">PREDICTED FT</div><div class="sb-ht-info">HT: '+p.ht+' · 2H: '+p.sh.a+'-'+p.sh.b+'</div></div><div class="sb-side right"><div class="sb-club" style="color:'+p.tmB.color+'">'+p.tmB.emoji+' '+p.tmB.abbr+'</div><div class="sb-name">'+p.tmB.full+'</div></div></div>';
+  h+='<div class="sb"><div class="sb-side"><div class="sb-club" style="color:'+p.tmA.color+'">'+p.tmA.emoji+' '+p.tmA.abbr+'</div><div class="sb-name">'+p.tmA.full+'</div></div><div class="sb-center"><div class="sb-ft">'+p.ft+'</div><div class="sb-label">PREDICTED FT</div><div class="sb-ht-info">10-min Volta match</div></div><div class="sb-side right"><div class="sb-club" style="color:'+p.tmB.color+'">'+p.tmB.emoji+' '+p.tmB.abbr+'</div><div class="sb-name">'+p.tmB.full+'</div></div></div>';
+  
+  // VOLTA: Time Buckets instead of HT
+  h+='<div class="card"><div class="card-head"><div class="card-title">⏱️ TIME BUCKETS</div><span class="badge bg-b">VOLTA 10 MIN</span></div><div class="card-body">';
+  h+='<div class="time-bucket">';
+  h+='<div class="bucket-card"><div class="bucket-label">0-2 MIN (BLITZ)</div><div class="bucket-goals" style="color:#ff7043">'+p.buckets.bucket0_2.a+'-'+p.buckets.bucket0_2.b+'</div><div class="bucket-note">High variance opening</div></div>';
+  h+='<div class="bucket-card"><div class="bucket-label">2-7 MIN (CORE)</div><div class="bucket-goals" style="color:#ffd54f">'+p.buckets.bucket2_7.a+'-'+p.buckets.bucket2_7.b+'</div><div class="bucket-note">True skill shows</div></div>';
+  h+='<div class="bucket-card"><div class="bucket-label">7-10 MIN (CHAOS)</div><div class="bucket-goals" style="color:#00e87a">'+p.buckets.bucket7_10.a+'-'+p.buckets.bucket7_10.b+'</div><div class="bucket-note">Desperation pressing</div></div>';
+  h+='</div></div></div>';
   
   // WIN PROBS
   h+='<div class="win-prob-row"><div class="win-prob-box"><div class="win-prob-label">HOME WIN</div><div class="win-prob-value" style="color:#00e87a">'+p.wp.h+'</div></div><div class="win-prob-box"><div class="win-prob-label">DRAW</div><div class="win-prob-value" style="color:#ffd54f">'+p.wp.d+'</div></div><div class="win-prob-box"><div class="win-prob-label">AWAY WIN</div><div class="win-prob-value" style="color:#ff7043">'+p.wp.a+'</div></div></div>';
   
   // AI
-  h+='<div class="ai-insight"><div class="ai-insight-title">🧠 ANALYSIS</div><div class="ai-insight-text">'+p.ai+'</div></div>';
+  h+='<div class="ai-insight"><div class="ai-insight-title">🧠 VOLTA ANALYSIS</div><div class="ai-insight-text">'+p.ai+'</div></div>';
   
   // BREAKDOWN
   h+='<div class="card"><div class="card-head"><div class="card-title">📊 MATCH BREAKDOWN</div><span class="badge '+(p.cls==='Chaos'?'bg-r':p.cls==='Open'?'bg-o':p.cls==='Balanced'?'bg-y':'bg-b')+'">'+p.totalGoals+' GOALS</span></div><div class="card-body"><div class="detail-grid">';
   h+='<div class="detail-card"><div class="detail-label">SCORING</div><div class="detail-value" style="font-size:12px;color:'+clsCol+'">'+p.scoringPattern+'</div></div>';
-  h+='<div class="detail-card"><div class="detail-label">HALF-TIME</div><div class="detail-value" style="font-size:12px;color:var(--blu)">'+p.htPattern+'</div></div>';
+  h+='<div class="detail-card"><div class="detail-label">PLAYSTYLES</div><div class="detail-value" style="font-size:10px;color:var(--pur)">'+(p.playstyleA||'balanced').replace('_',' ').toUpperCase()+' vs '+(p.playstyleB||'balanced').replace('_',' ').toUpperCase()+'</div></div>';
   h+='<div class="detail-card"><div class="detail-label">OVER 10.5 PROB</div><div class="detail-value" style="color:#00e87a">'+(p.overProb*100).toFixed(1)+'%</div></div>';
   h+='<div class="detail-card"><div class="detail-label">UNDER 10.5 PROB</div><div class="detail-value" style="color:#29b6f6">'+(p.underProb*100).toFixed(1)+'%</div></div>';
   h+='</div></div></div>';
@@ -633,7 +1306,7 @@ function renderPrediction(p){
   if(p.warn)h+='<div style="background:rgba(255,82,82,.05);border:1px solid rgba(255,82,82,.2);border-radius:11px;padding:12px 14px;margin-bottom:12px"><div style="font-family:var(--fh);font-size:17px;font-weight:700;color:#ff5252">⚠️ '+p.warn+'</div></div>';
   
   // CONFIDENCE
-  h+='<div class="conf-card"><div class="conf-header"><div><div style="font-family:var(--fm);font-size:7px;color:var(--mut)">CONFIDENCE</div><div class="conf-pct" style="color:'+confCol+'">'+p.conf+'%</div></div></div><div class="conf-bar-wrap"><div class="conf-bar" style="width:'+p.conf+'%;background:'+confCol+'"></div></div><div style="font-size:12px;color:var(--mut);margin-top:10px">Entropy + probability gap + data size</div></div>';
+  h+='<div class="conf-card"><div class="conf-header"><div><div style="font-family:var(--fm);font-size:7px;color:var(--mut)">CONFIDENCE</div><div class="conf-pct" style="color:'+confCol+'">'+p.conf+'%</div></div></div><div class="conf-bar-wrap"><div class="conf-bar" style="width:'+p.conf+'%;background:'+confCol+'"></div></div><div style="font-size:12px;color:var(--mut);margin-top:10px">Entropy + probability gap + player data size</div></div>';
   
   // SAVE
   h+='<div class="save-bar"><div><div style="font-family:var(--fh);font-size:14px;font-weight:700">SAVE PREDICTION</div><div style="font-family:var(--fm);font-size:7.5px;color:var(--mut)">Track accuracy when result entered</div></div><button class="btn btn-g btn-sm" onclick="savePrediction()">SAVE</button></div>';
@@ -642,46 +1315,157 @@ function renderPrediction(p){
 }
 
 function savePrediction(){
-  if(!state.lastPred)return;var p=state.lastPred;
-  var m={id:id(),date:new Date().toISOString(),teamA:p.tA,teamB:p.tB,htPred:p.ht,ftPred:p.ft,classification:p.cls,confidence:p.conf,top3:p.top3.map(function(s){return s.score}).join(', '),bestScore:p.bestScore,overProb:(p.overProb*100).toFixed(1)+'%',underProb:(p.underProb*100).toFixed(1)+'%',strategyType:p.strategy.type,htActual:null,ftActual:null,status:'pending',_winProbs:JSON.stringify(p.wp),_rho:p._rho,_optimalK:p._optK};
-  var db=loadDB();db.unshift(m);if(saveDB(db)){toast('✅ Saved! Track accuracy in Database');state.lastPred=null;counters()}else{toast('Save failed')}
+  if(!state.lastPred)return;
+  var p=state.lastPred;
+  var m={
+    id:id(),date:new Date().toISOString(),
+    teamA:p.tA,teamB:p.tB,
+    playersA:p.playersA||[],playersB:p.playersB||[],
+    ftPred:p.ft,classification:p.cls,confidence:p.conf,
+    top3:p.top3.map(function(s){return s.score}).join(', '),
+    bestScore:p.bestScore,
+    overProb:(p.overProb*100).toFixed(1)+'%',
+    underProb:(p.underProb*100).toFixed(1)+'%',
+    strategyType:p.strategy.type,
+    playstyleA:p.playstyleA,playstyleB:p.playstyleB,
+    ftActual:null,htActual:null,
+    timeBuckets:null,rageQuit:false,
+    status:'pending',
+    _winProbs:JSON.stringify(p.wp),
+    _optimalK:p._optK
+  };
+  var db=loadDB();db.unshift(m);
+  if(saveDB(db)){
+    toast('✅ Saved! Track accuracy in Database');
+    state.lastPred=null;
+    counters();
+  }else{toast('Save failed')}
 }
 
 // ════════════════ TEAM SELECT ════════════════
-function openTeamSelect(side){state.teamSide=side;document.getElementById('teamModalSide').textContent=side==='A'?'HOME':'AWAY';var h='';TEAMS.forEach(function(t){var sel=state[side==='A'?'pickA':'pickB']===t.name;h+='<div onclick="selectTeam(\''+t.name+'\')" style="display:flex;align-items:center;gap:14px;padding:14px;border-bottom:1px solid var(--bdr);cursor:pointer;'+(sel?'background:rgba(0,232,122,.05)':'')+'"><div style="width:44px;height:44px;border-radius:10px;display:flex;align-items:center;justify-content:center;border:1px solid var(--bdr2);font-size:20px">'+t.emoji+'</div><div><div style="font-family:var(--fh);font-size:18px;font-weight:700">'+t.full+'</div><div style="font-family:var(--fm);font-size:8px;color:var(--mut)">'+t.abbr+'</div></div></div>'});document.getElementById('teamList').innerHTML=h;document.getElementById('teamModal').classList.add('on')}
+function openTeamSelect(side){
+  state.teamSide=side;
+  document.getElementById('teamModalSide').textContent=side==='A'?'HOME':'AWAY';
+  var h='';
+  TEAMS.forEach(function(t){
+    var sel=state[side==='A'?'pickA':'pickB']===t.name;
+    h+='<div onclick="selectTeam(\''+t.name+'\')" style="display:flex;align-items:center;gap:14px;padding:14px;border-bottom:1px solid var(--bdr);cursor:pointer;'+(sel?'background:rgba(0,232,122,.05)':'')+'"><div style="width:44px;height:44px;border-radius:10px;display:flex;align-items:center;justify-content:center;border:1px solid var(--bdr2);font-size:20px">'+t.emoji+'</div><div><div style="font-family:var(--fh);font-size:18px;font-weight:700">'+t.full+'</div><div style="font-family:var(--fm);font-size:8px;color:var(--mut)">'+t.abbr+'</div></div></div>';
+  });
+  document.getElementById('teamList').innerHTML=h;
+  document.getElementById('teamModal').classList.add('on');
+}
 function closeTeamModal(){document.getElementById('teamModal').classList.remove('on')}
-function selectTeam(name){var side=state.teamSide;var other=side==='A'?'B':'A';if(state[other==='A'?'pickA':'pickB']===name){toast('Same team!');return}state[side==='A'?'pickA':'pickB']=name;updateTeamBtn(side);closeTeamModal()}
-function updateTeamBtn(side){var t=TEAMS.find(function(x){return x.name===state[side==='A'?'pickA':'pickB']});if(!t)return;var btn=document.getElementById('btn'+side);btn.classList.add('sel');btn.style.backgroundColor=t.color+'18';btn.style.borderColor=t.color;document.getElementById('emoji'+side).textContent=t.emoji;document.getElementById('abbr'+side).textContent=t.abbr;document.getElementById('abbr'+side).style.color=t.color;document.getElementById('name'+side).textContent=t.full;document.getElementById('name'+side).classList.remove('placeholder')}
+function selectTeam(name){
+  var side=state.teamSide;
+  var other=side==='A'?'B':'A';
+  if(state[other==='A'?'pickA':'pickB']===name){toast('Same team!');return}
+  state[side==='A'?'pickA':'pickB']=name;
+  updateTeamBtn(side);
+  closeTeamModal();
+}
+function updateTeamBtn(side){
+  var t=TEAMS.find(function(x){return x.name===state[side==='A'?'pickA':'pickB']});
+  if(!t)return;
+  var btn=document.getElementById('btn'+side);
+  btn.classList.add('sel');
+  btn.style.backgroundColor=t.color+'18';
+  btn.style.borderColor=t.color;
+  document.getElementById('emoji'+side).textContent=t.emoji;
+  document.getElementById('abbr'+side).textContent=t.abbr;
+  document.getElementById('abbr'+side).style.color=t.color;
+  document.getElementById('name'+side).textContent=t.full;
+  document.getElementById('name'+side).classList.remove('placeholder');
+}
 
-// ════════════════ RESULT MODAL ════════════════
-function openResultModal(id){var db=loadDB(),m=db.find(function(x){return x.id===id});if(!m)return;state.resultId=id;var a=getT(m.teamA),b=getT(m.teamB);document.getElementById('modalTitle').textContent=a.full+' vs '+b.full;document.getElementById('modalSubtitle').textContent='Predicted FT: '+(m.ftPred||'?')+' | HT: '+(m.htPred||'?');document.getElementById('ftALabel').textContent=a.full+' (Home)';document.getElementById('ftBLabel').textContent=b.full+' (Away)';document.getElementById('ftA').value='';document.getElementById('ftB').value='';document.getElementById('htA').value='';document.getElementById('htB').value='';document.getElementById('resultModal').classList.add('on')}
+// ════════════════ RESULT MODAL (Volta Updated) ════════════════
+function openResultModal(id){
+  var db=loadDB(),m=db.find(function(x){return x.id===id});
+  if(!m)return;
+  state.resultId=id;
+  var a=getT(m.teamA),b=getT(m.teamB);
+  document.getElementById('modalTitle').textContent=a.full+' vs '+b.full;
+  document.getElementById('modalSubtitle').textContent='Predicted FT: '+(m.ftPred||'?');
+  document.getElementById('ftALabel').textContent=a.full+' (Home)';
+  document.getElementById('ftBLabel').textContent=b.full+' (Away)';
+  document.getElementById('ftA').value='';
+  document.getElementById('ftB').value='';
+  document.getElementById('tbA1').value='';
+  document.getElementById('tbB1').value='';
+  document.getElementById('tbA2').value='';
+  document.getElementById('tbB2').value='';
+  document.getElementById('tbA3').value='';
+  document.getElementById('tbB3').value='';
+  document.getElementById('rageQuit').checked=false;
+  document.getElementById('resultModal').classList.add('on');
+}
 function closeResultModal(){document.getElementById('resultModal').classList.remove('on');state.resultId=null}
+
 function saveResult(){
   if(!state.resultId)return;
   var ftA=parseInt(document.getElementById('ftA').value),ftB=parseInt(document.getElementById('ftB').value);
   if(isNaN(ftA)||isNaN(ftB)){toast('Enter FT scores');return}
-  var htA=document.getElementById('htA').value,htB=document.getElementById('htB').value;
-  var htActual=null;
-  if(htA!==''&&htB!==''){var ha=parseInt(htA),hb=parseInt(htB);if(!isNaN(ha)&&!isNaN(hb))htActual=ha+'-'+hb}
-  var db=loadDB();var i=db.findIndex(function(m){return m.id===state.resultId});
+  
+  var rageQuit=document.getElementById('rageQuit').checked;
+  
+  // Time buckets
+  var tbA1=parseInt(document.getElementById('tbA1').value)||0;
+  var tbB1=parseInt(document.getElementById('tbB1').value)||0;
+  var tbA2=parseInt(document.getElementById('tbA2').value)||0;
+  var tbB2=parseInt(document.getElementById('tbB2').value)||0;
+  var tbA3=parseInt(document.getElementById('tbA3').value)||0;
+  var tbB3=parseInt(document.getElementById('tbB3').value)||0;
+  
+  var timeBuckets={
+    bucket0_2:{a:tbA1,b:tbB1},
+    bucket2_7:{a:tbA2,b:tbB2},
+    bucket7_10:{a:tbA3,b:tbB3}
+  };
+  
+  var db=loadDB();
+  var i=db.findIndex(function(m){return m.id===state.resultId});
   if(i>=0){
-    db[i].ftActual=ftA+'-'+ftB;db[i].htActual=htActual;db[i].status='result';
+    db[i].ftActual=ftA+'-'+ftB;
+    db[i].timeBuckets=timeBuckets;
+    db[i].rageQuit=rageQuit;
+    db[i].status='result';
+    
     // Track accuracy
     if(db[i].ftPred){
       var pred=parseScore(db[i].ftPred),actual=parseScore(db[i].ftActual);
       if(pred&&actual){
         db[i].correctFT=(pred.a===actual.a&&pred.b===actual.b);
         db[i].correctOU=(db[i].overProb&&parseFloat(db[i].overProb)>50?(actual.total>10.5):(actual.total<10.5));
-        if(db[i].htPred&&htActual){
-          var htPred=parseScore(db[i].htPred),htAct=parseScore(htActual);
-          if(htPred&&htAct)db[i].correctHT=(htPred.a===htAct.a&&htPred.b===htAct.b);
-        }
       }
     }
+    
     saveDB(db);
-    updateElo(db[i].teamA,db[i].teamB,ftA,ftB);
+    
+    // Update Elo (skip if rage quit)
+    if(!rageQuit){
+      updateElo(db[i].teamA,db[i].teamB,ftA,ftB);
+      
+      // Update player stats
+      var winA=ftA>ftB?'W':ftA<ftB?'L':'D';
+      var winB=ftA<ftB?'W':ftA>ftB?'L':'D';
+      var opponentsA=db[i].playersB||[];
+      var opponentsB=db[i].playersA||[];
+      
+      if(db[i].playersA){
+        db[i].playersA.forEach(function(tag){
+          updatePlayerStats(tag,ftA,ftB,winA,db[i].playersA,opponentsA);
+          updatePlayerElo(tag,getTeamPlayerElo(opponentsA),ftA,ftB);
+        });
+      }
+      if(db[i].playersB){
+        db[i].playersB.forEach(function(tag){
+          updatePlayerStats(tag,ftB,ftA,winB,db[i].playersB,opponentsB);
+          updatePlayerElo(tag,getTeamPlayerElo(opponentsB),ftB,ftA);
+        });
+      }
+    }
+    
     toast('✅ Result saved!');closeResultModal();
-    var ro=loadDB().filter(function(m){return m.ftActual});
+    var ro=loadDB().filter(function(m){return m.ftActual&&!m.rageQuit});
     if(ro.length>=15)setTimeout(function(){optimizeEloK(ro);rebuildElo()},150);
     if(state.page==='results')renderResults();
     if(state.page==='db')renderDatabase();
@@ -690,58 +1474,217 @@ function saveResult(){
 }
 
 // ════════════════ PAGES ════════════════
-function switchPage(p){document.querySelectorAll('.page').forEach(function(el){el.classList.remove('on')});document.querySelectorAll('.nav-btn').forEach(function(el){el.classList.remove('on')});document.getElementById('page-'+p).classList.add('on');document.getElementById('nav-'+p).classList.add('on');state.page=p;if(p==='results')renderResults();if(p==='db')renderDatabase()}
-function renderResults(){
-  var db=loadDB();var pend=db.filter(function(m){return m.status==='pending'||(!m.ftActual&&m.status!=='result')});var done=db.filter(function(m){return m.status==='result'||m.ftActual}).slice(0,50);
-  document.getElementById('pendingBadge').textContent=pend.length+' PENDING';
-  document.getElementById('pendingList').innerHTML=pend.length?pend.map(function(m){var a=getT(m.teamA),b=getT(m.teamB);return'<div class="pending-card"><div style="display:flex;justify-content:space-between;margin-bottom:10px"><span style="font-family:var(--fh);font-size:19px;font-weight:900">'+a.full+' vs '+b.full+'</span><span class="badge bg-y">PENDING</span></div><div class="flex flex-wrap gap-6" style="margin-bottom:8px"><span class="badge bg">FT: '+(m.ftPred||'?')+'</span><span class="badge bg-b">HT: '+(m.htPred||'?')+'</span></div><div class="flex gap-6"><button class="btn btn-g btn-sm" onclick="openResultModal(\''+m.id+'\')">ENTER HT+FT</button><button class="btn btn-ghost btn-sm" onclick="delMatch(\''+m.id+'\')">DELETE</button></div></div>'}).join(''):'<div class="empty-state"><div class="empty-icon">📋</div><div class="empty-text">NO PENDING</div></div>';
-  document.getElementById('completedList').innerHTML=done.length?done.map(function(m){var a=getT(m.teamA),b=getT(m.teamB);return'<div class="history-item"><div style="font-family:var(--fh);font-size:17px;font-weight:700;margin-bottom:6px">'+a.full+' vs '+b.full+'</div><div class="flex flex-wrap gap-6" style="margin-bottom:4px"><span style="font-size:9px">FT: pred '+(m.ftPred||'?')+' → <span style="color:#00e87a">'+(m.ftActual||'?')+'</span></span>'+(m.htActual?'<span style="font-size:9px">HT: pred '+(m.htPred||'?')+' → <span style="color:#29b6f6">'+m.htActual+'</span></span>':'')+(m.correctFT!==undefined?'<span class="badge '+(m.correctFT?'bg-g':'bg-r')+'">FT '+(m.correctFT?'✅':'❌')+'</span>':'')+'</div></div>'}).join(''):'<div class="empty-state"><div class="empty-icon">🏁</div><div class="empty-text">NO RESULTS</div></div>';
+function switchPage(p){
+  document.querySelectorAll('.page').forEach(function(el){el.classList.remove('on')});
+  document.querySelectorAll('.nav-btn').forEach(function(el){el.classList.remove('on')});
+  document.getElementById('page-'+p).classList.add('on');
+  document.getElementById('nav-'+p).classList.add('on');
+  state.page=p;
+  if(p==='results')renderResults();
+  if(p==='db')renderDatabase();
 }
+
+function renderResults(){
+  var db=loadDB();
+  var pend=db.filter(function(m){return m.status==='pending'||(!m.ftActual&&m.status!=='result')});
+  var done=db.filter(function(m){return m.status==='result'||m.ftActual}).slice(0,50);
+  
+  document.getElementById('pendingBadge').textContent=pend.length+' PENDING';
+  document.getElementById('pendingList').innerHTML=pend.length?pend.map(function(m){
+    var a=getT(m.teamA),b=getT(m.teamB);
+    var playerInfo='';
+    if(m.playersA&&m.playersA.length||m.playersB&&m.playersB.length){
+      playerInfo='<div style="font-family:var(--fm);font-size:8px;color:var(--mut);margin-bottom:6px">'+
+        (m.playersA?m.playersA.join(', '):'Unknown')+' vs '+(m.playersB?m.playersB.join(', '):'Unknown')+'</div>';
+    }
+    return'<div class="pending-card">'+
+      '<div style="display:flex;justify-content:space-between;margin-bottom:6px"><span style="font-family:var(--fh);font-size:19px;font-weight:900">'+a.full+' vs '+b.full+'</span><span class="badge bg-y">PENDING</span></div>'+
+      playerInfo+
+      '<div class="flex flex-wrap gap-6" style="margin-bottom:8px"><span class="badge bg">FT: '+(m.ftPred||'?')+'</span></div>'+
+      '<div class="flex gap-6"><button class="btn btn-g btn-sm" onclick="openResultModal(\''+m.id+'\')">ENTER RESULT</button><button class="btn btn-ghost btn-sm" onclick="delMatch(\''+m.id+'\')">DELETE</button></div>'+
+      '</div>';
+  }).join(''):'<div class="empty-state"><div class="empty-icon">📋</div><div class="empty-text">NO PENDING</div></div>';
+  
+  document.getElementById('completedList').innerHTML=done.length?done.map(function(m){
+    var a=getT(m.teamA),b=getT(m.teamB);
+    var rqBadge=m.rageQuit?'<span class="badge bg-r">RAGE QUIT</span>':'';
+    return'<div class="history-item">'+
+      '<div style="font-family:var(--fh);font-size:17px;font-weight:700;margin-bottom:6px">'+a.full+' vs '+b.full+' '+rqBadge+'</div>'+
+      '<div class="flex flex-wrap gap-6" style="margin-bottom:4px"><span style="font-size:9px">FT: pred '+(m.ftPred||'?')+' → <span style="color:#00e87a">'+(m.ftActual||'?')+'</span></span>'+
+      (m.correctFT!==undefined?'<span class="badge '+(m.correctFT?'bg-g':'bg-r')+'">FT '+(m.correctFT?'✅':'❌')+'</span>':'')+'</div>'+
+      '</div>';
+  }).join(''):'<div class="empty-state"><div class="empty-icon">🏁</div><div class="empty-text">NO RESULTS</div></div>';
+}
+
 function renderDatabase(){
-  var db=loadDB();var wr=db.filter(function(m){return m.ftActual});var elo=getElo();var sorted=Object.keys(elo).sort(function(a,b){return elo[b]-elo[a]});
+  var db=loadDB();
+  var wr=db.filter(function(m){return m.ftActual&&!m.rageQuit});
+  var elo=getElo();
+  var sorted=Object.keys(elo).sort(function(a,b){return elo[b]-elo[a]});
+  var players=loadPlayers();
+  var playerSorted=Object.keys(players).sort(function(a,b){return players[b].elo-players[a].elo});
+  
   var tots=wr.map(function(m){var g=parseScore(m.ftActual);return g?g.total:null}).filter(function(t){return t!==null});
-  var gAvg=tots.length?avg(tots):null;var K=getOptK();var rho=calibrateRho(wr);
+  var gAvg=tots.length?avg(tots):null;
+  var K=getOptK();
+  
   document.getElementById('totalBadge').textContent=db.length+' MATCHES';
   
-  // IMPROVEMENT 2: PERFORMANCE TRACKING
+  // PLAYER RANKINGS
+  var prHtml='';
+  if(playerSorted.length>0){
+    prHtml='<div style="margin-bottom:12px">';
+    playerSorted.slice(0,10).forEach(function(key,i){
+      var pl=players[key];
+      var psClass='ps-'+pl.playstyle;
+      var psLabel=pl.playstyle.replace('_',' ').toUpperCase();
+      prHtml+='<div class="player-card">'+
+        '<div class="player-header">'+
+        '<div class="player-avatar">🎮</div>'+
+        '<div class="player-info">'+
+        '<div class="player-name">'+pl.tag+' <span class="ps-tag '+psClass+'">'+psLabel+'</span></div>'+
+        '<div class="player-stats">'+pl.games+' games · '+pl.wins+'W '+pl.losses+'L · '+(pl.goalsFor/pl.games).toFixed(1)+' GPG</div>'+
+        '</div>'+
+        '<div class="player-elo">'+pl.elo+'</div>'+
+        '</div>'+
+        '</div>';
+    });
+    prHtml+='</div>';
+  }else{
+    prHtml='<div class="empty-state"><div class="empty-icon">🎮</div><div class="empty-text">NO PLAYER DATA<br>Enter gamertags in predictions to track</div></div>';
+  }
+  document.getElementById('playerRankings').innerHTML=prHtml;
+  
+  // PERFORMANCE STATS
   var withPred=wr.filter(function(m){return m.ftPred&&m.correctFT!==undefined});
   var ftAcc=withPred.filter(function(m){return m.correctFT}).length;
   var ftAccPct=withPred.length?Math.round(ftAcc/withPred.length*100):null;
   var ouAcc=withPred.filter(function(m){return m.correctOU}).length;
   var ouAccPct=withPred.length?Math.round(ouAcc/withPred.length*100):null;
-  var htAcc=withPred.filter(function(m){return m.correctHT}).length;
-  var htAccPct=withPred.filter(function(m){return m.correctHT!==undefined}).length?Math.round(htAcc/withPred.filter(function(m){return m.correctHT!==undefined}).length*100):null;
-  // ROI simulation
   var totalStake=0,totalReturn=0;
   withPred.forEach(function(m){
-    if(m.correctFT){totalStake+=1;totalReturn+=1;if(m.correctFT)totalReturn+=5}
-    else{totalStake+=1}
+    totalStake+=1;
+    if(m.correctFT)totalReturn+=6;else totalReturn+=0;
   });
   var roi=totalStake>0?Math.round((totalReturn-totalStake)/totalStake*100):null;
   
-  document.getElementById('performanceStats').innerHTML='<div class="stat-grid"><div class="stat-card"><div class="stat-value" style="color:'+(ftAccPct!==null&&ftAccPct>=50?'#00e87a':'#ff5252')+'">'+(ftAccPct!==null?ftAccPct+'%':'—')+'</div><div class="stat-label">FT ACCURACY</div></div><div class="stat-card"><div class="stat-value" style="color:'+(ouAccPct!==null&&ouAccPct>=60?'#00e87a':'#ffd54f')+'">'+(ouAccPct!==null?ouAccPct+'%':'—')+'</div><div class="stat-label">O/U ACCURACY</div></div><div class="stat-card"><div class="stat-value" style="color:'+(htAccPct!==null&&htAccPct>=40?'#00e87a':'#ff7043')+'">'+(htAccPct!==null?htAccPct+'%':'—')+'</div><div class="stat-label">HT ACCURACY</div></div><div class="stat-card"><div class="stat-value" style="color:'+(roi!==null&&roi>0?'#00e87a':'#ff5252')+'">'+(roi!==null?(roi>0?'+':'')+roi+'%':'—')+'</div><div class="stat-label">ROI (EXACT)</div></div></div><div style="font-size:9px;color:var(--mut);text-align:center;margin-bottom:12px">Based on '+withPred.length+' verified predictions</div>';
+  document.getElementById('performanceStats').innerHTML=
+    '<div class="stat-grid">'+
+    '<div class="stat-card"><div class="stat-value" style="color:'+(ftAccPct!==null&&ftAccPct>=50?'#00e87a':'#ff5252')+'">'+(ftAccPct!==null?ftAccPct+'%':'—')+'</div><div class="stat-label">FT ACCURACY</div></div>'+
+    '<div class="stat-card"><div class="stat-value" style="color:'+(ouAccPct!==null&&ouAccPct>=60?'#00e87a':'#ffd54f')+'">'+(ouAccPct!==null?ouAccPct+'%':'—')+'</div><div class="stat-label">O/U ACCURACY</div></div>'+
+    '<div class="stat-card"><div class="stat-value" style="color:'+(roi!==null&&roi>0?'#00e87a':'#ff5252')+'">'+(roi!==null?(roi>0?'+':'')+roi+'%':'—')+'</div><div class="stat-label">ROI (EXACT)</div></div>'+
+    '<div class="stat-card"><div class="stat-value" style="color:#ab47bc">'+playerSorted.length+'</div><div class="stat-label">PLAYERS</div></div>'+
+    '</div>'+
+    '<div style="font-size:9px;color:var(--mut);text-align:center;margin-bottom:12px">Based on '+withPred.length+' verified predictions (rage quits excluded)</div>';
   
-  document.getElementById('modelHealth').innerHTML='<div class="model-health-grid"><div class="model-health-card"><div style="font-family:var(--fm);font-size:7px;color:var(--mut)">ELO K</div><div style="font-family:var(--fh);font-size:28px;font-weight:900;color:#00e87a">'+K+'</div></div><div class="model-health-card"><div style="font-family:var(--fm);font-size:7px;color:var(--mut)">DC ρ</div><div style="font-family:var(--fh);font-size:28px;font-weight:900;color:'+(Math.abs(rho)<0.05?'#00e87a':'#ffd54f')+'">'+rho.toFixed(3)+'</div></div><div class="model-health-card"><div style="font-family:var(--fm);font-size:7px;color:var(--mut)">MATCHES</div><div style="font-family:var(--fh);font-size:28px;font-weight:900;color:#29b6f6">'+db.length+'</div></div></div>';
-  document.getElementById('eloRankings').innerHTML=sorted.map(function(n,i){var t=getT(n),r=elo[n],c=r-1500;return'<div class="elo-row"><div style="display:flex;align-items:center;gap:8px"><span style="font-family:var(--fm);font-size:10px;color:var(--mut);width:20px">#'+(i+1)+'</span><span class="elo-name">'+t.emoji+' '+t.full+'</span></div><div><span class="elo-rating" style="color:'+(r>1500?'#00e87a':r<1500?'#ff5252':'#4a5878')+'">'+r+'</span><span class="elo-change" style="color:'+(c>0?'#00e87a':c<0?'#ff5252':'#4a5878')+'">'+(c>0?'+'+c:c||'NEW')+'</span></div></div>'}).join('')||'<div class="empty-state">NO DATA</div>';
-  document.getElementById('globalStats').innerHTML='<div class="stat-card"><div class="stat-value">'+db.length+'</div><div class="stat-label">TOTAL</div></div><div class="stat-card"><div class="stat-value" style="color:#00e87a">'+wr.length+'</div><div class="stat-label">RESULTS</div></div><div class="stat-card"><div class="stat-value" style="color:#ffd54f">'+(gAvg?gAvg.toFixed(1):'—')+'</div><div class="stat-label">AVG GOALS</div></div><div class="stat-card"><div class="stat-value" style="color:#29b6f6">'+wr.filter(function(m){return m.htActual}).length+'</div><div class="stat-label">HT DATA</div></div>';
-  document.getElementById('ouGrid').innerHTML=[6.5,7.5,8.5,9.5,10.5,11.5,12.5,13.5,14.5,15.5,16.5,17.5,18.5].map(function(l){var h=tots.filter(function(t){return t>l}).length,p=tots.length?Math.round(h/tots.length*100):null,up=p!==null?100-p:null;return'<div class="ou-box"><div style="font-family:var(--fm);font-size:7px;color:#00e87a">OVR '+l+'</div><div style="font-family:var(--fh);font-size:20px;font-weight:700;color:'+(p===null?'#4a5878':p>=65?'#00e87a':p>=50?'#ffd54f':'#ff5252')+'">'+(p!==null?p+'%':'—')+'</div><div style="height:1px;background:var(--bdr);margin:4px 0"></div><div style="font-family:var(--fm);font-size:7px;color:#29b6f6">UND '+l+'</div><div style="font-family:var(--fh);font-size:20px;font-weight:700;color:'+(up===null?'#4a5878':up>=65?'#00e87a':up>=50?'#ffd54f':'#ff5252')+'">'+(up!==null?up+'%':'—')+'</div></div>'}).join('');
-  var tp='';TEAMS.forEach(function(t){var p=buildTeamProfile(t.name,db);if(p.games>0)tp+='<div class="history-item"><div style="display:flex;justify-content:space-between;align-items:center"><div><span style="font-family:var(--fh);font-size:16px;font-weight:700">'+t.emoji+' '+t.full+'</span><span style="font-size:9px;color:var(--mut);margin-left:8px">'+p.games+'g</span></div><div class="flex gap-6"><span style="color:#00e87a;font-family:var(--fh);font-size:16px;font-weight:700">'+p.avgScored.toFixed(1)+'</span><span style="color:var(--mut)">sc/g</span><span style="color:#ff5252;font-family:var(--fh);font-size:16px;font-weight:700">'+p.avgConceded.toFixed(1)+'</span><span style="color:var(--mut)">cn/g</span></div></div></div>'});document.getElementById('teamProfiles').innerHTML=tp||'<div class="empty-state">NO DATA</div>';
-  document.getElementById('historyList').innerHTML=db.slice(0,30).map(function(m){var a=getT(m.teamA),b=getT(m.teamB);return'<div class="history-item"><div style="font-family:var(--fh);font-size:17px;font-weight:700;margin-bottom:6px">'+a.full+' vs '+b.full+'</div><div class="flex flex-wrap gap-6"><span style="font-size:9px">FT: pred '+(m.ftPred||'?')+' → <span style="color:#00e87a">'+(m.ftActual||'pending')+'</span></span>'+(m.correctFT!==undefined?'<span class="badge '+(m.correctFT?'bg-g':'bg-r')+'">'+(m.correctFT?'✅':'❌')+'</span>':'')+'</div></div>'}).join('')||'<div class="empty-state">NO HISTORY</div>';
+  // MODEL HEALTH
+  document.getElementById('modelHealth').innerHTML=
+    '<div class="model-health-grid">'+
+    '<div class="model-health-card"><div style="font-family:var(--fm);font-size:7px;color:var(--mut)">ELO K</div><div style="font-family:var(--fh);font-size:28px;font-weight:900;color:#00e87a">'+K+'</div></div>'+
+    '<div class="model-health-card"><div style="font-family:var(--fm);font-size:7px;color:var(--mut)">MODEL</div><div style="font-family:var(--fh);font-size:28px;font-weight:900;color:#ab47bc">NB</div></div>'+
+    '<div class="model-health-card"><div style="font-family:var(--fm);font-size:7px;color:var(--mut)">MATCHES</div><div style="font-family:var(--fh);font-size:28px;font-weight:900;color:#29b6f6">'+db.length+'</div></div>'+
+    '</div>';
+  
+  // ELO RANKINGS
+  document.getElementById('eloRankings').innerHTML=sorted.map(function(n,i){
+    var t=getT(n),r=elo[n],c=r-1500;
+    return'<div class="elo-row"><div style="display:flex;align-items:center;gap:8px"><span style="font-family:var(--fm);font-size:10px;color:var(--mut);width:20px">#'+(i+1)+'</span><span class="elo-name">'+t.emoji+' '+t.full+'</span></div><div><span class="elo-rating" style="color:'+(r>1500?'#00e87a':r<1500?'#ff5252':'#4a5878')+'">'+r+'</span><span class="elo-change" style="color:'+(c>0?'#00e87a':c<0?'#ff5252':'#4a5878')+'">'+(c>0?'+'+c:c||'NEW')+'</span></div></div>';
+  }).join('')||'<div class="empty-state">NO DATA</div>';
+  
+  // GLOBAL STATS
+  document.getElementById('globalStats').innerHTML=
+    '<div class="stat-card"><div class="stat-value">'+db.length+'</div><div class="stat-label">TOTAL</div></div>'+
+    '<div class="stat-card"><div class="stat-value" style="color:#00e87a">'+wr.length+'</div><div class="stat-label">COMPLETED</div></div>'+
+    '<div class="stat-card"><div class="stat-value" style="color:#ffd54f">'+(gAvg?gAvg.toFixed(1):'—')+'</div><div class="stat-label">AVG GOALS</div></div>'+
+    '<div class="stat-card"><div class="stat-value" style="color:#ff5252">'+db.filter(function(m){return m.rageQuit}).length+'</div><div class="stat-label">RAGE QUITS</div></div>';
+  
+  // O/U GRID
+  document.getElementById('ouGrid').innerHTML=[6.5,7.5,8.5,9.5,10.5,11.5,12.5,13.5,14.5,15.5,16.5,17.5,18.5].map(function(l){
+    var h=tots.filter(function(t){return t>l}).length;
+    var p=tots.length?Math.round(h/tots.length*100):null;
+    var up=p!==null?100-p:null;
+    return'<div class="ou-box"><div style="font-family:var(--fm);font-size:7px;color:#00e87a">OVR '+l+'</div><div style="font-family:var(--fh);font-size:20px;font-weight:700;color:'+(p===null?'#4a5878':p>=65?'#00e87a':p>=50?'#ffd54f':'#ff5252')+'">'+(p!==null?p+'%':'—')+'</div><div style="height:1px;background:var(--bdr);margin:4px 0"></div><div style="font-family:var(--fm);font-size:7px;color:#29b6f6">UND '+l+'</div><div style="font-family:var(--fh);font-size:20px;font-weight:700;color:'+(up===null?'#4a5878':up>=65?'#00e87a':up>=50?'#ffd54f':'#ff5252')+'">'+(up!==null?up+'%':'—')+'</div></div>';
+  }).join('');
+  
+  // TEAM PROFILES
+  var tp='';
+  TEAMS.forEach(function(t){
+    var p=buildTeamProfile(t.name,db);
+    if(p.games>0){
+      tp+='<div class="history-item"><div style="display:flex;justify-content:space-between;align-items:center"><div><span style="font-family:var(--fh);font-size:16px;font-weight:700">'+t.emoji+' '+t.full+'</span><span style="font-size:9px;color:var(--mut);margin-left:8px">'+p.games+'g</span></div><div class="flex gap-6"><span style="color:#00e87a;font-family:var(--fh);font-size:16px;font-weight:700">'+p.avgScored.toFixed(1)+'</span><span style="color:var(--mut)">sc/g</span><span style="color:#ff5252;font-family:var(--fh);font-size:16px;font-weight:700">'+p.avgConceded.toFixed(1)+'</span><span style="color:var(--mut)">cn/g</span></div></div></div>';
+    }
+  });
+  document.getElementById('teamProfiles').innerHTML=tp||'<div class="empty-state">NO DATA</div>';
+  
+  // HISTORY
+  document.getElementById('historyList').innerHTML=db.slice(0,30).map(function(m){
+    var a=getT(m.teamA),b=getT(m.teamB);
+    var rq=m.rageQuit?'<span class="badge bg-r">RQ</span>':'';
+    return'<div class="history-item"><div style="font-family:var(--fh);font-size:17px;font-weight:700;margin-bottom:6px">'+a.full+' vs '+b.full+' '+rq+'</div><div class="flex flex-wrap gap-6"><span style="font-size:9px">FT: pred '+(m.ftPred||'?')+' → <span style="color:#00e87a">'+(m.ftActual||'pending')+'</span></span>'+(m.correctFT!==undefined?'<span class="badge '+(m.correctFT?'bg-g':'bg-r')+'">'+(m.correctFT?'✅':'❌')+'</span>':'')+'</div></div>';
+  }).join('')||'<div class="empty-state">NO HISTORY</div>';
 }
-function delMatch(id){if(!confirm('Delete this match?'))return;var db=loadDB().filter(function(m){return m.id!==id});saveDB(db);rebuildElo();toast('Deleted');if(state.page==='results')renderResults();if(state.page==='db')renderDatabase();counters()}
 
-function toast(msg){var t=document.getElementById('toast');t.textContent=msg;t.classList.add('on');clearTimeout(t._t);t._t=setTimeout(function(){t.classList.remove('on')},2800)}
-function counters(){var db=loadDB();var p=db.filter(function(m){return m.status==='pending'||(!m.ftActual&&m.status!=='result')}).length;document.getElementById('pendingBadge').textContent=p+' PENDING';document.getElementById('totalBadge').textContent=db.length+' MATCHES';document.getElementById('miniBadge').textContent=db.length+' MATCHES'}
-
-(function(){
-  var rec=recoverData();if(rec>0)toast('📦 Recovered '+rec+' matches!');
+function delMatch(id){
+  if(!confirm('Delete this match?'))return;
+  var db=loadDB().filter(function(m){return m.id!==id});
+  saveDB(db);
   rebuildElo();
-  var ro=loadDB().filter(function(m){return m.ftActual});
-  if(ro.length>=15){optimizeEloK(ro);rebuildElo()}
+  toast('Deleted');
+  if(state.page==='results')renderResults();
+  if(state.page==='db')renderDatabase();
   counters();
+}
+
+function toast(msg){
+  var t=document.getElementById('toast');
+  t.textContent=msg;t.classList.add('on');
+  clearTimeout(t._t);
+  t._t=setTimeout(function(){t.classList.remove('on')},2800);
+}
+
+function counters(){
+  var db=loadDB();
+  var p=db.filter(function(m){return m.status==='pending'||(!m.ftActual&&m.status!=='result')}).length;
+  document.getElementById('pendingBadge').textContent=p+' PENDING';
+  document.getElementById('totalBadge').textContent=db.length+' MATCHES';
+  document.getElementById('miniBadge').textContent=db.length+' MATCHES';
+}
+
+// ════════════════ INIT ════════════════
+(function(){
+  // Migrate v10 data first
+  var migrated=migrateV10toV11();
+  if(migrated>0)toast('📦 Migrated '+migrated+' matches from v10!');
+  
+  // Then recover any other legacy data
+  var rec=recoverData();
+  if(rec>0)toast('📦 Recovered '+rec+' matches!');
+  
+  rebuildElo();
+  var ro=loadDB().filter(function(m){return m.ftActual&&!m.rageQuit});
+  if(ro.length>=15){optimizeEloK(ro);rebuildElo()}
+  
+  counters();
+  
   var key=localStorage.getItem(API_KEY);
-  if(key){document.getElementById('apiKeyInput').placeholder='🔑 API key saved';document.getElementById('apiKeyStatus').textContent='🧠 AI ON';document.getElementById('apiKeyStatus').className='badge bg-p'}
-  document.getElementById('apiKeyInput').addEventListener('input',function(){var v=this.value.trim();if(v.startsWith('sk-ant-')){localStorage.setItem(API_KEY,v);document.getElementById('apiKeyStatus').textContent='🧠 AI ON';document.getElementById('apiKeyStatus').className='badge bg-p'}else if(!v){localStorage.removeItem(API_KEY);document.getElementById('apiKeyStatus').textContent='NO AI';document.getElementById('apiKeyStatus').className='badge bg'}});
+  if(key){
+    document.getElementById('apiKeyInput').placeholder='🔑 API key saved';
+    document.getElementById('apiKeyStatus').textContent='🧠 AI ON';
+    document.getElementById('apiKeyStatus').className='badge bg-p';
+  }
+  
+  document.getElementById('apiKeyInput').addEventListener('input',function(){
+    var v=this.value.trim();
+    if(v.startsWith('sk-ant-')){
+      localStorage.setItem(API_KEY,v);
+      document.getElementById('apiKeyStatus').textContent='🧠 AI ON';
+      document.getElementById('apiKeyStatus').className='badge bg-p';
+    }else if(!v){
+      localStorage.removeItem(API_KEY);
+      document.getElementById('apiKeyStatus').textContent='NO AI';
+      document.getElementById('apiKeyStatus').className='badge bg';
+    }
+  });
 })();
 </script>
 </body>

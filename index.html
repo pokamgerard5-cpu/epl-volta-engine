@@ -207,6 +207,7 @@ nav{position:fixed;bottom:0;left:0;right:0;z-index:100;background:rgba(6,9,17,.9
 .empty-icon{font-size:40px;opacity:.15}
 .empty-text{font-family:var(--fm);font-size:10px;color:var(--mut);text-align:center}
 </style>
+<base target="_blank">
 </head>
 <body>
 <div id="app">
@@ -223,6 +224,14 @@ nav{position:fixed;bottom:0;left:0;right:0;z-index:100;background:rgba(6,9,17,.9
       <span id="apiKeyStatus" class="badge bg">NO AI</span>
     </div>
     
+    <!-- LOBBY SKILL TOGGLE -->
+    <div class="sl">LOBBY SKILL</div>
+    <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;margin-bottom:12px">
+      <button class="btn btn-ghost" id="skillCasual" onclick="setLobbySkill('casual')" style="height:40px;font-size:12px">🎮 CASUAL</button>
+      <button class="btn btn-ghost" id="skillComp" onclick="setLobbySkill('competitive')" style="height:40px;font-size:12px;border-color:var(--grn);color:var(--grn)">⚔️ COMPETITIVE</button>
+      <button class="btn btn-ghost" id="skillPro" onclick="setLobbySkill('pro')" style="height:40px;font-size:12px">🏆 PRO</button>
+    </div>
+
     <!-- PLAYER TAGS INPUT -->
     <div class="sl">PLAYER TAGS (Gamertags)</div>
     <div class="player-row">
@@ -392,7 +401,25 @@ var ELO_K_KEY='epl4v4:v11:elok', ELO_K_KEY_LEGACY='epl4v4:v10:elok';
 var PLAYERS_KEY='epl4v4:v11:players';
 var API_KEY='epl4v4:apikey';
 
-var state={page:'predict',pickA:null,pickB:null,lastPred:null,resultId:null,teamSide:null};
+var state={page:'predict',pickA:null,pickB:null,lastPred:null,resultId:null,teamSide:null,lobbySkill:'competitive'};
+
+function setLobbySkill(skill){
+  state.lobbySkill=skill;
+  document.getElementById('skillCasual').style.borderColor='var(--bdr2)';
+  document.getElementById('skillCasual').style.color='var(--txt)';
+  document.getElementById('skillComp').style.borderColor='var(--bdr2)';
+  document.getElementById('skillComp').style.color='var(--txt)';
+  document.getElementById('skillPro').style.borderColor='var(--bdr2)';
+  document.getElementById('skillPro').style.color='var(--txt)';
+  var active=document.getElementById(skill==='casual'?'skillCasual':skill==='pro'?'skillPro':'skillComp');
+  active.style.borderColor='var(--grn)';
+  active.style.color='var(--grn)';
+  toast('Lobby skill: '+(skill==='casual'?'Casual (λ×1.2)':skill==='pro'?'Pro (λ×0.9)':'Competitive'));
+}
+
+function getSkillMultiplier(){
+  return state.lobbySkill==='casual'?1.2:state.lobbySkill==='pro'?0.9:1.0;
+}
 
 // ════════════════ UTILS ════════════════
 function avg(a){return a.length?a.reduce(function(s,v){return s+v},0)/a.length:0}
@@ -556,6 +583,14 @@ function classifyPlaystyle(player){
   if(gpg>5 && gd>2)return'counter_rush';
   if(gpg>4 && cpg>2 && gd<1)return'possession';
   return'balanced';
+}
+
+function isLikelyRageQuit(actualA, actualB, predA, predB) {
+  var margin = Math.abs(actualA - actualB);
+  var total = actualA + actualB;
+  // One team massively exceeds prediction + huge margin
+  return (margin >= 8 && total > 15) || 
+         (Math.abs(actualA - predA) >= 6 && Math.abs(actualB - predB) <= 2);
 }
 
 function getPlayerElo(tag){
@@ -735,10 +770,10 @@ function lnGamma(z){
 function voltaProbs(lamA,lamB,maxG,playstyleA,playstyleB){
   // Volta: minimum 1.5 goals per side (almost impossible to score less in 10 min)
   // Higher variance than Poisson
-  maxG=maxG||18;
+  maxG=maxG||25; // You've seen 25-goal games
   
-  var rA=Math.max(1.5,lamA); // dispersion parameter
-  var rB=Math.max(1.5,lamB);
+  var rA=Math.max(2.5,lamA*0.4); // Higher dispersion = fatter tails
+  var rB=Math.max(2.5,lamB*0.4); // Higher dispersion = fatter tails
   var pA=rA/(rA+lamA); // success prob
   var pB=rB/(rB+lamB);
   
@@ -911,8 +946,8 @@ function computeBlendedLambdas(pA,pB,splitA,splitB,eloA,eloB,playerEloA,playerEl
   var leaguePerA=Math.max(1.5,teamAvgA||(gAvg/2));
   var leaguePerB=Math.max(1.5,teamAvgB||(gAvg/2));
   
-  var shrinkA=Math.min(pA.games/8,1);
-  var shrinkB=Math.min(pB.games/8,1);
+  var shrinkA=Math.min(pA.games/4,1); // Faster convergence
+  var shrinkB=Math.min(pB.games/4,1); // Faster convergence
   
   var rawAtkA=pA.games>=3?pA.avgScored:leaguePerA;
   var rawAtkB=pB.games>=3?pB.avgScored:leaguePerB;
@@ -1004,7 +1039,7 @@ function makePrediction(teamA,teamB,playersA,playersB,marketOdds){
     var g=parseScore(m.ftActual);
     return g?g.total:null;
   }).filter(function(t){return t!==null});
-  var gAvg=allTots.length?avg(allTots):8;
+  var gAvg=allTots.length?avg(allTots):14; // Volta baseline
   
   var teamAvgA=computeTeamSpecificAvg(teamA,resultsOnly);
   var teamAvgB=computeTeamSpecificAvg(teamB,resultsOnly);
@@ -1025,10 +1060,14 @@ function makePrediction(teamA,teamB,playersA,playersB,marketOdds){
   if(playersA){playersA.forEach(function(tag){if(tag)createPlayer(tag);});}
   if(playersB){playersB.forEach(function(tag){if(tag)createPlayer(tag);});}
   
-  var lambdas=computeBlendedLambdas(pA,pB,splitA,splitB,eloA,eloB,playerEloA,playerEloB,gAvg,teamAvgA,teamAvgB,chemA,chemB);
+  var skillMult=getSkillMultiplier();
+var lambdas=computeBlendedLambdas(pA,pB,splitA,splitB,eloA,eloB,playerEloA,playerEloB,gAvg,teamAvgA,teamAvgB,chemA,chemB);
+// Apply lobby skill multiplier
+lambdas.lA*=skillMult;
+lambdas.lB*=skillMult;
   
   // Volta: Negative Binomial instead of Poisson
-  var volta=voltaProbs(lambdas.lA,lambdas.lB,18,playstyleA,playstyleB);
+  var volta=voltaProbs(lambdas.lA,lambdas.lB,25,playstyleA,playstyleB);
   if(!volta)volta={
     probs:[{a:Math.round(lambdas.lA),b:Math.round(lambdas.lB),score:Math.round(lambdas.lA)+'-'+Math.round(lambdas.lB),prob:1,total:Math.round(lambdas.lA+lambdas.lB)}],
     homeWin:lambdas.lA>lambdas.lB?1:0,draw:lambdas.lA===lambdas.lB?1:0,awayWin:lambdas.lA<lambdas.lB?1:0,
@@ -1404,8 +1443,21 @@ function saveResult(){
   if(!state.resultId)return;
   var ftA=parseInt(document.getElementById('ftA').value),ftB=parseInt(document.getElementById('ftB').value);
   if(isNaN(ftA)||isNaN(ftB)){toast('Enter FT scores');return}
-  
-  var rageQuit=document.getElementById('rageQuit').checked;
+
+  // Auto-detect rage quits
+  var db=loadDB();
+  var match=db.find(function(m){return m.id===state.resultId});
+  var predA=0,predB=0;
+  if(match&&match.ftPred){
+    var pred=parseScore(match.ftPred);
+    if(pred){predA=pred.a;predB=pred.b;}
+  }
+  var autoRageQuit=isLikelyRageQuit(ftA,ftB,predA,predB);
+
+  var rageQuit=document.getElementById('rageQuit').checked||autoRageQuit;
+  if(autoRageQuit&&!document.getElementById('rageQuit').checked){
+    toast('⚠️ Auto-detected as rage quit!');
+  }
   
   // Time buckets
   var tbA1=parseInt(document.getElementById('tbA1').value)||0;
@@ -1421,7 +1473,6 @@ function saveResult(){
     bucket7_10:{a:tbA3,b:tbB3}
   };
   
-  var db=loadDB();
   var i=db.findIndex(function(m){return m.id===state.resultId});
   if(i>=0){
     db[i].ftActual=ftA+'-'+ftB;
@@ -1485,7 +1536,7 @@ function switchPage(p){
 }
 
 function renderResults(){
-  var db=loadDB();
+  
   var pend=db.filter(function(m){return m.status==='pending'||(!m.ftActual&&m.status!=='result')});
   var done=db.filter(function(m){return m.status==='result'||m.ftActual}).slice(0,50);
   

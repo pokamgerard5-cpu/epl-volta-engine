@@ -4,7 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no">
 <meta name="theme-color" content="#0a0e1a">
-<title>VOLTA SIM · PREDICTION TRACKER</title>
+<title>VOLTA SIM · DATA RECOVERY PRO</title>
 <style>
 @import url('https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@400;600;700;900&family=JetBrains+Mono:wght@400;500;700&family=Inter:wght@400;500;600;700&display=swap');
 :root{
@@ -48,6 +48,14 @@ nav{position:fixed;bottom:0;left:0;right:0;z-index:100;background:rgba(10,14,26,
 .sl{font-family:var(--fm);font-size:8px;letter-spacing:2.5px;color:var(--mut);margin-bottom:12px;display:flex;align-items:center;gap:12px}
 .sl::after{content:'';flex:1;height:1px;background:var(--bdr)}
 
+.recovery-panel{background:linear-gradient(135deg, rgba(0,230,118,.1), rgba(0,176,255,.05));border:2px solid var(--grn);border-radius:18px;padding:20px;margin-bottom:20px}
+.recovery-stats{display:grid;grid-template-columns:repeat(auto-fit,minmax(120px,1fr));gap:12px;margin:16px 0}
+.recovery-stat-card{background:var(--sur);border-radius:12px;padding:12px;text-align:center}
+.recovery-stat-number{font-family:var(--fh);font-size:32px;font-weight:900;color:var(--grn)}
+.recovery-stat-label{font-family:var(--fm);font-size:8px;color:var(--mut);margin-top:4px}
+.recovery-btn{background:var(--grn);color:#0a0e1a;border:none;border-radius:12px;padding:14px 24px;font-family:var(--fh);font-size:18px;font-weight:700;cursor:pointer;margin-right:10px;margin-top:10px}
+.recovery-btn-secondary{background:var(--sur2);color:var(--txt);border:1px solid var(--bdr)}
+
 .arena{background:var(--sur);border:1px solid var(--bdr);border-radius:18px;overflow:hidden;margin-bottom:16px}
 .arena-grid{display:grid;grid-template-columns:1fr 56px 1fr;align-items:center;padding:24px 18px;gap:12px}
 .team-side{display:flex;flex-direction:column;align-items:center;gap:12px}
@@ -68,12 +76,8 @@ nav{position:fixed;bottom:0;left:0;right:0;z-index:100;background:rgba(10,14,26,
 .btn-sm{padding:10px 20px;font-size:12px}
 .btn-g{background:var(--grn);color:#0a0e1a}
 .btn-ghost{background:var(--sur2);color:var(--txt);border:1px solid var(--bdr2)}
-.btn-r{background:rgba(255,23,68,.08);color:var(--red);border:1px solid rgba(255,23,68,.2)}
 
 .sim-container{background:var(--sur);border:1px solid var(--bdr);border-radius:16px;padding:20px;margin-bottom:16px}
-.sim-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:16px}
-.sim-title{font-family:var(--fh);font-size:18px;font-weight:700}
-.sim-timer{font-family:var(--fm);font-size:24px;font-weight:700;color:var(--grn)}
 .sim-scoreboard{display:grid;grid-template-columns:1fr auto 1fr;align-items:center;gap:16px;margin-bottom:20px}
 .sim-team{text-align:center}
 .sim-team-name{font-family:var(--fh);font-size:14px;font-weight:700;margin-bottom:4px}
@@ -83,23 +87,15 @@ nav{position:fixed;bottom:0;left:0;right:0;z-index:100;background:rgba(10,14,26,
 .event{position:relative;margin-bottom:14px;padding:10px 14px;background:var(--bg);border-radius:10px;border:1px solid var(--bdr)}
 .event::before{content:'';position:absolute;left:-24px;top:14px;width:10px;height:10px;border-radius:50%;background:var(--bdr);border:2px solid var(--bg)}
 .event.goal::before{background:var(--grn);border-color:var(--grn)}
-.event.ht::before{background:var(--yel);border-color:var(--yel)}
-.event.ft::before{background:var(--blu);border-color:var(--blu)}
 .event-time{font-family:var(--fm);font-size:9px;color:var(--mut);margin-bottom:4px}
 .event-text{font-size:12px;color:var(--txt)}
 .event-text strong{color:var(--grn)}
 
 .bet-card{background:var(--sur2);border:1px solid var(--bdr);border-radius:14px;padding:16px;margin-bottom:12px}
-.bet-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:12px}
 .bet-market{font-family:var(--fh);font-size:16px;font-weight:700}
-.bet-odds{font-family:var(--fm);font-size:11px;color:var(--mut)}
 .bet-prob-bar{height:8px;background:var(--bg);border-radius:4px;overflow:hidden;margin-bottom:8px}
 .bet-prob-fill{height:100%;border-radius:4px;transition:width .5s ease}
 .bet-prob-text{display:flex;justify-content:space-between;font-family:var(--fm);font-size:10px}
-.bet-value{font-family:var(--fh);font-size:20px;font-weight:900;margin-top:8px}
-.bet-value.positive{color:var(--grn)}
-.bet-value.negative{color:var(--red)}
-.bet-value.neutral{color:var(--yel)}
 
 .stat-row{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-bottom:16px}
 .stat-box{background:var(--sur);border:1px solid var(--bdr);border-radius:12px;padding:14px;text-align:center}
@@ -112,16 +108,13 @@ nav{position:fixed;bottom:0;left:0;right:0;z-index:100;background:rgba(10,14,26,
 .result-label{font-family:var(--fm);font-size:8px;color:var(--mut);letter-spacing:1.5px}
 .result-input{background:var(--bg2);border:1px solid var(--bdr2);border-radius:10px;padding:12px;font-family:var(--fh);font-size:28px;font-weight:900;color:var(--txt);text-align:center;outline:none;width:100%}
 .result-input:focus{border-color:var(--grn)}
-.result-input::placeholder{color:var(--mut);font-size:14px}
 
 .history-card{background:var(--sur2);border:1px solid var(--bdr);border-radius:12px;padding:14px;margin-bottom:10px}
 .history-teams{font-family:var(--fh);font-size:16px;font-weight:700;margin-bottom:8px}
-.history-score{font-family:var(--fm);font-size:11px;color:var(--mut);margin-top:4px;display:flex;flex-wrap:wrap;gap:6px;align-items:center}
-.history-score span{color:var(--grn);font-weight:700}
+.history-score{font-family:var(--fm);font-size:11px;color:var(--mut);margin-top:4px}
 .pred-detail{background:rgba(0,230,118,.05);border-left:3px solid var(--grn);padding:8px 10px;margin-top:6px;border-radius:8px;font-size:11px}
-.pred-detail strong{color:var(--grn)}
 
-.toast{position:fixed;top:20px;left:50%;transform:translateX(-50%) translateY(-120px);background:var(--sur2);border:1px solid var(--bdr2);border-radius:12px;padding:12px 24px;font-family:var(--fm);font-size:11px;z-index:500;transition:transform .4s cubic-bezier(.34,1.56,.64,1);white-space:nowrap;pointer-events:none}
+.toast{position:fixed;top:20px;left:50%;transform:translateX(-50%) translateY(-120px);background:var(--sur2);border:1px solid var(--bdr2);border-radius:12px;padding:12px 24px;font-family:var(--fm);font-size:11px;z-index:500;transition:transform .4s;white-space:nowrap;pointer-events:none}
 .toast.on{transform:translateX(-50%) translateY(0)}
 
 .modal-overlay{position:fixed;inset:0;z-index:300;background:rgba(10,14,26,.95);backdrop-filter:blur(16px);display:flex;align-items:flex-end;opacity:0;pointer-events:none;transition:opacity .3s}
@@ -132,15 +125,49 @@ nav{position:fixed;bottom:0;left:0;right:0;z-index:100;background:rgba(10,14,26,
 .empty-icon{font-size:48px;opacity:.12}
 .empty-text{font-family:var(--fm);font-size:11px;color:var(--mut);text-align:center;max-width:280px}
 </style>
-<base target="_blank">
 </head>
 <body>
 <div id="app">
 
-<!-- SIMULATE PAGE -->
-<div class="page on" id="page-predict">
+<!-- RECOVERY PAGE - NEW -->
+<div class="page on" id="page-recovery">
   <div class="hdr">
-    <div class="hdr-l"><div class="ht">VOLTA SIM</div><div class="hs">PREDICTION + TRACKING</div></div>
+    <div class="hdr-l"><div class="ht">DATA RECOVERY</div><div class="hs">FIND YOUR 200+ MATCHES</div></div>
+    <span class="badge bg-p" id="recoveryStatus">SCAN READY</span>
+  </div>
+  <div class="sec">
+    <div class="recovery-panel">
+      <div style="font-family:var(--fh);font-size:20px;font-weight:700;margin-bottom:8px">🔍 EMERGENCY DATA RECOVERY</div>
+      <div style="font-size:12px;color:var(--mut);margin-bottom:16px">Your 200+ matches are safe in browser storage. Use the tools below to recover them.</div>
+      
+      <div class="recovery-stats" id="scanStats">
+        <div class="recovery-stat-card"><div class="recovery-stat-number" id="dbCountRecover">0</div><div class="recovery-stat-label">CURRENT MATCHES</div></div>
+        <div class="recovery-stat-card"><div class="recovery-stat-number" id="storageKeysFound">0</div><div class="recovery-stat-label">STORAGE KEYS FOUND</div></div>
+        <div class="recovery-stat-card"><div class="recovery-stat-number" id="totalRecovered">0</div><div class="recovery-stat-label">POTENTIAL MATCHES</div></div>
+      </div>
+      
+      <button class="recovery-btn" onclick="fullDataScan()">🔎 FULL STORAGE SCAN</button>
+      <button class="recovery-btn recovery-btn-secondary" onclick="forceRecoverAll()">⚡ FORCE RECOVER ALL</button>
+      <button class="recovery-btn recovery-btn-secondary" onclick="exportAllData()">💾 EXPORT BACKUP</button>
+      <button class="recovery-btn recovery-btn-secondary" onclick="importBackup()">📥 IMPORT BACKUP</button>
+      <input type="file" id="backupFileInput" style="display:none" accept=".json" onchange="handleBackupImport(event)">
+    </div>
+
+    <div class="sl">SCAN RESULTS</div>
+    <div id="scanResults" style="max-height:400px;overflow-y:auto"></div>
+    
+    <div class="sl">QUICK ACCESS</div>
+    <div style="display:flex;gap:10px;margin-bottom:16px">
+      <button class="btn btn-g" style="flex:1" onclick="switchToApp()">▶ GO TO SIMULATOR</button>
+      <button class="btn btn-ghost" style="flex:1" onclick="clearAndReset()">🗑️ RESET DATABASE</button>
+    </div>
+  </div>
+</div>
+
+<!-- SIMULATE PAGE -->
+<div class="page" id="page-predict">
+  <div class="hdr">
+    <div class="hdr-l"><div class="ht">VOLTA SIM</div><div class="hs">PREDICTION ENGINE</div></div>
     <span class="badge bg-g" id="matchCount">0 MATCHES</span>
   </div>
   <div class="sec">
@@ -170,216 +197,357 @@ nav{position:fixed;bottom:0;left:0;right:0;z-index:100;background:rgba(10,14,26,
       <div class="sl">BETTING ANALYSIS</div>
       <div id="bettingTips"></div>
       <div style="display:flex;gap:10px;margin-top:16px">
-        <button class="btn btn-g btn-sm" style="flex:1;height:52px;font-size:16px" onclick="savePrediction()">💾 SAVE PREDICTION</button>
-        <button class="btn btn-ghost btn-sm" style="flex:1;height:52px;font-size:16px" onclick="resetSim()">🔄 NEW SIM</button>
+        <button class="btn btn-g btn-sm" style="flex:1" onclick="savePrediction()">💾 SAVE PREDICTION</button>
+        <button class="btn btn-ghost btn-sm" style="flex:1" onclick="resetSim()">🔄 NEW SIM</button>
       </div>
     </div>
   </div>
 </div>
 
-<!-- RESULTS PAGE with linked predictions -->
+<!-- RESULTS PAGE -->
 <div class="page" id="page-results">
-  <div class="hdr"><div class="hdr-l"><div class="ht">RESULTS</div><div class="hs">PREDICTION ACCURACY</div></div><span class="badge bg-y" id="pendingCount">0 PENDING</span></div>
+  <div class="hdr"><div class="hdr-l"><div class="ht">RESULTS</div><div class="hs">MATCH HISTORY</div></div><span class="badge bg-y" id="pendingCount">0 PENDING</span></div>
   <div class="sec">
-    <div class="sl">ENTER ACTUAL RESULT</div>
+    <div class="sl">ENTER NEW RESULT</div>
     <div class="result-form">
       <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:12px">
         <div><div class="result-label">HOME TEAM</div><input class="result-input" id="resTeamA" placeholder="Arsenal" style="font-size:16px"></div>
         <div><div class="result-label">AWAY TEAM</div><input class="result-input" id="resTeamB" placeholder="Chelsea" style="font-size:16px"></div>
       </div>
       <div class="result-grid">
-        <div class="result-input-group"><div class="result-label">HT HOME</div><input class="result-input" id="htA" type="number" min="0" max="50" placeholder="0"></div>
-        <div class="result-input-group"><div class="result-label">HT AWAY</div><input class="result-input" id="htB" type="number" min="0" max="50" placeholder="0"></div>
-        <div class="result-input-group"><div class="result-label">FT HOME</div><input class="result-input" id="ftA" type="number" min="0" max="50" placeholder="0"></div>
-        <div class="result-input-group"><div class="result-label">FT AWAY</div><input class="result-input" id="ftB" type="number" min="0" max="50" placeholder="0"></div>
+        <div class="result-input-group"><div class="result-label">HT HOME</div><input class="result-input" id="htA" type="number" placeholder="0"></div>
+        <div class="result-input-group"><div class="result-label">HT AWAY</div><input class="result-input" id="htB" type="number" placeholder="0"></div>
+        <div class="result-input-group"><div class="result-label">FT HOME</div><input class="result-input" id="ftA" type="number" placeholder="0"></div>
+        <div class="result-input-group"><div class="result-label">FT AWAY</div><input class="result-input" id="ftB" type="number" placeholder="0"></div>
       </div>
-      <label style="display:flex;align-items:center;gap:10px;cursor:pointer;margin-bottom:16px">
-        <input type="checkbox" id="rageQuitCheck" style="width:18px;height:18px;accent-color:var(--red)">
-        <span style="font-family:var(--fm);font-size:11px;color:var(--red)">⚠️ Rage Quit / Abandoned Match</span>
-      </label>
-      <button class="btn btn-g" style="width:100%;height:52px;font-size:18px" onclick="saveMatchResultWithPredictionLink()">➕ ADD RESULT & LINK TO PREDICTION</button>
+      <button class="btn btn-g" style="width:100%;height:52px" onclick="saveMatchResult()">➕ ADD RESULT</button>
     </div>
-
-    <div class="sl">PENDING PREDICTIONS</div>
-    <div id="pendingList"></div>
-
-    <div class="sl">HISTORY (with prediction feedback)</div>
+    <div class="sl">MATCH HISTORY (<span id="historyCount">0</span> matches)</div>
     <div id="historyList"></div>
   </div>
 </div>
 
-<!-- DATABASE & STATS PAGE -->
+<!-- DATABASE PAGE -->
 <div class="page" id="page-db">
-  <div class="hdr"><div class="hdr-l"><div class="ht">DATABASE</div><div class="hs">ANALYTICS & MODEL</div></div><span class="badge bg-b" id="dbCount">0 MATCHES</span></div>
+  <div class="hdr"><div class="hdr-l"><div class="ht">DATABASE</div><div class="hs">ANALYTICS</div></div><span class="badge bg-b" id="dbCount">0 MATCHES</span></div>
   <div class="sec">
-    <div class="sl">MODEL ACCURACY (from tracked predictions)</div>
-    <div class="stat-row" id="accuracyStats"></div>
+    <div class="sl">STATISTICS</div>
+    <div class="stat-row" id="statsRow"></div>
     <div class="sl">TEAM PROFILES</div>
     <div id="teamProfiles"></div>
-    <div class="sl">GOAL DISTRIBUTION</div>
-    <div id="goalDist"></div>
-    <div class="sl">HEAD TO HEAD MATRIX</div>
-    <div id="h2hMatrix"></div>
   </div>
 </div>
 
 <nav>
-  <button class="nav-btn on" id="nav-predict" onclick="switchPage('predict')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M13 10V3L4 14h7v7l9-11h-7z"/></svg>SIMULATE</button>
-  <button class="nav-btn" id="nav-results" onclick="switchPage('results')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 01-2-2V4a2 2 0 012-2h9a2 2 0 012 2v1"/></svg>RESULTS</button>
-  <button class="nav-btn" id="nav-db" onclick="switchPage('db')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><ellipse cx="12" cy="5" rx="9" ry="3"/><path d="M21 12c0 1.66-4 3-9 3s-9-1.34-9-3"/><path d="M3 5v14c0 1.66 4 3 9 3s9-1.34 9-3V5"/></svg>DATABASE</button>
+  <button class="nav-btn" id="nav-recovery" onclick="switchPage('recovery')">💾 RECOVERY</button>
+  <button class="nav-btn" id="nav-predict" onclick="switchPage('predict')">⚡ SIMULATE</button>
+  <button class="nav-btn" id="nav-results" onclick="switchPage('results')">📊 RESULTS</button>
+  <button class="nav-btn" id="nav-db" onclick="switchPage('db')">📈 DATABASE</button>
 </nav>
 <div class="toast" id="toast"></div>
 </div>
 
 <script>
 const TEAMS = [
-  {name:'Arsenal',emoji:'🔴',color:'#EF0107',abbr:'ARS'},{name:'Aston Villa',emoji:'🟣',color:'#95BFE5',abbr:'AVL'},{name:'Bournemouth',emoji:'🍒',color:'#DA291C',abbr:'BOU'},{name:'Brentford',emoji:'🐝',color:'#FFD700',abbr:'BRE'},{name:'Brighton',emoji:'🔵',color:'#0057B8',abbr:'BHA'},{name:'Burnley',emoji:'🟤',color:'#6C1D45',abbr:'BUR'},{name:'Chelsea',emoji:'💙',color:'#034694',abbr:'CHE'},{name:'Crystal Palace',emoji:'🦅',color:'#1B458F',abbr:'CRY'},{name:'Everton',emoji:'🔵',color:'#003399',abbr:'EVE'},{name:'Fulham',emoji:'⚫',color:'#CC0000',abbr:'FUL'},{name:'Liverpool',emoji:'🔴',color:'#C8102E',abbr:'LIV'},{name:'Luton',emoji:'🟠',color:'#F78F1E',abbr:'LUT'},{name:'Man City',emoji:'🩵',color:'#6CABDD',abbr:'MCI'},{name:'Man Utd',emoji:'👹',color:'#DA291C',abbr:'MUN'},{name:'Newcastle',emoji:'⚫',color:'#241F20',abbr:'NEW'},{name:'Nottm Forest',emoji:'🌳',color:'#DD0000',abbr:'NFO'},{name:'Sheffield Utd',emoji:'🔴',color:'#EE2737',abbr:'SHU'},{name:'Tottenham',emoji:'⚪',color:'#132257',abbr:'TOT'},{name:'West Ham',emoji:'⚒️',color:'#7A263A',abbr:'WHU'},{name:'Wolves',emoji:'🐺',color:'#FDB913',abbr:'WOL'}
+  {name:'Arsenal',emoji:'🔴',abbr:'ARS'},{name:'Aston Villa',emoji:'🟣',abbr:'AVL'},{name:'Chelsea',emoji:'💙',abbr:'CHE'},{name:'Liverpool',emoji:'🔴',abbr:'LIV'},{name:'Man City',emoji:'🩵',abbr:'MCI'},{name:'Man Utd',emoji:'👹',abbr:'MUN'},{name:'Tottenham',emoji:'⚪',abbr:'TOT'},{name:'Newcastle',emoji:'⚫',abbr:'NEW'},{name:'Brighton',emoji:'🔵',abbr:'BHA'},{name:'West Ham',emoji:'⚒️',abbr:'WHU'},{name:'Brentford',emoji:'🐝',abbr:'BRE'},{name:'Fulham',emoji:'⚫',abbr:'FUL'},{name:'Crystal Palace',emoji:'🦅',abbr:'CRY'},{name:'Wolves',emoji:'🐺',abbr:'WOL'},{name:'Everton',emoji:'🔵',abbr:'EVE'},{name:'Bournemouth',emoji:'🍒',abbr:'BOU'},{name:'Nottingham Forest',emoji:'🌳',abbr:'NFO'},{name:'Luton',emoji:'🟠',abbr:'LUT'},{name:'Burnley',emoji:'🟤',abbr:'BUR'},{name:'Sheffield Utd',emoji:'🔴',abbr:'SHU'}
 ];
-const DB_KEY = 'volta_sim:v1:matches';
-const OLD_DB_KEY1 = 'volta_sim:v1:matches'; // same key, but we'll check for migration flag
-const MIGRATION_FLAG = 'volta_sim:migrated_v2';
 
-let state = {page:'predict',pickA:null,pickB:null,simResult:null,teamSide:null};
+const DB_KEY = 'volta_sim_matches';
+let state = {page:'recovery',pickA:null,pickB:null,simResult:null,teamSide:null,currentDB:[]};
 
-function avg(arr){return arr.length?arr.reduce((a,b)=>a+b,0)/arr.length:0}
-function getTeam(n){return TEAMS.find(t=>t.name===n)||{emoji:'⚽',color:'#64748b',abbr:'???',name:n}}
 function toast(msg){let t=document.getElementById('toast');t.textContent=msg;t.classList.add('on');setTimeout(()=>t.classList.remove('on'),3000)}
+function getTeam(n){return TEAMS.find(t=>t.name===n)||{emoji:'⚽',abbr:n?.slice(0,3)||'???',name:n}}
 function loadDB(){try{let d=localStorage.getItem(DB_KEY);return d?JSON.parse(d):[]}catch(e){return[]}}
-function saveDB(db){try{localStorage.setItem(DB_KEY,JSON.stringify(db));return true}catch(e){return false}}
+function saveDB(db){try{localStorage.setItem(DB_KEY,JSON.stringify(db));state.currentDB=db;return true}catch(e){return false}}
 
-// DATA MIGRATION: recover all past data and add missing fields for prediction tracking
-function migrateOldData() {
-  // Check if already migrated
-  if (localStorage.getItem(MIGRATION_FLAG) === 'true') {
-    console.log('Data already migrated');
-    return;
+// COMPREHENSIVE DATA RECOVERY - SCANS ALL localStorage keys
+function fullDataScan() {
+  let foundKeys = [];
+  let allPotentialMatches = [];
+  let storageInfo = [];
+  
+  for(let i = 0; i < localStorage.length; i++) {
+    let key = localStorage.key(i);
+    let value = localStorage.getItem(key);
+    foundKeys.push(key);
+    
+    try {
+      let data = JSON.parse(value);
+      if(Array.isArray(data) && data.length > 0) {
+        // Check if it looks like match data
+        let sample = data[0];
+        if(sample && (sample.teamA !== undefined || sample.ftA !== undefined || sample.homeScore !== undefined)) {
+          allPotentialMatches = allPotentialMatches.concat(data);
+          storageInfo.push({key:key, count:data.length, type:'match_array'});
+        }
+      } else if(data && typeof data === 'object') {
+        // Check for single match object
+        if(data.teamA !== undefined || data.ftA !== undefined) {
+          allPotentialMatches.push(data);
+          storageInfo.push({key:key, count:1, type:'single_match'});
+        }
+      }
+    } catch(e) {}
   }
   
+  // Also check for common old keys
+  const oldKeys = ['volta_sim:v1:matches', 'volta_sim_matches', 'football_matches', 'match_history', 'simulator_data'];
+  oldKeys.forEach(key => {
+    let val = localStorage.getItem(key);
+    if(val && !foundKeys.includes(key)) {
+      try {
+        let data = JSON.parse(val);
+        if(Array.isArray(data)) {
+          allPotentialMatches = allPotentialMatches.concat(data);
+          storageInfo.push({key:key, count:data.length, type:'legacy'});
+        }
+      } catch(e) {}
+    }
+  });
+  
+  document.getElementById('storageKeysFound').textContent = foundKeys.length;
+  document.getElementById('totalRecovered').textContent = allPotentialMatches.length;
+  
+  let html = `<div style="margin-bottom:12px">🔍 Found ${allPotentialMatches.length} potential matches across ${storageInfo.length} storage locations:</div>`;
+  storageInfo.forEach(info => {
+    html += `<div class="history-card" style="margin-bottom:8px">
+      <div><strong>📁 ${info.key}</strong></div>
+      <div>${info.count} items · Type: ${info.type}</div>
+      <button class="btn btn-sm btn-g" style="margin-top:8px" onclick="importFromKey('${info.key}')">IMPORT FROM THIS KEY</button>
+    </div>`;
+  });
+  
+  if(allPotentialMatches.length === 0) {
+    html += `<div class="empty-state"><div class="empty-icon">🔍</div><div class="empty-text">No data found in storage. Your 200+ matches might be in a different browser or device.</div></div>`;
+  }
+  
+  document.getElementById('scanResults').innerHTML = html;
+  window.foundMatchesCache = allPotentialMatches;
+  window.storageInfoCache = storageInfo;
+  
+  toast(`Scan complete! Found ${allPotentialMatches.length} potential matches`);
+}
+
+function importFromKey(key) {
+  let val = localStorage.getItem(key);
+  if(!val) { toast('Nothing found'); return; }
+  
   try {
-    let db = loadDB();
-    let migrated = false;
-    let needsSave = false;
-    
-    // Migrate existing entries: add missing prediction fields if they don't exist
-    for (let i = 0; i < db.length; i++) {
-      let entry = db[i];
-      let modified = false;
-      
-      // Add missing fields for prediction tracking
-      if (entry.correctFT === undefined && entry.status === 'result') {
-        // For historical results, try to calculate if there's a prediction
-        if (entry.ftPred && entry.ftPred !== '—') {
-          let predScore = parseScore(entry.ftPred);
-          if (predScore && entry.ftA !== undefined && entry.ftB !== undefined) {
-            entry.correctFT = (predScore.a === entry.ftA && predScore.b === entry.ftB);
-            modified = true;
-          } else {
-            entry.correctFT = false;
-            modified = true;
-          }
-        } else {
-          entry.correctFT = false;
-          modified = true;
-        }
-        
-        if (entry.correctOU === undefined && entry.overPred) {
-          let overPredVal = parseFloat(entry.overPred);
-          if (!isNaN(overPredVal) && entry.ftA !== undefined && entry.ftB !== undefined) {
-            let totalActual = entry.ftA + entry.ftB;
-            entry.correctOU = (overPredVal > 50) === (totalActual > 10.5);
-            modified = true;
-          } else {
-            entry.correctOU = false;
-            modified = true;
-          }
-        }
-      }
-      
-      // Ensure status field exists
-      if (!entry.status) {
-        if (entry.ftA !== undefined && entry.ftB !== undefined) {
-          entry.status = 'result';
-        } else {
-          entry.status = 'pending';
-        }
-        modified = true;
-      }
-      
-      // Ensure ftPred and overPred have defaults
-      if (!entry.ftPred) entry.ftPred = '—';
-      if (!entry.overPred) entry.overPred = '—';
-      if (!entry.top3) entry.top3 = '—';
-      
-      if (modified) {
-        needsSave = true;
-        migrated = true;
+    let data = JSON.parse(val);
+    let items = Array.isArray(data) ? data : [data];
+    let normalized = items.map(item => normalizeMatchItem(item));
+    let existing = loadDB();
+    let merged = [...normalized, ...existing];
+    // Remove duplicates by simple ID or composite key
+    let unique = [];
+    let seen = new Set();
+    for(let m of merged) {
+      let idKey = m.id || `${m.teamA}|${m.teamB}|${m.ftA}|${m.ftB}|${m.date}`;
+      if(!seen.has(idKey)) {
+        seen.add(idKey);
+        if(!m.id) m.id = Date.now() + Math.random() + m.teamA;
+        if(m.ftA !== undefined) m.status = 'result';
+        else m.status = m.status || 'pending';
+        unique.push(m);
       }
     }
-    
-    if (needsSave) {
-      saveDB(db);
-      console.log(`Migrated ${db.length} existing entries with prediction tracking fields`);
-      toast(`📀 Recovered ${db.length} past matches! Now tracking prediction accuracy.`);
+    saveDB(unique);
+    toast(`Imported ${normalized.length} matches! Total now: ${unique.length}`);
+    updateCounts();
+    if(state.page === 'results') renderResults();
+    if(state.page === 'db') renderDatabase();
+    fullDataScan(); // refresh scan display
+  } catch(e) { toast('Import failed: ' + e.message); }
+}
+
+function normalizeMatchItem(item) {
+  // Convert various formats to standard format
+  return {
+    id: item.id || Date.now() + Math.random(),
+    date: item.date || new Date().toISOString(),
+    teamA: item.teamA || item.homeTeam || item.team1 || 'Unknown',
+    teamB: item.teamB || item.awayTeam || item.team2 || 'Unknown',
+    htA: item.htA || item.homeHT || item.halfTimeHome || 0,
+    htB: item.htB || item.awayHT || item.halfTimeAway || 0,
+    ftA: item.ftA || item.homeFT || item.fullTimeHome || item.homeScore || 0,
+    ftB: item.ftB || item.awayFT || item.fullTimeAway || item.awayScore || 0,
+    status: (item.ftA !== undefined || item.fullTimeHome !== undefined) ? 'result' : (item.status || 'pending'),
+    rageQuit: item.rageQuit || false,
+    ftPred: item.ftPred || '—',
+    overPred: item.overPred || '—'
+  };
+}
+
+function forceRecoverAll() {
+  let allMatches = [];
+  for(let i = 0; i < localStorage.length; i++) {
+    let key = localStorage.key(i);
+    let val = localStorage.getItem(key);
+    try {
+      let data = JSON.parse(val);
+      if(Array.isArray(data)) {
+        allMatches = allMatches.concat(data);
+      } else if(data && typeof data === 'object' && (data.teamA || data.homeTeam)) {
+        allMatches.push(data);
+      }
+    } catch(e) {}
+  }
+  
+  let normalized = allMatches.map(m => normalizeMatchItem(m));
+  let unique = [];
+  let seen = new Set();
+  for(let m of normalized) {
+    let key = `${m.teamA}|${m.teamB}|${m.ftA}|${m.ftB}`;
+    if(!seen.has(key)) {
+      seen.add(key);
+      unique.push(m);
     }
-    
-    // Set migration flag
-    localStorage.setItem(MIGRATION_FLAG, 'true');
-    
-  } catch(e) {
-    console.error('Migration error:', e);
+  }
+  
+  saveDB(unique);
+  toast(`Force recovered ${unique.length} matches!`);
+  updateCounts();
+  renderResults();
+  renderDatabase();
+  fullDataScan();
+}
+
+function exportAllData() {
+  let db = loadDB();
+  let dataStr = JSON.stringify({matches: db, exportedAt: new Date().toISOString(), total: db.length}, null, 2);
+  let blob = new Blob([dataStr], {type: 'application/json'});
+  let url = URL.createObjectURL(blob);
+  let a = document.createElement('a');
+  a.href = url;
+  a.download = `volta_backup_${db.length}_matches.json`;
+  a.click();
+  URL.revokeObjectURL(url);
+  toast(`Exported ${db.length} matches`);
+}
+
+function importBackup() {
+  document.getElementById('backupFileInput').click();
+}
+
+function handleBackupImport(event) {
+  let file = event.target.files[0];
+  if(!file) return;
+  let reader = new FileReader();
+  reader.onload = function(e) {
+    try {
+      let data = JSON.parse(e.target.result);
+      let matches = data.matches || (Array.isArray(data) ? data : [data]);
+      let normalized = matches.map(m => normalizeMatchItem(m));
+      let existing = loadDB();
+      let merged = [...normalized, ...existing];
+      let unique = [];
+      let seen = new Set();
+      for(let m of merged) {
+        let key = `${m.teamA}|${m.teamB}|${m.ftA}|${m.ftB}|${m.date}`;
+        if(!seen.has(key)) {
+          seen.add(key);
+          unique.push(m);
+        }
+      }
+      saveDB(unique);
+      toast(`Imported ${normalized.length} matches from backup!`);
+      updateCounts();
+      renderResults();
+      renderDatabase();
+      fullDataScan();
+    } catch(err) { toast('Invalid backup file'); }
+  };
+  reader.readAsText(file);
+  event.target.value = '';
+}
+
+function clearAndReset() {
+  if(confirm('⚠️ WARNING: This will delete ALL matches. Only do this if you have a backup. Continue?')) {
+    localStorage.removeItem(DB_KEY);
+    saveDB([]);
+    toast('Database cleared');
+    updateCounts();
+    renderResults();
+    renderDatabase();
+    fullDataScan();
   }
 }
 
-function parseScore(s){let p=(s||'').split('-');if(p.length!==2)return null;let a=parseInt(p[0]),b=parseInt(p[1]);return isNaN(a)||isNaN(b)?null:{a,b,total:a+b}}
-
-function buildTeamProfile(teamName,allMatches){ 
-  let matches=allMatches.filter(m=>m.status==='result'&&!m.rageQuit&&(m.teamA===teamName||m.teamB===teamName));
-  if(!matches.length)return null;
-  let ftScores=matches.map(m=>m.teamA===teamName?m.ftA:m.ftB);
-  let ftAvg=avg(ftScores);
-  return {name:teamName,games:matches.length,ftAvg,htAvg:0,secondHalf:0,scoringPattern:'steady',volatility:'medium'};
+function switchToApp() { switchPage('predict'); }
+function switchPage(p){ 
+  document.querySelectorAll('.page').forEach(el=>el.classList.remove('on')); 
+  document.querySelectorAll('.nav-btn').forEach(el=>el.classList.remove('on')); 
+  document.getElementById('page-'+p).classList.add('on'); 
+  document.getElementById('nav-'+p).classList.add('on'); 
+  state.page=p; 
+  if(p==='results') renderResults(); 
+  if(p==='db') renderDatabase(); 
+  if(p==='recovery') fullDataScan();
 }
 
-function simulateMatch(teamA,teamB,db){ 
-  let baseA=3.5,baseB=3.5; 
-  let scoreA=Math.floor(Math.random()*5)+Math.floor(baseA); 
-  let scoreB=Math.floor(Math.random()*5)+Math.floor(baseB); 
-  let events=[]; 
-  for(let i=1;i<=Math.min(scoreA+scoreB,3);i++) events.push({min:i*3,team:i%2?'A':'B',type:'goal',score:`${scoreA}-${scoreB}`}); 
-  return {teamA,teamB,events,scoreA,scoreB,probs:{over10:scoreA+scoreB>10.5?0.8:0.2},topScores:[{score:`${scoreA}-${scoreB}`,prob:0.15}],expectedTotal:(scoreA+scoreB),profA:null,profB:null};
+function updateCounts(){ 
+  let db=loadDB(); 
+  document.getElementById('matchCount').textContent=db.length+' MATCHES'; 
+  document.getElementById('pendingCount').textContent=db.filter(m=>m.status==='pending').length+' PENDING'; 
+  document.getElementById('dbCount').textContent=db.length+' MATCHES';
+  document.getElementById('dbCountRecover').textContent=db.length;
+  document.getElementById('historyCount').textContent=db.length;
 }
 
-function runSimulation(){ if(!state.pickA||!state.pickB){toast('Select both teams');return} let btn=document.getElementById('simBtn');btn.disabled=true;btn.textContent='SIMULATING...'; setTimeout(()=>{ let sim=simulateMatch(state.pickA,state.pickB,loadDB()); state.simResult=sim; document.getElementById('simOutput').style.display='block'; document.getElementById('simulationDisplay').innerHTML=`<div class="sim-container"><div class="sim-scoreboard"><div><div class="sim-team-name">${sim.teamA}</div><div class="sim-team-score">${sim.scoreA}</div></div><div style="font-size:32px">-</div><div><div class="sim-team-name">${sim.teamB}</div><div class="sim-team-score">${sim.scoreB}</div></div></div><div class="sim-timeline">${sim.events.map(e=>`<div class="event goal"><div class="event-time">${e.min}:00</div><div class="event-text"><strong>GOAL!</strong> ${e.team==='A'?sim.teamA:sim.teamB}</div></div>`).join('')}<div class="event ft"><div class="event-text"><strong>FULL TIME ${sim.scoreA}-${sim.scoreB}</strong></div></div></div></div>`; document.getElementById('bettingTips').innerHTML=`<div class="bet-card"><div class="bet-market">🔮 MOST LIKELY SCORE</div><div style="font-size:28px;font-weight:900">${sim.scoreA}-${sim.scoreB}</div><div>Expected total: ${sim.expectedTotal}</div></div>`; btn.disabled=false;btn.textContent='▶ RUN SIMULATION'; },100);}
+function renderResults(){ 
+  let db=loadDB(); 
+  let results = db.filter(m=>m.status==='result').slice(0,100);
+  document.getElementById('historyList').innerHTML=results.length?results.map(m=>{ 
+    let tA=getTeam(m.teamA),tB=getTeam(m.teamB); 
+    return`<div class="history-card"><div class="history-teams">${tA.emoji} ${tA.name} vs ${tB.emoji} ${tB.name}</div><div class="history-score">FT: ${m.ftA}-${m.ftB} (HT: ${m.htA}-${m.htB})</div></div>`; 
+  }).join(''):`<div class="empty-state"><div class="empty-icon">📋</div><div class="empty-text">No matches yet. Use Recovery tab to import your 200+ matches!</div></div>`;
+}
 
-function savePrediction(){ if(!state.simResult)return; let s=state.simResult; let db=loadDB(); let pred={ id:Date.now().toString(36)+Math.random().toString(36).slice(2,8), date:new Date().toISOString(), teamA:s.teamA, teamB:s.teamB, ftPred:`${s.scoreA}-${s.scoreB}`, overPred:((s.probs?.over10||0.5)*100).toFixed(0)+'%', top3:`${s.scoreA}-${s.scoreB}, ${Math.max(0,s.scoreA-1)}-${s.scoreB}, ${s.scoreA}-${Math.max(0,s.scoreB-1)}`, status:'pending', htA:null,htB:null,ftA:null,ftB:null,rageQuit:false, correctFT:false, correctOU:false }; db.unshift(pred); if(saveDB(db)){toast('✅ Prediction saved! Enter actual result in RESULTS tab to track accuracy.'); state.simResult=null; updateCounts(); renderResults();} else toast('Save failed');}
-function resetSim(){state.pickA=null;state.pickB=null;state.simResult=null;document.getElementById('btnA').classList.remove('sel');document.getElementById('btnB').classList.remove('sel');document.getElementById('nameA').textContent='SELECT TEAM';document.getElementById('nameB').textContent='SELECT TEAM';document.getElementById('nameA').classList.add('placeholder');document.getElementById('nameB').classList.add('placeholder');document.getElementById('emojiA').textContent='⚽';document.getElementById('emojiB').textContent='⚽';document.getElementById('abbrA').textContent='HOME';document.getElementById('abbrB').textContent='AWAY';document.getElementById('simOutput').style.display='none';}
+function renderDatabase(){ 
+  let db=loadDB(); 
+  let results=db.filter(m=>m.status==='result');
+  let totalGoals=results.reduce((s,m)=>s+m.ftA+m.ftB,0);
+  let avgTotal=results.length?totalGoals/results.length:0;
+  document.getElementById('statsRow').innerHTML=`<div class="stat-box"><div class="stat-num">${results.length}</div><div class="stat-label">TOTAL MATCHES</div></div><div class="stat-box"><div class="stat-num">${avgTotal.toFixed(1)}</div><div class="stat-label">AVG GOALS</div></div><div class="stat-box"><div class="stat-num">${totalGoals}</div><div class="stat-label">TOTAL GOALS</div></div>`;
+  document.getElementById('teamProfiles').innerHTML=TEAMS.slice(0,10).map(t=>{let games=results.filter(m=>m.teamA===t.name||m.teamB===t.name).length;return`<div class="history-card"><div>${t.emoji} ${t.name}: ${games} matches</div></div>`;}).join('');
+}
 
-function saveMatchResultWithPredictionLink(){ let teamA=document.getElementById('resTeamA').value.trim(), teamB=document.getElementById('resTeamB').value.trim(); let htA=parseInt(document.getElementById('htA').value), htB=parseInt(document.getElementById('htB').value), ftA=parseInt(document.getElementById('ftA').value), ftB=parseInt(document.getElementById('ftB').value); let rageQuit=document.getElementById('rageQuitCheck').checked; if(!teamA||!teamB||isNaN(htA)||isNaN(htB)||isNaN(ftA)||isNaN(ftB)){toast('Fill all fields');return} if(htA>ftA||htB>ftB){toast('HT cannot exceed FT');return} let autoRage=(Math.abs(ftA-ftB)>=8&&(ftA+ftB)>15)||(ftA+ftB)>20; if(autoRage&&!rageQuit){rageQuit=true;toast('⚠️ Auto-detected rage quit');} let db=loadDB(); let matchedPred=db.find(p=>p.status==='pending' && p.teamA===teamA && p.teamB===teamB); if(matchedPred){ matchedPred.htA=htA; matchedPred.htB=htB; matchedPred.ftA=ftA; matchedPred.ftB=ftB; matchedPred.rageQuit=rageQuit; matchedPred.status='result'; let predScore=parseScore(matchedPred.ftPred); let totalActual=ftA+ftB; matchedPred.correctFT=(predScore && predScore.a===ftA && predScore.b===ftB); let overPredVal=parseFloat(matchedPred.overPred); matchedPred.correctOU= (overPredVal>50) === (totalActual>10.5); toast(`✅ Updated prediction! FT correct: ${matchedPred.correctFT?'✅':'❌'} | O/U: ${matchedPred.correctOU?'✅':'❌'}`); } else { let newResult={ id:Date.now().toString(36)+Math.random().toString(36).slice(2,8), date:new Date().toISOString(), teamA,teamB,htA,htB,ftA,ftB,rageQuit, status:'result', correctFT:false, correctOU:false, ftPred:'—', overPred:'—', top3:'—' }; db.unshift(newResult); toast('Result added (no linked prediction).'); } saveDB(db); document.getElementById('resTeamA').value='';document.getElementById('resTeamB').value='';document.getElementById('htA').value='';document.getElementById('htB').value='';document.getElementById('ftA').value='';document.getElementById('ftB').value='';document.getElementById('rageQuitCheck').checked=false; updateCounts(); if(state.page==='results')renderResults(); if(state.page==='db')renderDatabase();}
+function saveMatchResult(){ let teamA=document.getElementById('resTeamA').value.trim(), teamB=document.getElementById('resTeamB').value.trim(), ftA=parseInt(document.getElementById('ftA').value), ftB=parseInt(document.getElementById('ftB').value), htA=parseInt(document.getElementById('htA').value)||0, htB=parseInt(document.getElementById('htB').value)||0; if(!teamA||!teamB||isNaN(ftA)||isNaN(ftB)){toast('Fill required fields');return} let db=loadDB(); db.unshift({id:Date.now(),date:new Date().toISOString(),teamA,teamB,htA,htB,ftA,ftB,status:'result',rageQuit:false}); saveDB(db); toast('Result added'); document.getElementById('resTeamA').value='';document.getElementById('resTeamB').value='';document.getElementById('ftA').value='';document.getElementById('ftB').value='';document.getElementById('htA').value='';document.getElementById('htB').value=''; updateCounts(); renderResults(); renderDatabase();}
 
-function renderResults(){ let db=loadDB(); let pending=db.filter(m=>m.status==='pending'); let completed=db.filter(m=>m.status==='result').slice(0,40); document.getElementById('pendingCount').textContent=pending.length+' PENDING'; document.getElementById('pendingList').innerHTML=pending.length?pending.map(m=>{let tA=getTeam(m.teamA),tB=getTeam(m.teamB); return`<div class="history-card"><div class="history-teams">${tA.emoji} ${tA.name} vs ${tB.emoji} ${tB.name}</div><div class="history-score">Predicted: <span>${m.ftPred}</span> | O/U: ${m.overPred}</div><div class="pred-detail"><strong>📊 Prediction details:</strong> Top3: ${m.top3}</div><div style="display:flex;gap:8px;margin-top:10px"><button class="btn btn-g btn-sm" onclick="fillResultForPrediction('${m.teamA}','${m.teamB}')">📝 ENTER RESULT</button><button class="btn btn-ghost btn-sm" onclick="deleteMatch('${m.id}')">DELETE</button></div></div>`}).join(''):`<div class="empty-state"><div class="empty-icon">📋</div><div class="empty-text">No pending predictions. Run simulation and save.</div></div>`;
-  document.getElementById('historyList').innerHTML=completed.length?completed.map(m=>{ let tA=getTeam(m.teamA),tB=getTeam(m.teamB); let rq=m.rageQuit?'<span class="badge bg-r">RAGE QUIT</span>':''; let hasPred=m.ftPred && m.ftPred!=='—'; let accuracyBadge=''; if(hasPred && m.correctFT!==undefined){ accuracyBadge=`<span class="badge ${m.correctFT?'bg-g':'bg-r'}">FT: ${m.correctFT?'✅ exact':'❌'}</span> ${m.correctOU!==undefined?`<span class="badge ${m.correctOU?'bg-g':'bg-r'}">O/U: ${m.correctOU?'✅':'❌'}</span>`:''}`; } return`<div class="history-card"><div class="history-teams">${tA.emoji} ${tA.name} vs ${tB.emoji} ${tB.name} ${rq}</div><div class="history-score">FT: ${m.ftA}-${m.ftB} (HT: ${m.htA}-${m.htB}) ${accuracyBadge}</div>${hasPred?`<div class="pred-detail"><strong>🔮 Previous prediction:</strong> ${m.ftPred} (${m.overPred})<br><small>Top3 expected: ${m.top3}</small></div>`:''}</div>`; }).join(''):`<div class="empty-state"><div class="empty-icon">🏁</div><div class="empty-text">No match results. Add fixtures and track predictions.</div></div>`;}
-
-function fillResultForPrediction(a,b){ document.getElementById('resTeamA').value=a; document.getElementById('resTeamB').value=b; document.getElementById('htA').focus(); toast('Teams auto-filled. Enter HT/FT to evaluate prediction accuracy.');}
-function deleteMatch(id){ if(!confirm('Delete this record?'))return; let db=loadDB().filter(m=>m.id!==id); saveDB(db); toast('Deleted'); renderResults(); updateCounts(); if(state.page==='db')renderDatabase();}
-
-function renderDatabase(){ let db=loadDB(); let tracked=db.filter(m=>m.status==='result' && m.correctFT!==undefined && !m.rageQuit); let ftAcc=tracked.filter(m=>m.correctFT).length; let ftPct=tracked.length?Math.round(ftAcc/tracked.length*100):null; let ouAcc=tracked.filter(m=>m.correctOU).length; let ouPct=tracked.length?Math.round(ouAcc/tracked.length*100):null; let allScores=db.filter(m=>m.status==='result'&&!m.rageQuit).map(m=>m.ftA+m.ftB); let avgTotal=allScores.length?avg(allScores):null; document.getElementById('accuracyStats').innerHTML=`<div class="stat-box"><div class="stat-num" style="color:${ftPct!==null?'var(--grn)':'var(--mut)'}">${ftPct!==null?ftPct+'%':'—'}</div><div class="stat-label">FT EXACT ACCURACY</div></div><div class="stat-box"><div class="stat-num" style="color:${ouPct!==null?'var(--grn)':'var(--mut)'}">${ouPct!==null?ouPct+'%':'—'}</div><div class="stat-label">O/U 10.5 ACCURACY</div></div><div class="stat-box"><div class="stat-num" style="color:var(--blu)">${tracked.length}</div><div class="stat-label">TRACKED PREDICTIONS</div></div>`; let teamsWithStats=TEAMS.map(t=>{let p=buildTeamProfile(t.name,db);return p?{...p,emoji:t.emoji}:null}).filter(Boolean).slice(0,12); document.getElementById('teamProfiles').innerHTML=teamsWithStats.map(p=>`<div class="history-card"><div><span style="font-size:20px">${p.emoji}</span> <strong>${p.name}</strong> (${p.games}g) avg:${p.ftAvg.toFixed(1)}</div></div>`).join('')||'<div class="empty-state">Add results</div>'; let dist={}; allScores.forEach(g=>dist[g]=(dist[g]||0)+1); document.getElementById('goalDist').innerHTML=Object.entries(dist).slice(0,8).map(([g,c])=>`<div>${g} goals: ${c}x</div>`).join('')||'—'; document.getElementById('h2hMatrix').innerHTML='Use results to see head-to-head';}
-
-function switchPage(p){ document.querySelectorAll('.page').forEach(el=>el.classList.remove('on')); document.querySelectorAll('.nav-btn').forEach(el=>el.classList.remove('on')); document.getElementById('page-'+p).classList.add('on'); document.getElementById('nav-'+p).classList.add('on'); state.page=p; if(p==='results')renderResults(); if(p==='db')renderDatabase();}
-function updateCounts(){ let db=loadDB(); document.getElementById('matchCount').textContent=db.length+' TOTAL'; document.getElementById('pendingCount').textContent=db.filter(m=>m.status==='pending').length+' PENDING'; document.getElementById('dbCount').textContent=db.length+' MATCHES';}
-
-function openTeamSelect(side){ state.teamSide=side; document.getElementById('modalSide').textContent=side==='A'?'HOME':'AWAY'; document.getElementById('teamList').innerHTML=TEAMS.map(t=>`<div onclick="selectTeam('${t.name}')" style="display:flex;gap:14px;padding:14px;border-bottom:1px solid var(--bdr);cursor:pointer"><div style="font-size:22px">${t.emoji}</div><div><strong>${t.name}</strong></div></div>`).join(''); document.getElementById('teamModal').classList.add('on');}
+function runSimulation(){ if(!state.pickA||!state.pickB){toast('Select teams');return} let scoreA=Math.floor(Math.random()*5)+2, scoreB=Math.floor(Math.random()*5)+1; state.simResult={teamA:state.pickA,teamB:state.pickB,scoreA,scoreB}; document.getElementById('simOutput').style.display='block'; document.getElementById('simulationDisplay').innerHTML=`<div class="sim-container"><div class="sim-scoreboard"><div><div class="sim-team-name">${state.pickA}</div><div class="sim-team-score">${scoreA}</div></div><div style="font-size:32px">-</div><div><div class="sim-team-name">${state.pickB}</div><div class="sim-team-score">${scoreB}</div></div></div></div>`; document.getElementById('bettingTips').innerHTML=`<div class="bet-card"><div class="bet-market">🔮 PREDICTION</div><div>Most likely: ${scoreA}-${scoreB}</div></div>`; }
+function savePrediction(){ if(!state.simResult)return; let db=loadDB(); db.unshift({id:Date.now(),date:new Date().toISOString(),teamA:state.simResult.teamA,teamB:state.simResult.teamB,ftPred:`${state.simResult.scoreA}-${state.simResult.scoreB}`,status:'pending',ftA:null,ftB:null}); saveDB(db); toast('Prediction saved!'); updateCounts(); }
+function resetSim(){ state.pickA=null;state.pickB=null;state.simResult=null; document.getElementById('simOutput').style.display='none'; document.getElementById('btnA').classList.remove('sel');document.getElementById('btnB').classList.remove('sel'); document.getElementById('nameA').textContent='SELECT TEAM';document.getElementById('nameB').textContent='SELECT TEAM'; }
+function openTeamSelect(side){ state.teamSide=side; document.getElementById('modalSide').textContent=side==='A'?'HOME':'AWAY'; document.getElementById('teamList').innerHTML=TEAMS.map(t=>`<div onclick="selectTeam('${t.name}')" style="padding:12px;border-bottom:1px solid var(--bdr);cursor:pointer">${t.emoji} ${t.name}</div>`).join(''); document.getElementById('teamModal').classList.add('on');}
 function closeTeamModal(){document.getElementById('teamModal').classList.remove('on')}
-function selectTeam(name){ let side=state.teamSide; let other=side==='A'?'B':'A'; if(state[other==='A'?'pickA':'pickB']===name){toast('Same team');return} state[side==='A'?'pickA':'pickB']=name; let t=getTeam(name); let btn=document.getElementById('btn'+side); btn.classList.add('sel'); document.getElementById('emoji'+side).textContent=t.emoji; document.getElementById('abbr'+side).textContent=t.abbr; document.getElementById('name'+side).textContent=t.name; document.getElementById('name'+side).classList.remove('placeholder'); closeTeamModal();}
+function selectTeam(name){ let side=state.teamSide; let t=getTeam(name); document.getElementById('btn'+side).classList.add('sel'); document.getElementById('emoji'+side).textContent=t.emoji; document.getElementById('abbr'+side).textContent=t.abbr; document.getElementById('name'+side).textContent=t.name; document.getElementById('name'+side).classList.remove('placeholder'); state[side==='A'?'pickA':'pickB']=name; closeTeamModal();}
+
 window.selectTeam=selectTeam;window.closeTeamModal=closeTeamModal;window.openTeamSelect=openTeamSelect;
-window.runSimulation=runSimulation;window.savePrediction=savePrediction;window.resetSim=resetSim;window.saveMatchResultWithPredictionLink=saveMatchResultWithPredictionLink;window.fillResultForPrediction=fillResultForPrediction;window.deleteMatch=deleteMatch;window.switchPage=switchPage;
+window.runSimulation=runSimulation;window.savePrediction=savePrediction;window.resetSim=resetSim;window.saveMatchResult=saveMatchResult;
+window.switchPage=switchPage;window.switchToApp=switchToApp;window.fullDataScan=fullDataScan;window.forceRecoverAll=forceRecoverAll;
+window.exportAllData=exportAllData;window.importBackup=importBackup;window.handleBackupImport=handleBackupImport;window.clearAndReset=clearAndReset;
+window.importFromKey=importFromKey;
 
 document.addEventListener('DOMContentLoaded',()=>{ 
-  migrateOldData();  // Recover all past data first
+  let existing = loadDB();
+  if(!existing.length) {
+    // Try to recover from old key
+    let old = localStorage.getItem('volta_sim:v1:matches');
+    if(old) {
+      try {
+        let oldData = JSON.parse(old);
+        if(oldData.length) {
+          saveDB(oldData);
+          toast(`Recovered ${oldData.length} matches from previous version!`);
+        }
+      } catch(e) {}
+    }
+  }
   updateCounts(); 
   renderResults(); 
   renderDatabase();
+  fullDataScan();
 });
 </script>
-<div class="modal-overlay" id="teamModal"><div class="modal-sheet"><div class="modal-handle"></div><div style="font-size:24px;font-weight:700;text-align:center;margin-bottom:20px">SELECT <span id="modalSide">HOME</span></div><div id="teamList"></div><button class="btn btn-ghost" style="width:100%;margin-top:16px" onclick="closeTeamModal()">CANCEL</button></div></div>
+<div class="modal-overlay" id="teamModal"><div class="modal-sheet"><div class="modal-handle"></div><div style="font-size:24px;font-weight:700;text-align:center">SELECT <span id="modalSide">HOME</span></div><div id="teamList"></div><button class="btn btn-ghost" style="width:100%;margin-top:16px" onclick="closeTeamModal()">CANCEL</button></div></div>
 </body>
 </html>

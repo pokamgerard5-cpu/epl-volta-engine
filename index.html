@@ -104,7 +104,7 @@ nav{position:fixed;bottom:0;left:0;right:0;z-index:100;background:rgba(10,14,26,
 .bet-value.neutral{color:var(--yel)}
 
 /* STATS GRID */
-.stat-row{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin-bottom:16px}
+.stat-row{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-bottom:16px}
 .stat-box{background:var(--sur);border:1px solid var(--bdr);border-radius:12px;padding:14px;text-align:center}
 .stat-num{font-family:var(--fh);font-size:32px;font-weight:900}
 .stat-label{font-family:var(--fm);font-size:7px;color:var(--mut);letter-spacing:1.5px;margin-top:4px}
@@ -142,7 +142,6 @@ nav{position:fixed;bottom:0;left:0;right:0;z-index:100;background:rgba(10,14,26,
 .confidence-ring svg{position:absolute;inset:0;transform:rotate(-90deg)}
 .confidence-text{font-family:var(--fh);font-size:20px;font-weight:900}
 </style>
-<base target="_blank">
 <base target="_blank">
 </head>
 <body>
@@ -198,10 +197,6 @@ nav{position:fixed;bottom:0;left:0;right:0;z-index:100;background:rgba(10,14,26,
 <!-- RESULTS PAGE -->
 <div class="page" id="page-results">
   <div class="hdr"><div class="hdr-l"><div class="ht">RESULTS</div><div class="hs">MATCH DATABASE</div></div><span class="badge bg-y" id="pendingCount">0 PENDING</span></div>
-  <div style="padding:0 16px 8px;display:flex;gap:10px;max-width:640px;margin:0 auto;width:100%">
-    <button class="btn btn-ghost btn-sm" style="flex:1" onclick="toggleShowAll()" id="showAllBtn">📋 SHOW ALL</button>
-    <button class="btn btn-b btn-sm" style="flex:1;background:rgba(0,176,255,.08);color:var(--blu);border:1px solid rgba(0,176,255,.2)" onclick="exportAllData()">📤 EXPORT JSON</button>
-  </div>
   <div class="sec">
     <div class="sl">ENTER NEW RESULT</div>
     <div class="result-form">
@@ -245,10 +240,6 @@ nav{position:fixed;bottom:0;left:0;right:0;z-index:100;background:rgba(10,14,26,
 <!-- DATABASE & STATS PAGE -->
 <div class="page" id="page-db">
   <div class="hdr"><div class="hdr-l"><div class="ht">DATABASE</div><div class="hs">ANALYTICS & MODEL</div></div><span class="badge bg-b" id="dbCount">0 MATCHES</span></div>
-  <div style="padding:0 16px 8px;display:flex;gap:10px;max-width:640px;margin:0 auto;width:100%">
-    <button class="btn btn-b btn-sm" style="flex:1;background:rgba(0,176,255,.08);color:var(--blu);border:1px solid rgba(0,176,255,.2)" onclick="exportAllData()">📤 EXPORT JSON</button>
-    <button class="btn btn-p btn-sm" style="flex:1;background:rgba(224,64,251,.08);color:var(--pur);border:1px solid rgba(224,64,251,.2)" onclick="importData()">📥 IMPORT JSON</button>
-  </div>
   <div class="sec">
     <div class="sl">MODEL ACCURACY</div>
     <div class="stat-row" id="accuracyStats">
@@ -324,7 +315,7 @@ const TEAMS = [
 
 const DB_KEY = 'volta_sim:v1:matches';
 
-let state = {page:'predict',pickA:null,pickB:null,simResult:null,showAll:false};
+let state = {page:'predict',pickA:null,pickB:null,simResult:null};
 
 // ═══════════════════════════════════════════════════════════════
 // UTILITIES
@@ -771,8 +762,7 @@ function saveMatchResult(){
     pred.rageQuit=rageQuit;pred.status='result';
     let pScore=parseScore(pred.ftPred);
     if(pScore){pred.correctFT=(pScore.a===ftA&&pScore.b===ftB);}
-    let overProb = parseFloat(pred.overProb);
-    pred.correctOU = !isNaN(overProb) ? (overProb > 50) === (total > 10.5) : null;
+    pred.correctOU=(parseFloat(pred.overPred)>50)===(total>10.5);
   }else{
     db.unshift(m);
   }
@@ -796,32 +786,10 @@ function saveMatchResult(){
 
 function parseScore(s){if(!s)return null;let p=s.split('-');if(p.length!==2)return null;let a=parseInt(p[0]),b=parseInt(p[1]);return isNaN(a)||isNaN(b)?null:{a,b,total:a+b}}
 
-function getHTFTOutcome(htA, htB, ftA, ftB, isPrediction){
-  // HT outcome
-  let ht = htA > htB ? '1' : htA < htB ? '2' : 'X';
-  // FT outcome  
-  let ft = ftA > ftB ? '1' : ftA < ftB ? '2' : 'X';
-  let code = ht + '/' + ft;
-
-  let labels = {
-    '1/1':'Home HT → Home FT',
-    '1/X':'Home HT → Draw FT',
-    '1/2':'Home HT → Away FT',
-    'X/1':'Draw HT → Home FT',
-    'X/X':'Draw HT → Draw FT',
-    'X/2':'Draw HT → Away FT',
-    '2/1':'Away HT → Home FT',
-    '2/X':'Away HT → Draw FT',
-    '2/2':'Away HT → Away FT'
-  };
-
-  return {code, label: labels[code] || code, ht, ft};
-}
-
 function renderResults(){
   let db=loadDB();
   let pending=db.filter(m=>m.status==='pending');
-  let completed=db.filter(m=>m.status==='result');
+  let completed=db.filter(m=>m.status==='result').slice(0,30);
 
   document.getElementById('pendingCount').textContent=pending.length+' PENDING';
 
@@ -830,7 +798,6 @@ function renderResults(){
     return`<div class="history-card">
       <div class="history-teams">${tA.emoji} ${tA.name} vs ${tB.emoji} ${tB.name}</div>
       <div class="history-score">Predicted: <span>${m.ftPred}</span> | O/U: ${m.overProb}</div>
-      <div style="font-family:var(--fm);font-size:9px;color:var(--mut);margin-top:4px">Top 3: ${m.top3||'—'}</div>
       <div style="display:flex;gap:8px;margin-top:10px">
         <button class="btn btn-g btn-sm" onclick="fillResult('${m.teamA}','${m.teamB}')">ENTER RESULT</button>
         <button class="btn btn-ghost btn-sm" onclick="deleteMatch('${m.id}')">DELETE</button>
@@ -838,123 +805,17 @@ function renderResults(){
     </div>`;
   }).join(''):`<div class="empty-state"><div class="empty-icon">📋</div><div class="empty-text">No pending predictions. Run a simulation and save it to track.</div></div>`;
 
-  let displayCompleted = state.showAll ? completed : completed.slice(0,30);
-  document.getElementById('showAllBtn').textContent = state.showAll ? '📋 SHOW RECENT (30)' : '📋 SHOW ALL (' + completed.length + ')';
-
-  document.getElementById('historyList').innerHTML=displayCompleted.length?displayCompleted.map(m=>{
+  document.getElementById('historyList').innerHTML=completed.length?completed.map(m=>{
     let tA=getTeam(m.teamA),tB=getTeam(m.teamB);
-    let rq=m.rageQuit?'<span class="badge bg-r" style="margin-left:6px">RQ</span>':'';
-
-    // Build the card content
-    let html = `<div class="history-card" style="position:relative">`;
-
-    // Header: teams + date + rage quit
-    html += `<div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:10px">
-      <div class="history-teams">${tA.emoji} ${tA.name} vs ${tB.emoji} ${tB.name}${rq}</div>
-      <div style="font-family:var(--fm);font-size:8px;color:var(--mut)">${fmtDate(m.date)}</div>
+    let rq=m.rageQuit?'<span class="badge bg-r">RAGE QUIT</span>':'';
+    let pred=m.ftPred?`<div class="history-score">Pred: ${m.ftPred} → <span>FT: ${m.ftA}-${m.ftB}</span> ${m.correctFT!==undefined?`<span class="badge ${m.correctFT?'bg-g':'bg-r'}">${m.correctFT?'✅':'❌'}</span>`:''}</div>`:`<div class="history-score">FT: ${m.ftA}-${m.ftB} HT: ${m.htA}-${m.htB}</div>`;
+    return`<div class="history-card">
+      <div class="history-teams">${tA.emoji} ${tA.name} vs ${tB.emoji} ${tB.name} ${rq}</div>
+      ${pred}
     </div>`;
-
-    // If this match had a prediction, show prediction vs actual
-    if(m.ftPred){
-      let predScore = parseScore(m.ftPred);
-      let actualHT = `${m.htA}-${m.htB}`;
-      let actualFT = `${m.ftA}-${m.ftB}`;
-
-      // Calculate HT/FT outcomes
-      let predHT = predScore ? getHTFTOutcome(predScore.a, predScore.b, m.htA, m.htB, true) : null;
-      let actualHTFT = getHTFTOutcome(m.htA, m.htB, m.ftA, m.ftB, false);
-
-      // Prediction section
-      html += `<div style="background:var(--bg);border:1px solid var(--bdr);border-radius:10px;padding:12px;margin-bottom:10px">`;
-      html += `<div style="font-family:var(--fm);font-size:8px;color:var(--mut);letter-spacing:1.5px;margin-bottom:8px">PREDICTION</div>`;
-
-      // Top predicted scores
-      html += `<div style="display:flex;gap:6px;margin-bottom:8px;flex-wrap:wrap">`;
-      let topScores = m.top3 ? m.top3.split(',').map(s=>s.trim()) : [m.ftPred];
-      topScores.forEach((sc, i) => {
-        let isCorrect = sc === actualFT;
-        let badgeClass = isCorrect ? 'bg-g' : 'bg';
-        html += `<span class="badge ${badgeClass}" style="font-size:9px">${i===0?'🎯':''} ${sc}</span>`;
-      });
-      html += `</div>`;
-
-      // O/U prediction
-      let ouPred = parseFloat(m.overProb) > 50 ? 'OVER 10.5' : 'UNDER 10.5';
-      let ouActual = (m.ftA + m.ftB) > 10.5 ? 'OVER' : 'UNDER';
-      let ouCorrect = m.correctOU !== undefined ? m.correctOU : (parseFloat(m.overProb) > 50) === ((m.ftA + m.ftB) > 10.5);
-      html += `<div style="display:flex;gap:8px;align-items:center;margin-bottom:6px">
-        <span style="font-family:var(--fm);font-size:9px;color:var(--mut)">O/U 10.5:</span>
-        <span class="badge ${ouCorrect?'bg-g':'bg-r'}" style="font-size:8px">${ouPred} → ${ouActual} ${ouCorrect?'✅':'❌'}</span>
-      </div>`;
-
-      html += `</div>`;
-
-      // Actual Result section
-      html += `<div style="background:var(--sur2);border:1px solid var(--bdr);border-radius:10px;padding:12px;margin-bottom:10px">`;
-      html += `<div style="font-family:var(--fm);font-size:8px;color:var(--mut);letter-spacing:1.5px;margin-bottom:8px">ACTUAL RESULT</div>`;
-
-      // HT/FT grid
-      html += `<div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:8px">`;
-      html += `<div style="text-align:center;padding:8px;background:var(--bg);border-radius:8px">
-        <div style="font-family:var(--fm);font-size:8px;color:var(--mut)">HALF TIME</div>
-        <div style="font-family:var(--fh);font-size:22px;font-weight:900;color:var(--yel)">${actualHT}</div>
-      </div>`;
-      html += `<div style="text-align:center;padding:8px;background:var(--bg);border-radius:8px">
-        <div style="font-family:var(--fm);font-size:8px;color:var(--mut)">FULL TIME</div>
-        <div style="font-family:var(--fh);font-size:22px;font-weight:900;color:var(--grn)">${actualFT}</div>
-      </div>`;
-      html += `</div>`;
-
-      // HT/FT Outcome
-      if(actualHTFT){
-        html += `<div style="display:flex;gap:8px;align-items:center;justify-content:center;padding:6px;background:var(--bg);border-radius:6px">
-          <span style="font-family:var(--fm);font-size:9px;color:var(--mut)">HT/FT OUTCOME:</span>
-          <span style="font-family:var(--fh);font-size:16px;font-weight:900;color:var(--blu)">${actualHTFT.code}</span>
-          <span style="font-family:var(--fm);font-size:8px;color:var(--mut)">${actualHTFT.label}</span>
-        </div>`;
-      }
-
-      html += `</div>`;
-
-      // Accuracy summary
-      let ftCorrect = m.correctFT !== undefined ? m.correctFT : (predScore && predScore.a === m.ftA && predScore.b === m.ftB);
-      html += `<div style="display:flex;gap:6px;flex-wrap:wrap">`;
-      html += `<span class="badge ${ftCorrect?'bg-g':'bg-r'}">FT EXACT ${ftCorrect?'✅':'❌'}</span>`;
-      html += `<span class="badge ${ouCorrect?'bg-g':'bg-r'}">O/U 10.5 ${ouCorrect?'✅':'❌'}</span>`;
-      if(m.top3 && m.top3.includes(actualFT)){
-        html += `<span class="badge bg-y">TOP 3 HIT 🎯</span>`;
-      }
-      html += `</div>`;
-
-    } else {
-      // No prediction - just show result
-      html += `<div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:8px">`;
-      html += `<div style="text-align:center;padding:8px;background:var(--bg);border-radius:8px">
-        <div style="font-family:var(--fm);font-size:8px;color:var(--mut)">HALF TIME</div>
-        <div style="font-family:var(--fh);font-size:22px;font-weight:900;color:var(--yel)">${m.htA}-${m.htB}</div>
-      </div>`;
-      html += `<div style="text-align:center;padding:8px;background:var(--bg);border-radius:8px">
-        <div style="font-family:var(--fm);font-size:8px;color:var(--mut)">FULL TIME</div>
-        <div style="font-family:var(--fh);font-size:22px;font-weight:900;color:var(--grn)">${m.ftA}-${m.ftB}</div>
-      </div>`;
-      html += `</div>`;
-
-      let actualHTFT = getHTFTOutcome(m.htA, m.htB, m.ftA, m.ftB, false);
-      if(actualHTFT){
-        html += `<div style="display:flex;gap:8px;align-items:center;justify-content:center;padding:6px;background:var(--bg);border-radius:6px;margin-bottom:8px">
-          <span style="font-family:var(--fm);font-size:9px;color:var(--mut)">HT/FT OUTCOME:</span>
-          <span style="font-family:var(--fh);font-size:16px;font-weight:900;color:var(--blu)">${actualHTFT.code}</span>
-          <span style="font-family:var(--fm);font-size:8px;color:var(--mut)">${actualHTFT.label}</span>
-        </div>`;
-      }
-
-      html += `<div style="font-family:var(--fm);font-size:9px;color:var(--mut)">No prediction recorded for this match</div>`;
-    }
-
-    html += `</div>`;
-    return html;
   }).join(''):`<div class="empty-state"><div class="empty-icon">🏁</div><div class="empty-text">No match history yet. Add your first result above.</div></div>`;
 }
+
 function fillResult(a,b){
   document.getElementById('resTeamA').value=a;
   document.getElementById('resTeamB').value=b;
@@ -969,56 +830,6 @@ function deleteMatch(id){
   toast('Deleted');
   renderResults();
   updateCounts();
-}
-
-
-function toggleShowAll(){
-  state.showAll = !state.showAll;
-  renderResults();
-}
-
-function exportAllData(){
-  let db = loadDB();
-  let dataStr = JSON.stringify(db, null, 2);
-  let blob = new Blob([dataStr], {type: 'application/json'});
-  let url = URL.createObjectURL(blob);
-  let a = document.createElement('a');
-  a.href = url;
-  a.download = 'volta_sim_all_matches_' + new Date().toISOString().slice(0,10) + '.json';
-  document.body.appendChild(a);
-  a.click();
-  document.body.removeChild(a);
-  URL.revokeObjectURL(url);
-  toast('✅ Exported ' + db.length + ' matches');
-}
-
-function importData(){
-  let input = document.createElement('input');
-  input.type = 'file';
-  input.accept = '.json';
-  input.onchange = e => {
-    let file = e.target.files[0];
-    let reader = new FileReader();
-    reader.onload = event => {
-      try{
-        let data = JSON.parse(event.target.result);
-        if(Array.isArray(data) && data.length > 0){
-          if(confirm('Replace current database with ' + data.length + ' matches? Current: ' + loadDB().length)){
-            saveDB(data);
-            updateCounts();
-            renderResults();
-            toast('✅ Imported ' + data.length + ' matches');
-          }
-        } else {
-          toast('❌ Invalid file format');
-        }
-      } catch(err){
-        toast('❌ Error reading file: ' + err.message);
-      }
-    };
-    reader.readAsText(file);
-  };
-  input.click();
 }
 
 // ═══════════════════════════════════════════════════════════════
@@ -1038,24 +849,8 @@ function renderDatabase(){
   let totals=results.map(m=>m.ftA+m.ftB);
   let avgTotal=totals.length?avg(totals):null;
 
-  // HT/FT accuracy
-  let htftCorrect = 0, htftTotal = 0;
-  withPred.forEach(m => {
-    if(m.htA !== null && m.htB !== null && m.ftA !== null && m.ftB !== null){
-      let predScore = parseScore(m.ftPred);
-      if(predScore){
-        let predHTFT = getHTFTOutcome(predScore.a, predScore.b, predScore.a, predScore.b, true);
-        let actualHTFT = getHTFTOutcome(m.htA, m.htB, m.ftA, m.ftB, false);
-        if(predHTFT.code === actualHTFT.code) htftCorrect++;
-        htftTotal++;
-      }
-    }
-  });
-  let htftPct = htftTotal ? Math.round(htftCorrect/htftTotal*100) : null;
-
   document.getElementById('accuracyStats').innerHTML=`
     <div class="stat-box"><div class="stat-num" style="color:${ftPct!==null&&ftPct>=40?'var(--grn)':'var(--mut)'}">${ftPct!==null?ftPct+'%':'—'}</div><div class="stat-label">FT EXACT</div></div>
-    <div class="stat-box"><div class="stat-num" style="color:${htftPct!==null&&htftPct>=30?'var(--grn)':'var(--mut)'}">${htftPct!==null?htftPct+'%':'—'}</div><div class="stat-label">HT/FT</div></div>
     <div class="stat-box"><div class="stat-num" style="color:${ouPct!==null&&ouPct>=55?'var(--grn)':'var(--mut)'}">${ouPct!==null?ouPct+'%':'—'}</div><div class="stat-label">O/U 10.5</div></div>
     <div class="stat-box"><div class="stat-num" style="color:var(--blu)">${avgTotal!==null?avgTotal.toFixed(1):'—'}</div><div class="stat-label">AVG TOTAL</div></div>
   `;
@@ -1087,7 +882,7 @@ function renderDatabase(){
   let dist={};
   totals.forEach(t=>{dist[t]=(dist[t]||0)+1});
   let maxCount=Math.max(...Object.values(dist),1);
-  document.getElementById('goalDist').innerHTML='<div style="font-family:var(--fm);font-size:10px;color:var(--mut);margin-bottom:12px;text-align:center">Based on ' + totals.length + ' non-abandoned matches</div>' + Object.entries(dist).sort((a,b)=>parseInt(a[0])-parseInt(b[0])).map(([goals,count])=>{
+  document.getElementById('goalDist').innerHTML=Object.entries(dist).sort((a,b)=>parseInt(a[0])-parseInt(b[0])).map(([goals,count])=>{
     let pct=(count/maxCount*100);
     let color=parseInt(goals)>12?'var(--grn)':parseInt(goals)>8?'var(--yel)':'var(--mut)';
     return`<div style="display:flex;align-items:center;gap:10px;margin-bottom:6px">
@@ -1107,7 +902,7 @@ function renderDatabase(){
     h2h[key].matches++;
     h2h[key].avgTotal+=(m.ftA+m.ftB);
   });
-  document.getElementById('h2hMatrix').innerHTML=Object.entries(h2h).sort((a,b)=>b[1].matches-a[1].matches).map(([pair,data])=>`
+  document.getElementById('h2hMatrix').innerHTML=Object.entries(h2h).sort((a,b)=>b[1].matches-a[1].matches).slice(0,10).map(([pair,data])=>`
     <div class="history-card">
       <div style="display:flex;justify-content:space-between">
         <span style="font-family:var(--fh);font-size:14px;font-weight:700">${pair}</span>

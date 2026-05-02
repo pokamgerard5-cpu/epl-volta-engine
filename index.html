@@ -132,6 +132,24 @@ nav{position:fixed;bottom:0;left:0;right:0;z-index:100;background:rgba(10,14,26,
 
 /* MARKET STRENGTH STARS */
 .stars{font-size:10px;margin-right:4px}
+
+/* AI ANALYST */
+.ai-card{background:var(--sur2);border:1px solid rgba(224,64,251,.2);border-radius:14px;overflow:hidden;margin-bottom:12px}
+.ai-card-hdr{background:linear-gradient(90deg,rgba(224,64,251,.08),rgba(0,176,255,.08));padding:12px 16px;border-bottom:1px solid rgba(224,64,251,.15);display:flex;align-items:center;gap:8px}
+.ai-card-icon{font-size:16px}
+.ai-card-title{font-family:var(--fh);font-size:16px;font-weight:700;color:var(--pur)}
+.ai-card-body{padding:14px 16px;font-size:12px;color:var(--txt);line-height:1.8}
+.ai-card-body strong{color:var(--grn)}
+.ai-card-body em{color:var(--yel);font-style:normal}
+.ai-verdict{background:linear-gradient(135deg,rgba(224,64,251,.1),rgba(0,176,255,.1));border:1px solid rgba(224,64,251,.3);border-radius:14px;padding:18px;margin-bottom:14px}
+.ai-verdict-label{font-family:var(--fm);font-size:8px;color:var(--pur);letter-spacing:2px;margin-bottom:8px}
+.ai-verdict-pick{font-family:var(--fh);font-size:28px;font-weight:900;color:var(--pur);margin-bottom:6px}
+.ai-verdict-reason{font-family:var(--fm);font-size:10px;color:var(--mut);line-height:1.6}
+.ai-thinking{display:flex;align-items:center;gap:10px;padding:18px;font-family:var(--fm);font-size:10px;color:var(--mut)}
+@keyframes pulse{0%,100%{opacity:.3}50%{opacity:1}}
+.ai-dot{width:8px;height:8px;border-radius:50%;background:var(--pur);animation:pulse 1s infinite}
+.ai-dot:nth-child(2){animation-delay:.2s}
+.ai-dot:nth-child(3){animation-delay:.4s}
 </style>
 <base target="_blank">
 </head>
@@ -170,6 +188,25 @@ nav{position:fixed;bottom:0;left:0;right:0;z-index:100;background:rgba(10,14,26,
       <div id="simulationDisplay"></div>
       <div class="sl">BETTING ANALYSIS</div>
       <div id="bettingTips"></div>
+
+      <div class="sl">AI ANALYST</div>
+      <div id="aiSection">
+        <div style="background:linear-gradient(135deg,rgba(224,64,251,.06),rgba(0,176,255,.06));border:1px solid rgba(224,64,251,.25);border-radius:16px;padding:20px;margin-bottom:16px">
+          <div style="display:flex;align-items:center;gap:12px;margin-bottom:12px">
+            <div style="width:36px;height:36px;border-radius:10px;background:linear-gradient(135deg,var(--pur),var(--blu));display:flex;align-items:center;justify-content:center;font-size:18px;flex-shrink:0">🧠</div>
+            <div>
+              <div style="font-family:var(--fh);font-size:18px;font-weight:700">VOLTA INTELLIGENCE</div>
+              <div style="font-family:var(--fm);font-size:8px;color:var(--mut);letter-spacing:1.5px">AI MATCH ANALYST · UNLIMITED</div>
+            </div>
+          </div>
+          <div style="font-family:var(--fm);font-size:10px;color:var(--mut);margin-bottom:14px;line-height:1.7">The AI will analyse all statistical data, team patterns, and historical context to give you a deep betting intelligence report — including hidden patterns the model may have missed.</div>
+          <button id="aiBtn" onclick="runAiAnalysis()" class="btn btn-g" style="width:100%;height:48px;font-size:16px;background:linear-gradient(135deg,var(--pur),var(--blu));color:#fff">
+            🧠 GET AI ANALYSIS
+          </button>
+        </div>
+        <div id="aiOutput" style="display:none"></div>
+      </div>
+
       <div style="display:flex;gap:10px;margin-top:16px">
         <button class="btn btn-g btn-sm" style="flex:1;height:52px;font-size:16px" onclick="savePrediction()">💾 SAVE TO TRACK</button>
         <button class="btn btn-ghost btn-sm" style="flex:1;height:52px;font-size:16px" onclick="resetSim()">🔄 NEW SIM</button>
@@ -1302,6 +1339,244 @@ function updateCounts() {
 (function(){
   updateCounts();
 })();
+
+// ═══════════════════════════════════════════════════════════════
+// VOLTA INTELLIGENCE — AI ANALYST (Unlimited, Claude-powered)
+// Reads all statistical context and reasons independently
+// ═══════════════════════════════════════════════════════════════
+async function runAiAnalysis() {
+  let sim = state.simResult;
+  if(!sim) { toast('Run a simulation first'); return; }
+
+  let btn = document.getElementById('aiBtn');
+  let out = document.getElementById('aiOutput');
+  btn.disabled = true;
+  btn.textContent = '⏳ ANALYSING...';
+  out.style.display = 'block';
+  out.innerHTML = `<div class="ai-thinking">
+    <div class="ai-dot"></div><div class="ai-dot"></div><div class="ai-dot"></div>
+    <span style="margin-left:6px">Volta Intelligence is reading the data...</span>
+  </div>`;
+
+  // Build the full statistical context packet for the AI
+  let db = loadDB();
+  let profA = sim.profA, profB = sim.profB, h2h = sim.h2h;
+  let p = sim.probs;
+  let tA = getTeam(sim.teamA), tB = getTeam(sim.teamB);
+
+  // Gather last 8 matches for each team to show recent form
+  function recentForm(teamName) {
+    return db
+      .filter(m => (m.teamA===teamName||m.teamB===teamName) && m.status==='result' && !m.rageQuit)
+      .slice(0,8)
+      .map(m => {
+        let home = m.teamA===teamName;
+        let gs = home?m.ftA:m.ftB, gc = home?m.ftB:m.ftA;
+        let result = gs>gc?'W':gs===gc?'D':'L';
+        return `${result} ${gs}-${gc} vs ${home?m.teamB:m.teamA} (HT:${home?m.htA:m.htB}-${home?m.htB:m.htA})`;
+      });
+  }
+
+  let formA = recentForm(sim.teamA);
+  let formB = recentForm(sim.teamB);
+
+  // Accuracy track record
+  let tracked = db.filter(m=>m.status==='result'&&m.acc);
+  let accSummary = tracked.length
+    ? `FT exact: ${Math.round(tracked.filter(m=>m.acc.ftExact).length/tracked.length*100)}%, `+
+      `O/U 10.5: ${Math.round(tracked.filter(m=>m.acc.ou105).length/tracked.length*100)}%, `+
+      `1X2: ${Math.round(tracked.filter(m=>m.acc.outcome).length/tracked.length*100)}% (${tracked.length} tracked)`
+    : 'No accuracy data yet (model still learning)';
+
+  const prompt = `You are VOLTA INTELLIGENCE, an elite FIFA Volta 4v4 match analyst and betting specialist. You reason like a sharp bettor — sceptical, probabilistic, pattern-driven. You are NOT a general assistant. You only speak about this match.
+
+=== MATCH: ${sim.teamA.toUpperCase()} vs ${sim.teamB.toUpperCase()} ===
+Format: FIFA Volta 4v4 · EPL teams · 10-minute matches · 1XBET markets
+
+=== POISSON MODEL OUTPUT (5,000 Monte Carlo runs) ===
+Expected FT total: ${sim.expFtTotal.toFixed(2)} goals
+Expected HT total: ${sim.expHtTotal.toFixed(2)} goals
+λ ${sim.teamA} HT: ${sim.λ_htA.toFixed(3)} | 2H: ${sim.λ_2hA.toFixed(3)}
+λ ${sim.teamB} HT: ${sim.λ_htB.toFixed(3)} | 2H: ${sim.λ_2hB.toFixed(3)}
+
+FT 1X2: Home ${(p.homeWin*100).toFixed(1)}% / Draw ${(p.draw*100).toFixed(1)}% / Away ${(p.awayWin*100).toFixed(1)}%
+HT 1X2: Home ${(p.htHomeWin*100).toFixed(1)}% / Draw ${(p.htDraw*100).toFixed(1)}% / Away ${(p.htAwayWin*100).toFixed(1)}%
+BTTS FT: ${(p.btts*100).toFixed(1)}% | BTTS HT: ${(p.bttsh*100).toFixed(1)}%
+Win to Nil ${sim.teamA}: ${(p.wtnA*100).toFixed(1)}% | ${sim.teamB}: ${(p.wtnB*100).toFixed(1)}%
+
+FT O/U Lines:
+- Over 6.5: ${(p.ftOU[6.5]*100).toFixed(1)}% / Under: ${((1-p.ftOU[6.5])*100).toFixed(1)}%
+- Over 8.5: ${(p.ftOU[8.5]*100).toFixed(1)}% / Under: ${((1-p.ftOU[8.5])*100).toFixed(1)}%
+- Over 10.5: ${(p.ftOU[10.5]*100).toFixed(1)}% / Under: ${((1-p.ftOU[10.5])*100).toFixed(1)}%
+- Over 12.5: ${(p.ftOU[12.5]*100).toFixed(1)}% / Under: ${((1-p.ftOU[12.5])*100).toFixed(1)}%
+- Over 14.5: ${(p.ftOU[14.5]*100).toFixed(1)}% / Under: ${((1-p.ftOU[14.5])*100).toFixed(1)}%
+
+HT O/U Lines:
+- Over 4.5: ${(p.htOU[4.5]*100).toFixed(1)}% / Under: ${((1-p.htOU[4.5])*100).toFixed(1)}%
+- Over 5.5: ${(p.htOU[5.5]*100).toFixed(1)}% / Under: ${((1-p.htOU[5.5])*100).toFixed(1)}%
+- Over 6.5: ${(p.htOU[6.5]*100).toFixed(1)}% / Under: ${((1-p.htOU[6.5])*100).toFixed(1)}%
+
+Top FT Scorelines: ${sim.topFT.map(s=>`${s.score}(${(s.prob*100).toFixed(1)}%)`).join(', ')}
+Top HT Scorelines: ${sim.topHT.map(s=>`${s.score}(${(s.prob*100).toFixed(1)}%)`).join(', ')}
+
+=== ${sim.teamA.toUpperCase()} PROFILE (${profA?profA.games:'0'} matches) ===
+${profA ? `
+FT attack avg: ${profA.ftAttack.toFixed(2)} goals/game
+FT defense avg (conceded): ${profA.ftDefense.toFixed(2)} goals/game
+HT attack: ${profA.htAttack.toFixed(2)} | 2H attack: ${profA.ht2Attack.toFixed(2)}
+HT defense: ${profA.htDefense.toFixed(2)} | 2H defense: ${profA.ht2Defense.toFixed(2)}
+HT lead → Win rate: ${(profA.htLeadRate*100).toFixed(0)}%
+HT trail → Win rate (comeback): ${(profA.htTrailRate*100).toFixed(0)}%
+Comeback rate: ${(profA.comebackRate*100).toFixed(0)}%
+Blown lead rate: ${(profA.blownLeadRate*100).toFixed(0)}%
+Scoring pattern: ${profA.scoringPattern}
+Goal volatility: ${profA.volatility.toFixed(2)}
+` : 'NO DATA — uses league average'}
+Recent form (last 8): ${formA.length ? formA.join(' | ') : 'No matches recorded'}
+
+=== ${sim.teamB.toUpperCase()} PROFILE (${profB?profB.games:'0'} matches) ===
+${profB ? `
+FT attack avg: ${profB.ftAttack.toFixed(2)} goals/game
+FT defense avg (conceded): ${profB.ftDefense.toFixed(2)} goals/game
+HT attack: ${profB.htAttack.toFixed(2)} | 2H attack: ${profB.ht2Attack.toFixed(2)}
+HT defense: ${profB.htDefense.toFixed(2)} | 2H defense: ${profB.ht2Defense.toFixed(2)}
+HT lead → Win rate: ${(profB.htLeadRate*100).toFixed(0)}%
+HT trail → Win rate (comeback): ${(profB.htTrailRate*100).toFixed(0)}%
+Comeback rate: ${(profB.comebackRate*100).toFixed(0)}%
+Blown lead rate: ${(profB.blownLeadRate*100).toFixed(0)}%
+Scoring pattern: ${profB.scoringPattern}
+Goal volatility: ${profB.volatility.toFixed(2)}
+` : 'NO DATA — uses league average'}
+Recent form (last 8): ${formB.length ? formB.join(' | ') : 'No matches recorded'}
+
+=== HEAD TO HEAD ===
+${h2h ? `${h2h.matches} meetings · FT avg ${h2h.avgFtTotal.toFixed(1)} goals · HT avg ${h2h.avgHtTotal.toFixed(1)} goals · Range ${h2h.minTotal}–${h2h.maxTotal} total` : 'No head-to-head history'}
+
+=== MODEL ACCURACY SO FAR ===
+${accSummary}
+
+=== YOUR TASK ===
+Write a sharp, punchy betting intelligence report. Use this EXACT structure with these exact section headers (use **SECTION NAME** markdown bold for each):
+
+**MATCH NARRATIVE** — 2-3 sentences on the key story of this matchup: which team has structural advantages, momentum patterns, or statistical edges.
+
+**SCORING DYNAMICS** — Deep dive into first half vs second half expected flow. When do goals tend to come? What does the HT/2H split tell us?
+
+**BEST BETS (RANKED)** — List your top 3-5 recommended markets in order of confidence. For each: name the market, state your reasoning in 1-2 sentences, and give a confidence level (HIGH/MEDIUM/LOW). Bold the market name.
+
+**HIDDEN ANGLES** — 1-2 patterns, edges or observations that the raw probabilities don't make obvious. Think like a sharp who's watched these teams closely.
+
+**AVOID** — 1-2 markets to stay away from and why.
+
+**FINAL VERDICT** — Your single strongest recommended bet in one bold line. Then one sentence on risk management.
+
+Be direct. Be specific. Use numbers. No filler phrases like "it's important to note" or "it's worth mentioning". Maximum 380 words total.`;
+
+  try {
+    const response = await fetch('https://api.anthropic.com/v1/messages', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        model: 'claude-sonnet-4-20250514',
+        max_tokens: 1000,
+        messages: [{ role: 'user', content: prompt }]
+      })
+    });
+
+    if(!response.ok) {
+      let err = await response.json().catch(()=>({}));
+      throw new Error(err.error?.message || `HTTP ${response.status}`);
+    }
+
+    const data = await response.json();
+    let raw = (data.content||[]).filter(b=>b.type==='text').map(b=>b.text).join('');
+    if(!raw) throw new Error('Empty response from AI');
+
+    out.innerHTML = renderAiOutput(raw, sim);
+    btn.textContent = '🔄 REFRESH ANALYSIS';
+    btn.disabled = false;
+
+  } catch(err) {
+    out.innerHTML = `<div style="background:rgba(255,23,68,.06);border:1px solid rgba(255,23,68,.2);border-radius:12px;padding:16px">
+      <div style="font-family:var(--fh);font-size:16px;font-weight:700;color:var(--red)">⚠️ AI ERROR</div>
+      <div style="font-family:var(--fm);font-size:10px;color:var(--mut);margin-top:6px">${err.message}</div>
+    </div>`;
+    btn.textContent = '🧠 RETRY ANALYSIS';
+    btn.disabled = false;
+  }
+}
+
+// Render AI markdown-like output into cards
+function renderAiOutput(raw, sim) {
+  // Parse sections separated by **TITLE** pattern
+  let sections = [];
+  let sectionDefs = [
+    {key:'MATCH NARRATIVE',   icon:'📖', color:'var(--blu)'},
+    {key:'SCORING DYNAMICS',  icon:'⚡', color:'var(--yel)'},
+    {key:'BEST BETS (RANKED)',icon:'🎯', color:'var(--grn)'},
+    {key:'HIDDEN ANGLES',     icon:'🔍', color:'var(--pur)'},
+    {key:'AVOID',             icon:'⛔', color:'var(--red)'},
+    {key:'FINAL VERDICT',     icon:'🏆', color:'var(--orn)'}
+  ];
+
+  // Split raw text by section headers
+  let remaining = raw;
+  let parsed = {};
+  sectionDefs.forEach(sd => {
+    let re = new RegExp(`\\*\\*${sd.key}\\*\\*[\\s\\S]*?(?=\\*\\*[A-Z]|$)`, 'i');
+    let match = remaining.match(re);
+    if(match) {
+      let body = match[0].replace(new RegExp(`\\*\\*${sd.key}\\*\\*`, 'i'), '').trim();
+      parsed[sd.key] = body;
+    }
+  });
+
+  // If parsing found nothing (AI deviated from format), show raw in one card
+  if(!Object.keys(parsed).length) {
+    let formatted = raw.replace(/\*\*(.+?)\*\*/g, '<strong>$1</strong>').replace(/\n/g, '<br>');
+    return `<div class="ai-card">
+      <div class="ai-card-hdr"><span class="ai-card-icon">🧠</span><span class="ai-card-title">AI ANALYSIS</span></div>
+      <div class="ai-card-body">${formatted}</div>
+    </div>`;
+  }
+
+  let html = '';
+
+  // FINAL VERDICT as highlighted block (shown first if found)
+  if(parsed['FINAL VERDICT']) {
+    let vText = parsed['FINAL VERDICT']
+      .replace(/\*\*(.+?)\*\*/g, '<strong>$1</strong>')
+      .replace(/\n/g, '<br>');
+    html += `<div class="ai-verdict">
+      <div class="ai-verdict-label">🏆 FINAL VERDICT</div>
+      <div class="ai-verdict-pick" style="font-size:18px;line-height:1.4">${vText}</div>
+    </div>`;
+  }
+
+  // Remaining sections as cards
+  sectionDefs.filter(sd=>sd.key!=='FINAL VERDICT').forEach(sd => {
+    let body = parsed[sd.key];
+    if(!body) return;
+    let formatted = body
+      .replace(/\*\*(.+?)\*\*/g, '<strong>$1</strong>')
+      .replace(/\n- /g, '<br>• ')
+      .replace(/\n/g, '<br>');
+    html += `<div class="ai-card">
+      <div class="ai-card-hdr">
+        <span class="ai-card-icon">${sd.icon}</span>
+        <span class="ai-card-title" style="color:${sd.color}">${sd.key}</span>
+      </div>
+      <div class="ai-card-body">${formatted}</div>
+    </div>`;
+  });
+
+  // Timestamp + disclaimer
+  html += `<div style="font-family:var(--fm);font-size:8px;color:var(--mut);text-align:center;padding:12px;opacity:.6">
+    Generated ${new Date().toLocaleTimeString()} · Based on ${loadDB().filter(m=>m.status==='result').length} recorded matches · Always gamble responsibly
+  </div>`;
+
+  return html;
+}
 </script>
 </body>
 </html>

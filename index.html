@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
-<title>BACCARAT IQ v11 · ENTROPY ENGINE + DATA COLLECTOR</title>
+<title>BACCARAT IQ v12 · WORKING ENGINE + DATA COLLECTOR</title>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.js"></script>
 <style>
 *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
@@ -39,7 +39,6 @@ body{background:var(--bg);color:var(--text);font-family:var(--mono);font-size:11
 .bdg-live{background:rgba(0,230,118,.1);color:var(--G);border:1px solid rgba(0,230,118,.25)}
 .bdg-hi{background:rgba(255,51,85,.15);color:var(--Rl);border:1px solid var(--R);animation:pls 1.5s infinite;margin-left:5px}
 .bdg-ok{background:var(--Gd);color:var(--G);border:1px solid rgba(0,230,118,.3);margin-left:5px}
-.bdg-warn{background:rgba(255,184,0,.1);color:var(--Wl);border:1px solid var(--W);margin-left:5px}
 @keyframes pls{0%,100%{opacity:1}50%{opacity:.4}}
 
 #wrap{display:grid;grid-template-columns:236px 1fr 282px;height:calc(100vh - 44px);overflow:hidden}
@@ -54,9 +53,9 @@ body{background:var(--bg);color:var(--text);font-family:var(--mono);font-size:11
 .eb{padding:10px 4px;border-radius:var(--r);border:1px solid var(--border3);background:var(--bg3);font-family:var(--head);font-size:15px;letter-spacing:1px;cursor:pointer;transition:all .1s;text-align:center}
 .eb:active{transform:scale(.92)}
 .eb sp{display:block;font-family:var(--mono);font-size:6px;color:var(--text3);margin-top:1px;letter-spacing:.08em}
-.eb.P{color:var(--Pl)}.eb.P:hover,.eb.P.fl{background:var(--Pd);border-color:var(--P);box-shadow:0 0 8px rgba(0,200,255,.2)}
-.eb.B{color:var(--Bl)}.eb.B:hover,.eb.B.fl{background:var(--Bd);border-color:var(--B)}
-.eb.T{color:var(--Tl)}.eb.T:hover,.eb.T.fl{background:var(--Td);border-color:var(--T)}
+.eb.P{color:var(--Pl)}.eb.P:hover,.eb.P.active-flash{background:var(--Pd);border-color:var(--P);box-shadow:0 0 8px rgba(0,200,255,.2)}
+.eb.B{color:var(--Bl)}.eb.B:hover,.eb.B.active-flash{background:var(--Bd);border-color:var(--B)}
+.eb.T{color:var(--Tl)}.eb.T:hover,.eb.T.active-flash{background:var(--Td);border-color:var(--T)}
 .brow{display:flex;gap:4px;margin-bottom:4px}
 .brow input{flex:1;background:var(--bg3);border:1px solid var(--border3);border-radius:var(--r);color:var(--text);font-family:var(--mono);font-size:10px;padding:4px 7px}
 .brow button{padding:4px 8px;background:var(--bg4);border:1px solid var(--border3);border-radius:var(--r);color:var(--text2);cursor:pointer;font-family:var(--mono);font-size:8px}
@@ -162,16 +161,22 @@ body{background:var(--bg);color:var(--text);font-family:var(--mono);font-size:11
 .mx th,.mx td{padding:3px 5px;text-align:center;border:1px solid var(--border);background:var(--bg3);color:var(--text2)}
 .databox{background:var(--bg3);border:1px solid var(--border2);border-radius:var(--r);padding:6px 8px;margin-top:6px}
 .databox .row{display:flex;justify-content:space-between;font-size:7px;margin-bottom:3px}
+#az{position:fixed;top:50px;right:8px;z-index:999;display:flex;flex-direction:column;gap:3px;pointer-events:none;width:265px}
+.al{padding:5px 9px;border-radius:var(--r);font-size:8px;border-left:2px solid;animation:sli .15s ease}
+.al.ok{background:var(--Gd);border-color:var(--G);color:var(--Gl)}
+.al.warn{background:rgba(255,184,0,.08);border-color:var(--W);color:var(--Wl)}
+.al.danger{background:var(--Rd);border-color:var(--R);color:var(--Rl)}
+@keyframes sli{from{opacity:0;transform:translateX(18px)}to{opacity:1;transform:translateX(0)}}
 </style>
 </head>
 <body>
-<div id="top"><div class="logo">BACCARAT·IQ</div><div class="logov">v11 · DATA COLLECTOR</div><div class="ts"><lb>Bankroll</lb><div class="tv w" id="t-bank">$1,000</div></div><div class="ts"><lb>P&L</lb><div class="tv" id="t-pnl">$0.00</div></div><div class="ts"><lb>Win Rate</lb><div class="tv" id="t-wr">—</div></div><div class="ts"><lb>Bets</lb><div class="tv P" id="t-bets">0</div></div><div class="sp"></div><span class="bdg bdg-live">LIVE</span><span class="bdg bdg-ok" id="regime-top">WAIT</span></div>
+<div id="top"><div class="logo">BACCARAT·IQ</div><div class="logov">v12 · LIVE ENGINE</div><div class="ts"><lb>Bankroll</lb><div class="tv w" id="t-bank">$1,000</div></div><div class="ts"><lb>P&L</lb><div class="tv" id="t-pnl">$0.00</div></div><div class="ts"><lb>Win Rate</lb><div class="tv" id="t-wr">—</div></div><div class="ts"><lb>Bets</lb><div class="tv P" id="t-bets">0</div></div><div class="sp"></div><span class="bdg bdg-live">LIVE</span><span class="bdg bdg-ok" id="regime-top">WAIT</span></div>
 <div id="az"></div>
 <div id="wrap">
 <div class="lp">
   <div class="sec"><div class="sh">Record Outcome<div class="shl"></div></div>
     <div class="ebtns"><button class="eb P" id="btn-P">PLAYER<sp>P</sp></button><button class="eb B" id="btn-B">BANKER<sp>B</sp></button><button class="eb T" id="btn-T">TIE<sp>T</sp></button></div>
-    <div class="brow"><input id="batch" placeholder="Paste BPBBPT..."><button id="batchBtn">GO</button></div><div class="kh">⌨ P / B / T keys active</div>
+    <div class="brow"><input id="batch" placeholder="Paste BPBBPT..."><button id="batchBtn">GO</button></div><div class="kh">⌨ P / B / T keys always active</div>
   </div>
   <div class="sec"><div class="sh">Config<div class="shl"></div></div>
     <div class="sr"><label>Conf Thresh</label><input type="range" min="50" max="85" value="62" step="1" id="sl-c"><span class="sv" id="sv-c">62%</span></div>
@@ -199,57 +204,310 @@ body{background:var(--bg);color:var(--text);font-family:var(--mono);font-size:11
 </div>
 <div id="ctr">
   <div id="ent-sec"><div class="ent-hdr"><div class="ent-title">ENTROPY · TIE RISK ENGINE</div><div style="display:flex;gap:8px"><span id="ent-val">—</span><span id="regime-badge" style="padding:3px 12px;background:var(--bg4);">WAIT</span></div></div>
-    <div id="ent-wrap"><div id="ent-fill" style="width:0%"></div><div id="ent-thresh"></div></div>
+    <div id="ent-wrap"><div id="ent-fill" style="width:0%"></div><div id="ent-thresh" style="left:82%"></div></div>
     <div class="ent-labels"><span>predictable</span><span id="ent-limit-lbl">Max 0.82</span><span>random</span></div>
     <div id="runs-row"><div class="rstat"><lb>Entropy H</lb><div class="rv" id="rs-ent">—</div></div><div class="rstat"><lb>Runs Z</lb><div class="rv" id="rs-z">—</div></div><div class="rstat"><lb>Tie Risk</lb><div class="rv" id="rs-tierisk">—</div></div><div class="rstat"><lb>Gate</lb><div class="rv" id="rs-gate">OPEN</div></div></div>
   </div>
   <div id="dec-box"><div id="dec-hdr"><div class="dtit">ENSEMBLE DECISION</div><div id="dec-rnd">—</div></div>
     <div id="dec-main"><div id="bet-box" class="SKIP"><div id="ba" class="SKIP">—</div><div id="bsub">record to activate</div><div id="bstake" class="stk-S">NO BET</div></div><div id="dec-meta"><div class="dm"><lb>Stake</lb><div class="dv" id="d-stake">—</div></div><div class="dm"><lb>Win Prob</lb><div class="dv" id="d-prob">—</div></div><div class="dm"><lb>EV</lb><div class="dv" id="d-ev">—</div></div><div class="dm"><lb>Models</lb><div class="dv" id="d-agree">—</div></div></div></div>
   </div>
-  <div id="conf-sec"><div class="crow"><span>CONFIDENCE</span><span id="cpct">0%</span><span id="cthr">thresh:62%</span></div><div id="cout"><div id="cin" style="width:0%"></div><div class="tm" id="ctm"></div></div></div>
+  <div id="conf-sec"><div class="crow"><span>CONFIDENCE</span><span id="cpct">0%</span><span id="cthr">thresh:62%</span></div><div id="cout"><div id="cin" style="width:0%"></div><div class="tm" id="ctm" style="left:62%"></div></div></div>
   <div id="rsn"><div class="rt">🧠 REASONING</div><div id="rlist"></div></div>
   <div id="ca"><div class="cc"><h4>Equity Curve</h4><canvas id="eq-c"></canvas></div><div class="cc"><h4>Entropy</h4><canvas id="ent-c"></canvas></div></div>
 </div>
-<div class="rp"><div class="sec"><div class="sh">Metrics<div class="shl"></div></div><div class="sg"><div class="sc sc-P"><lb>Bets Taken</lb><div class="sv P" id="s-bets">0</div></div><div class="sc sc-G"><lb>Won</lb><div class="sv pos" id="s-won">0</div></div><div class="sc sc-R"><lb>Lost</lb><div class="sv neg" id="s-lost">0</div></div><div class="sc sc-W"><lb>Win Rate</lb><div class="sv neu" id="s-wr">—</div></div></div><div class="wb-wrap"><div class="wb-lbl"><span>Won</span><span>Lost</span></div><div class="wb-o"><div class="wb-w" id="wbw"></div><div class="wb-l" id="wbl"></div></div></div><div class="sg"><div class="sc sc-G"><lb>P&L</lb><div class="sv" id="s-pnl">$0</div></div><div class="sc sc-W"><lb>ROI</lb><div class="sv" id="s-roi">0%</div></div></div></div>
+<div class="rp"><div class="sec"><div class="sh">Metrics<div class="shl"></div></div><div class="sg"><div class="sc sc-P"><lb>Bets Taken</lb><div class="sv P" id="s-bets">0</div></div><div class="sc sc-G"><lb>Won</lb><div class="sv pos" id="s-won">0</div></div><div class="sc sc-R"><lb>Lost</lb><div class="sv neg" id="s-lost">0</div></div><div class="sc sc-W"><lb>Win Rate</lb><div class="sv neu" id="s-wr">—</div></div></div><div class="wb-wrap"><div class="wb-lbl"><span>Won</span><span>Lost</span></div><div class="wb-o"><div class="wb-w" id="wbw" style="width:0%"></div><div class="wb-l" id="wbl" style="width:0%"></div></div></div><div class="sg"><div class="sc sc-G"><lb>P&L</lb><div class="sv" id="s-pnl">$0</div></div><div class="sc sc-W"><lb>ROI</lb><div class="sv" id="s-roi">0%</div></div></div></div>
   <div class="sec"><div class="sh">6-Model Votes<div class="shl"></div></div><div id="mv-list"></div><div id="mv-sum" style="margin-top:4px;padding:4px 7px;background:var(--bg3);font-size:8px">—</div></div>
-  <div class="sec"><div class="sh">Markov<div class="shl"></div></div><table class="mx" id="mxtbl"><tr><th>→</th><th>P</th><th>B</th><th>T</th></tr><tr><th>P</th><td id="mx-PP">—</td><td id="mx-PB">—</td><td id="mx-PT">—</td></tr><tr><th>B</th><td id="mx-BP">—</td><td id="mx-BB">—</td><td id="mx-BT">—</td></tr><tr><th>T</th><td id="mx-TP">—</td><td id="mx-TB">—</td><td id="mx-TT">—</td></tr></table></div>
+  <div class="sec"><div class="sh">Markov Matrix<div class="shl"></div></div><table class="mx" id="mxtbl"><tr><th>→</th><th>P</th><th>B</th><th>T</th></tr><tr><th>P</th><td id="mx-PP">—</td><td id="mx-PB">—</td><td id="mx-PT">—</td></tr><tr><th>B</th><td id="mx-BP">—</td><td id="mx-BB">—</td><td id="mx-BT">—</td></tr><tr><th>T</th><td id="mx-TP">—</td><td id="mx-TB">—</td><td id="mx-TT">—</td></tr></table></div>
 </div></div>
+
 <script>
-const ODDS_P=2.0,ODDS_B=1.95; let eqChart,entChart;
-let collectedData = []; // stores {round, outcome, betSide, stake, pnl, entropy, timestamp}
+// ========== FULLY WORKING BACCARAT ENGINE ==========
+const ODDS_P=2.0, ODDS_B=1.95;
+let eqChart, entChart;
+let collectedData = [];
+
 let STATE = {
-  outcomes:[], betsHist:[], bankroll:1000, startBank:1000, equity:[1000], entHist:[],
-  config:{confThreshold:62,stakePct:2,entropyMax:0.82,secureMode:true,trapFilter:true,allowBanker:true,entropyGate:true,tieProtect:true},
-  halted:false, pendingBet:null, lastDecision:null,
-  stats:{bets:0,won:0,lost:0,skipped:0,totalStaked:0,totalPnl:0,bestStreak:0,curStreak:0,pbets:0,bbets:0,pwins:0,bwins:0,entropyBlocked:0,tieBlocked:0},
-  modelAcc:{mk:[],pm:[],sc:[],by:[],mo:[],ti:[]}
+  outcomes: [], bankroll: 1000, startBank: 1000, equity: [1000], entHist: [],
+  config: { confThreshold: 62, stakePct: 2, entropyMax: 0.82, secureMode: true, trapFilter: true, allowBanker: true, entropyGate: true, tieProtect: true },
+  halted: false, pendingBet: null, lastDecision: null,
+  stats: { bets: 0, won: 0, lost: 0, skipped: 0, totalStaked: 0, totalPnl: 0, bestStreak: 0, curStreak: 0, pbets: 0, bbets: 0, pwins: 0, bwins: 0, entropyBlocked: 0, tieBlocked: 0 },
+  modelAcc: { mk: [], pm: [], sc: [], by: [], mo: [], ti: [] }
 };
-function mean(a){return a.length?a.reduce((s,v)=>s+v,0)/a.length:0;}
-function clamp(v,a,b){return Math.max(a,Math.min(b,v));}
-function w10(arr){return arr.slice(-10);}
-function entropyCalc(outcomes){let w=w10(outcomes),n=w.length; if(n<4) return {Hn:1,regime:'WAIT',gate:false,Z:0,maxRun:0}; let c={P:0,B:0,T:0}; for(let x of w)c[x]++; let H=0; for(let k of ['P','B','T']){let p=c[k]/n; if(p>0) H-=p*Math.log2(p);} let Hn=H/Math.log2(3); let nt=w.filter(x=>x!=='T'); let runs=1; for(let i=1;i<nt.length;i++)if(nt[i]!==nt[i-1])runs++; let maxRun=1,cr=1; for(let i=1;i<w.length;i++){if(w[i]===w[i-1])cr++;else cr=1;maxRun=Math.max(maxRun,cr);} let regime=Hn<0.55?'PATTERNED':Hn<0.74?'SEMI':Hn<0.9?'NOISY':'RANDOM'; let gate=Hn<=STATE.config.entropyMax&&regime!=='RANDOM'; return {Hn,regime,gate,Z:runs-((2*c.P*c.B)/nt.length+1),maxRun};}
-function tieRisk(outcomes){let idx=outcomes.map((v,i)=>v==='T'?i:-1).filter(i=>i>=0); if(idx.length<2) return {prob:0.08,since:0,avg:12}; let intervals=[]; for(let i=1;i<idx.length;i++) intervals.push(idx[i]-idx[i-1]); let avg=mean(intervals); let since=outcomes.length-1-idx[idx.length-1]; let prob=clamp(since/(avg*1.2)*0.12,0.05,0.28); return {prob,since,avg};}
-function mMarkov(o){if(o.length<4) return {vote:'?',conf:10}; let tr={P:{P:1,B:1,T:0.5},B:{P:1,B:1,T:0.5},T:{P:1,B:1,T:0.3}}; let a=o.slice(-10); for(let i=0;i<a.length-1;i++){let f=a[i],t=a[i+1];if(tr[f])tr[f][t]+=3;} let last=o[o.length-1]; let row=tr[last]; let tot=row.P+row.B+row.T; let best=row.P/tot>=row.B/tot?'P':'B'; let conf=clamp(Math.abs(row.P/tot-row.B/tot)/0.15*65,20,92); return {vote:best,conf};}
-function mPattern(o){if(o.length<6) return {vote:'?',conf:10}; let L={}; for(let i=4;i<o.length;i++){let k=o.slice(i-3,i).join(''); let nxt=o[i]; if(!L[k])L[k]={P:0,B:0,T:0}; L[k][nxt]++;} let last3=o.slice(-3).join(''); if(L[last3]){let tot=L[last3].P+L[last3].B+L[last3].T; let best=L[last3].P>=L[last3].B?'P':'B'; let conf=clamp((Math.abs(L[last3].P-L[last3].B)/tot)*100+20,20,90); return {vote:best,conf};} return {vote:'?',conf:10};}
-function mStreak(o){if(o.length<5) return {vote:'?',conf:10}; let w=w10(o).filter(x=>x!=='T'); if(w.length<3) return {vote:'P',conf:20}; let changes=0; for(let i=1;i<w.length;i++)if(w[i]!==w[i-1])changes++; let chop=changes/(w.length-1); let last=o[o.length-1]; let streak=1; for(let i=o.length-2;i>=0&&o[i]===last;i--)streak++; if(chop>0.65) return {vote:last==='P'?'B':'P',conf:clamp((chop-0.55)*200,30,80)}; else return {vote:last,conf:clamp(streak*18,20,70)};}
-function mBayes(o){if(o.length<5) return {vote:'?',conf:10}; let aP=0.446*5,aB=0.458*5,aT=0.096*5; for(let x of w10(o)){if(x==='P')aP+=1.6;else if(x==='B')aB+=1.6;else aT+=0.6;} let best=aP>=aB?'P':'B'; let conf=clamp(Math.abs(aP-aB)/(aP+aB)*100+20,20,90); return {vote:best,conf};}
-function mMomentum(o){if(o.length<8) return {vote:'?',conf:10}; let w=w10(o).filter(x=>x!=='T'); let half=Math.floor(w.length/2); let first=w.slice(0,half).filter(x=>x==='P').length/half; let last=w.slice(half).filter(x=>x==='P').length/(w.length-half); let mom=last-first; let best=mom>0.1?'P':mom<-0.1?'B':'P'; let conf=clamp(Math.abs(mom)*180,15,85); return {vote:best,conf};}
-function mTieAware(o,ti){if(o.length<8) return {vote:'?',conf:10}; let last=o[o.length-1]; let base=last==='B'?{P:0.44,B:0.48}:last==='P'?{P:0.48,B:0.44}:{P:0.45,B:0.45}; let vote=base.P>=base.B?'P':'B'; let conf=clamp(55-(ti.prob*180),20,85); return {vote,conf};}
-function detectTrap(o){let w=w10(o); let cP=w.filter(x=>x==='P').length, cB=w.filter(x=>x==='B').length; if(cP>=7) return {risk:75,type:'P DOM'}; if(cB>=7) return {risk:75,type:'B DOM'}; let changes=0; for(let i=1;i<w.length;i++)if(w[i]!==w[i-1])changes++; if(changes>=6) return {risk:60,type:'ZIGZAG'}; return {risk:0,type:'none'};}
-function computeDecision(){let n=STATE.outcomes.length; if(n<6) return {side:'SKIP',confidence:0,stake:0,reasoning:[{t:'S',txt:'need 6+'}]}; let ent=entropyCalc(STATE.outcomes); let ti=tieRisk(STATE.outcomes); let trap=detectTrap(STATE.outcomes); let mk=mMarkov(STATE.outcomes), pm=mPattern(STATE.outcomes), sc=mStreak(STATE.outcomes), by=mBayes(STATE.outcomes), mo=mMomentum(STATE.outcomes), tiM=mTieAware(STATE.outcomes,ti); let models={mk,pm,sc,by,mo,ti:tiM}; let vP=0,vB=0; Object.values(models).forEach(m=>{if(m.vote==='P')vP+=m.conf/100;else if(m.vote==='B')vB+=m.conf/100;}); let winner=vP>=vB?'P':'B'; let agree=Object.values(models).filter(m=>m.vote===winner).length; let rawConf=clamp((Math.abs(vP-vB)/(vP+vB||1))*100+agree*5,0,96); let finalConf=Math.floor(rawConf*(1-clamp((ent.Hn-0.68)*3,0,0.4))); let thresh=STATE.config.confThreshold+(STATE.config.secureMode?6:0)+(ent.Hn*12); let entBlocked=STATE.config.entropyGate&&!ent.gate; let tieBlocked=STATE.config.tieProtect&&ti.prob>0.21; let trapRisk=STATE.config.trapFilter&&trap.risk>55; let skip=entBlocked||tieBlocked||trapRisk||finalConf<thresh||agree<(STATE.config.secureMode?4:3); let side=skip?'SKIP':winner; let stake=0; if(side!=='SKIP'){let entScale=clamp(1-(ent.Hn-0.55)*2.2,0.3,1.0); stake=clamp(STATE.bankroll*(STATE.config.stakePct/100)*entScale,0,STATE.bankroll*0.045);} let ev=(0.468*(winner==='B'?0.95:1.0)-0.532)*100; let reasoning=[{t:winner,txt:`${winner} · conf ${finalConf}%`},{t:'G',txt:`Entropy ${ent.Hn.toFixed(3)} ${ent.regime}`},{t:'G',txt:`Tie risk ${(ti.prob*100).toFixed(0)}%`}]; if(side==='SKIP')reasoning.push({t:'S',txt:`SKIP: ${entBlocked?'entropy':tieBlocked?'tie':'low conf'}`}); else reasoning.push({t:'G',txt:`✅ ENTRY stake $${stake.toFixed(2)}`}); return {side,confidence:finalConf,stake,reasoning,ent,ti,winner,agree,ev,entBlocked,tieBlocked,thresh,models,voteP:vP,voteB:vB};}
-function record(outcome){if(STATE.halted){showAlert('Halted','danger');return;} let bet=STATE.pendingBet; let pnl=0; if(bet&&bet.side!=='SKIP'){STATE.stats.bets++; STATE.stats.totalStaked+=bet.stake; if(bet.side==='P')STATE.stats.pbets++;else STATE.stats.bbets++; if(outcome===bet.side){let odds=bet.side==='B'?ODDS_B:ODDS_P; pnl=(odds-1)*bet.stake; STATE.stats.won++; if(bet.side==='P')STATE.stats.pwins++;else STATE.stats.bwins++; STATE.stats.curStreak++; STATE.stats.bestStreak=Math.max(STATE.stats.bestStreak,STATE.stats.curStreak);}else{pnl=-bet.stake; STATE.stats.lost++; STATE.stats.curStreak=0;} STATE.stats.totalPnl+=pnl; STATE.bankroll=parseFloat((STATE.bankroll+pnl).toFixed(2)); STATE.equity.push(STATE.bankroll);}else{STATE.stats.skipped++; if(STATE.lastDecision?.entBlocked)STATE.stats.entropyBlocked++; STATE.equity.push(STATE.bankroll);} STATE.outcomes.push(outcome); let entNow=entropyCalc(STATE.outcomes); STATE.entHist.push(entNow.Hn); if(STATE.entHist.length>100)STATE.entHist.shift(); collectedData.push({round:STATE.outcomes.length,outcome,betSide:bet?.side||'SKIP',stake:bet?.stake||0,pnl:pnl,entropy:entNow.Hn,ts:new Date().toISOString()}); let dec=computeDecision(); STATE.lastDecision=dec; STATE.pendingBet=dec.side!=='SKIP'?{side:dec.side,stake:dec.stake}:null; renderAll(dec); updateDataPanel(); if((STATE.startBank-STATE.bankroll)/STATE.startBank>=0.2){STATE.halted=true;showAlert('Stop-loss 20%','danger');}}
-function renderAll(dec){let ent=dec.ent||{Hn:1,regime:'WAIT',gate:false}; let ti=dec.ti||{prob:0.08}; document.getElementById('ent-fill').style.width=ent.Hn*100+'%'; document.getElementById('ent-val').innerText=ent.Hn.toFixed(3); document.getElementById('rs-ent').innerText=ent.Hn.toFixed(3); document.getElementById('rs-tierisk').innerHTML=`${(ti.prob*100).toFixed(0)}%`; document.getElementById('rs-gate').innerText=(ent.gate&&!dec.entBlocked)?'OPEN':'LOCKED'; let box=document.getElementById('bet-box'),ba=document.getElementById('ba'); box.className=dec.side==='P'?'BP':dec.side==='B'?'BB':'SKIP'; ba.className=dec.side==='P'?'BP':dec.side==='B'?'BB':'SKIP'; if(dec.side==='P'){ba.innerText='BET PLAYER'; document.getElementById('bstake').className='stk-P'; document.getElementById('bstake').innerHTML=`STAKE $${dec.stake.toFixed(2)}`;}else if(dec.side==='B'){ba.innerText='BET BANKER'; document.getElementById('bstake').className='stk-B'; document.getElementById('bstake').innerHTML=`STAKE $${dec.stake.toFixed(2)}`;}else{ba.innerText='SKIP'; document.getElementById('bstake').className='stk-S'; document.getElementById('bstake').innerHTML='NO BET';} document.getElementById('d-stake').innerHTML=dec.side!=='SKIP'?`$${dec.stake.toFixed(2)}`:'—'; document.getElementById('d-prob').innerHTML=`${(dec.ev?48:46)}%`; document.getElementById('d-ev').innerHTML=`${dec.ev>0?'+':''}${(dec.ev||0).toFixed(1)}%`; document.getElementById('d-agree').innerHTML=`${dec.agree||0}/6`; document.getElementById('cpct').innerHTML=`${dec.confidence}%`; document.getElementById('cthr').innerHTML=`thresh:${dec.thresh?.toFixed(0)||62}%`; document.getElementById('cin').style.width=clamp(dec.confidence,0,100)+'%'; document.getElementById('ctm').style.left=(dec.thresh||62)+'%'; document.getElementById('rlist').innerHTML=(dec.reasoning||[]).map(r=>{let cls=r.t==='T'?'ri-T':r.t==='G'?'ri-G':r.t==='S'?'ri-S':'ri-P'; return `<div class="ri"><div class="rico ${cls}">${r.t==='T'?'!':r.t==='G'?'✓':'—'}</div><span>${r.txt}</span></div>`;}).join(''); document.getElementById('dec-rnd').innerHTML=`Round #${STATE.outcomes.length+1}`; let s=STATE.stats; document.getElementById('s-bets').innerText=s.bets; document.getElementById('s-won').innerText=s.won; document.getElementById('s-lost').innerText=s.lost; let wr=s.bets?(s.won/s.bets*100).toFixed(1):'—'; document.getElementById('s-wr').innerHTML=wr; document.getElementById('wbw').style.width=s.bets?(s.won/s.bets*100)+'%':'0%'; document.getElementById('wbl').style.width=s.bets?(s.lost/s.bets*100)+'%':'0%'; document.getElementById('s-pnl').innerHTML=`${s.totalPnl>=0?'+':''}$${s.totalPnl.toFixed(2)}`; document.getElementById('s-roi').innerHTML=s.totalStaked?((s.totalPnl/s.totalStaked)*100).toFixed(1)+'%':'0%'; if(dec.models){document.getElementById('mv-list').innerHTML=Object.keys(dec.models).map((k,i)=>{let m=dec.models[k]; let acc=STATE.modelAcc[k]?.length>3?mean(STATE.modelAcc[k]):null; return `<div class="mvrow"><div class="mvname">${['Markov','Pattern','Streak','Bayes','Momentum','Tie'][i]}</div><div class="mvote ${m.vote==='P'?'mv-P':m.vote==='B'?'mv-B':'mv-S'}">${m.vote==='?'?'—':m.vote}</div><div class="mvbar"><div class="mvfill" style="background:${m.vote==='P'?'var(--P)':'var(--B)'};width:${m.conf}%"></div></div><div class="mvconf">${m.conf}%</div><div class="mvacc ${acc&&acc>0.52?'acc-g':'acc-n'}">${acc?(acc*100).toFixed(0)+'%':'—'}</div></div>`;}).join('');} updateHistoryUI(); updateCharts();}
-function updateHistoryUI(){let hl=document.getElementById('hl'); hl.innerHTML=''; for(let i=STATE.outcomes.length-1;i>=0;i--){let o=STATE.outcomes[i]; let betItem=STATE.pendingBet?null:null; let div=document.createElement('div'); div.className='hi'; div.innerHTML=`<span class="hn">#${i+1}</span><div class="hb hb${o}">${o}</div><span class="hp neu">—</span>`; hl.appendChild(div);} document.getElementById('hc').innerText=STATE.outcomes.length;}
-function updateDataPanel(){document.getElementById('dc-rounds').innerText=collectedData.length; let wins=collectedData.filter(d=>d.pnl>0).length; let wrTotal=collectedData.length?((wins/collectedData.length)*100).toFixed(1):0; document.getElementById('dc-wr').innerHTML=wrTotal+'%'; let totalProfit=collectedData.reduce((s,d)=>s+d.pnl,0); document.getElementById('dc-profit').innerHTML=`${totalProfit>=0?'+':''}$${totalProfit.toFixed(2)}`; let avgEnt=collectedData.length?mean(collectedData.map(d=>d.entropy)).toFixed(3):'—'; document.getElementById('dc-avg-ent').innerHTML=avgEnt;}
-function updateCharts(){if(eqChart){eqChart.data.labels=STATE.equity.map((_,i)=>i); eqChart.data.datasets[0].data=STATE.equity; eqChart.update('none');} if(entChart){entChart.data.labels=STATE.entHist.map((_,i)=>i); entChart.data.datasets[0].data=STATE.entHist; entChart.data.datasets[1].data=STATE.entHist.map(()=>STATE.config.entropyMax); entChart.update('none');}}
-function exportCSV(){let headers=['round','outcome','bet_side','stake','pnl','entropy','timestamp']; let rows=collectedData.map(d=>[d.round,d.outcome,d.betSide,d.stake,d.pnl,d.entropy,d.ts]); let csv=[headers.join(','),...rows.map(r=>r.map(v=>`"${v}"`).join(','))].join('\n'); let blob=new Blob([csv],{type:'text/csv'}); let a=document.createElement('a'); a.href=URL.createObjectURL(blob); a.download=`baccarat_data_${new Date().toISOString().slice(0,19)}.csv`; a.click(); showAlert('CSV exported','ok');}
-function clearData(){collectedData=[]; updateDataPanel(); showAlert('Data collection cleared','info');}
-function resetSession(){let bank=parseFloat(document.getElementById('sl-b').value); STATE={outcomes:[],betsHist:[],bankroll:bank,startBank:bank,equity:[bank],entHist:[],config:{...STATE.config},halted:false,pendingBet:null,lastDecision:null,stats:{bets:0,won:0,lost:0,skipped:0,totalStaked:0,totalPnl:0,bestStreak:0,curStreak:0,pbets:0,bbets:0,pwins:0,bwins:0,entropyBlocked:0,tieBlocked:0},modelAcc:{mk:[],pm:[],sc:[],by:[],mo:[],ti:[]}}; document.getElementById('hl').innerHTML=''; let dec=computeDecision(); STATE.lastDecision=dec; renderAll(dec); updateDataPanel(); showAlert('Session reset','ok');}
-function updateCfg(){STATE.config.confThreshold=parseFloat(document.getElementById('sl-c').value); STATE.config.stakePct=parseFloat(document.getElementById('sl-s').value); STATE.config.entropyMax=parseFloat(document.getElementById('sl-e').value); STATE.config.secureMode=document.getElementById('tg-sec').checked; STATE.config.trapFilter=document.getElementById('tg-trp').checked; STATE.config.allowBanker=document.getElementById('tg-bnk').checked; STATE.config.entropyGate=document.getElementById('tg-ent').checked; STATE.config.tieProtect=document.getElementById('tg-tie').checked; document.getElementById('sv-c').innerText=STATE.config.confThreshold+'%'; document.getElementById('sv-b').innerHTML='$'+(STATE.bankroll/1000).toFixed(1)+'K'; document.getElementById('sv-s').innerText=STATE.config.stakePct+'%'; document.getElementById('sv-e').innerText=STATE.config.entropyMax.toFixed(2); if(STATE.outcomes.length>=6){let dec=computeDecision(); STATE.lastDecision=dec; STATE.pendingBet=dec.side!=='SKIP'?{side:dec.side,stake:dec.stake}:null; renderAll(dec);}}
-function batchImport(){let raw=document.getElementById('batch').value.toUpperCase().replace(/[^BPT]/g,''); if(!raw)return; for(let ch of raw){let dec=computeDecision(); STATE.lastDecision=dec; STATE.pendingBet=dec.side!=='SKIP'?{side:dec.side,stake:dec.stake}:null; record(ch);} document.getElementById('batch').value='';}
-function runBacktest(){if(STATE.outcomes.length<20){showAlert('need 20+ outcomes','warn');return;} let bets=0,wins=0; for(let i=8;i<STATE.outcomes.length;i++){let hist=STATE.outcomes.slice(0,i); let ent=entropyCalc(hist); let ti=tieRisk(hist); if(STATE.config.entropyGate&&!ent.gate)continue; if(STATE.config.tieProtect&&ti.prob>0.21)continue; let mk=mMarkov(hist),pm=mPattern(hist),sc=mStreak(hist),by=mBayes(hist),mo=mMomentum(hist),tiM=mTieAware(hist,ti); let vP=0,vB=0; [mk,pm,sc,by,mo,tiM].forEach(m=>{if(m.vote==='P')vP+=m.conf/100;else if(m.vote==='B')vB+=m.conf/100;}); let winner=vP>=vB?'P':'B'; let agree=[mk,pm,sc,by,mo,tiM].filter(m=>m.vote===winner).length; let thresh=STATE.config.confThreshold+(STATE.config.secureMode?6:0)+ent.Hn*12; let conf=clamp((Math.abs(vP-vB)/(vP+vB||1))*100+agree*4,0,96); if(conf>=thresh&&agree>=4){bets++; if(STATE.outcomes[i]===winner)wins++;}} showAlert(`Backtest: ${bets} bets, ${bets?(wins/bets*100).toFixed(1):0}% win`,'ok');}
-function showAlert(msg,type){let az=document.getElementById('az'); let el=document.createElement('div'); el.className=`al ${type}`; el.innerText=msg; az.appendChild(el); setTimeout(()=>el.remove(),4000);}
-window.onload=()=>{eqChart=new Chart(document.getElementById('eq-c'),{type:'line',data:{labels:[],datasets:[{data:[],borderWidth:1.8,fill:true,tension:0.3,pointRadius:0}]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false}},scales:{x:{display:false},y:{grid:{color:'rgba(255,255,255,0.02)'},ticks:{color:'#28404E',font:{size:7}}}}}); entChart=new Chart(document.getElementById('ent-c'),{type:'line',data:{labels:[],datasets:[{label:'H',data:[],borderColor:'#FF3355',borderWidth:1.5,fill:true,backgroundColor:'rgba(255,51,85,0.06)',tension:0.3,pointRadius:0},{label:'Gate',data:[],borderColor:'rgba(0,230,118,.5)',borderWidth:1,borderDash:[3,3],pointRadius:0}]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false}},scales:{x:{display:false},y:{min:0,max:1,grid:{color:'rgba(255,255,255,0.02)'},ticks:{color:'#28404E',font:{size:7}}}}}); updateCfg(); resetSession(); document.getElementById('btn-P').onclick=()=>record('P'); document.getElementById('btn-B').onclick=()=>record('B'); document.getElementById('btn-T').onclick=()=>record('T'); document.getElementById('batchBtn').onclick=batchImport; document.getElementById('resetBtn').onclick=resetSession; document.getElementById('backtestBtn').onclick=runBacktest; document.getElementById('exportCsvBtn').onclick=exportCSV; document.getElementById('clearDataBtn').onclick=clearData; document.addEventListener('keydown',e=>{if(document.activeElement.tagName!=='INPUT'){if(e.key==='P'||e.key==='p')record('P');else if(e.key==='B'||e.key==='b')record('B');else if(e.key==='T'||e.key==='t')record('T');}}); ['sl-c','sl-b','sl-s','sl-e'].forEach(id=>document.getElementById(id).addEventListener('input',updateCfg)); ['tg-sec','tg-trp','tg-bnk','tg-ent','tg-tie'].forEach(id=>document.getElementById(id).addEventListener('change',updateCfg)); showAlert('BaccaratIQ v11 · Data collector active. Record P/B/T.','ok');};
+
+function showAlert(msg, type) { let az = document.getElementById('az'); let el = document.createElement('div'); el.className = `al ${type}`; el.innerText = msg; az.appendChild(el); setTimeout(() => el.remove(), 4000); }
+function clamp(v, a, b) { return Math.max(a, Math.min(b, v)); }
+function mean(a) { return a.length ? a.reduce((s, v) => s + v, 0) / a.length : 0; }
+function w10(arr) { return arr.slice(-10); }
+
+function entropyCalc(outcomes) {
+  let w = w10(outcomes), n = w.length;
+  if (n < 4) return { Hn: 1, regime: 'WAIT', gate: false, Z: 0, maxRun: 0 };
+  let c = { P: 0, B: 0, T: 0 };
+  for (let x of w) c[x]++;
+  let H = 0;
+  for (let k of ['P', 'B', 'T']) { let p = c[k] / n; if (p > 0) H -= p * Math.log2(p); }
+  let Hn = H / Math.log2(3);
+  let nt = w.filter(x => x !== 'T');
+  let runs = 1;
+  for (let i = 1; i < nt.length; i++) if (nt[i] !== nt[i - 1]) runs++;
+  let maxRun = 1, cr = 1;
+  for (let i = 1; i < w.length; i++) { if (w[i] === w[i - 1]) cr++; else cr = 1; maxRun = Math.max(maxRun, cr); }
+  let regime = Hn < 0.55 ? 'PATTERNED' : Hn < 0.74 ? 'SEMI' : Hn < 0.9 ? 'NOISY' : 'RANDOM';
+  let gate = Hn <= STATE.config.entropyMax && regime !== 'RANDOM';
+  return { Hn, regime, gate, Z: runs - ((2 * c.P * c.B) / (nt.length || 1) + 1), maxRun };
+}
+
+function tieRisk(outcomes) {
+  let idx = outcomes.map((v, i) => v === 'T' ? i : -1).filter(i => i >= 0);
+  if (idx.length < 2) return { prob: 0.08, since: 0, avg: 12 };
+  let intervals = [];
+  for (let i = 1; i < idx.length; i++) intervals.push(idx[i] - idx[i - 1]);
+  let avg = mean(intervals);
+  let since = outcomes.length - 1 - idx[idx.length - 1];
+  let prob = clamp(since / (avg * 1.2) * 0.12, 0.05, 0.28);
+  return { prob, since, avg };
+}
+
+function mMarkov(o) {
+  if (o.length < 4) return { vote: '?', conf: 10 };
+  let tr = { P: { P: 1, B: 1, T: 0.5 }, B: { P: 1, B: 1, T: 0.5 }, T: { P: 1, B: 1, T: 0.3 } };
+  let a = o.slice(-10);
+  for (let i = 0; i < a.length - 1; i++) { let f = a[i], t = a[i + 1]; if (tr[f]) tr[f][t] += 3; }
+  let last = o[o.length - 1];
+  let row = tr[last];
+  let tot = row.P + row.B + row.T;
+  let best = row.P / tot >= row.B / tot ? 'P' : 'B';
+  let conf = clamp(Math.abs(row.P / tot - row.B / tot) / 0.15 * 65, 20, 92);
+  return { vote: best, conf };
+}
+function mPattern(o) { if (o.length < 6) return { vote: '?', conf: 10 }; let L = {}; for (let i = 4; i < o.length; i++) { let k = o.slice(i - 3, i).join(''); let nxt = o[i]; if (!L[k]) L[k] = { P: 0, B: 0, T: 0 }; L[k][nxt]++; } let last3 = o.slice(-3).join(''); if (L[last3]) { let tot = L[last3].P + L[last3].B + L[last3].T; let best = L[last3].P >= L[last3].B ? 'P' : 'B'; let conf = clamp((Math.abs(L[last3].P - L[last3].B) / tot) * 100 + 20, 20, 90); return { vote: best, conf }; } return { vote: '?', conf: 10 }; }
+function mStreak(o) { if (o.length < 5) return { vote: '?', conf: 10 }; let w = w10(o).filter(x => x !== 'T'); if (w.length < 3) return { vote: 'P', conf: 20 }; let changes = 0; for (let i = 1; i < w.length; i++) if (w[i] !== w[i - 1]) changes++; let chop = changes / (w.length - 1); let last = o[o.length - 1]; let streak = 1; for (let i = o.length - 2; i >= 0 && o[i] === last; i--) streak++; if (chop > 0.65) return { vote: last === 'P' ? 'B' : 'P', conf: clamp((chop - 0.55) * 200, 30, 80) }; else return { vote: last, conf: clamp(streak * 18, 20, 70) }; }
+function mBayes(o) { if (o.length < 5) return { vote: '?', conf: 10 }; let aP = 0.446 * 5, aB = 0.458 * 5; for (let x of w10(o)) { if (x === 'P') aP += 1.6; else if (x === 'B') aB += 1.6; } let best = aP >= aB ? 'P' : 'B'; let conf = clamp(Math.abs(aP - aB) / (aP + aB) * 100 + 20, 20, 90); return { vote: best, conf }; }
+function mMomentum(o) { if (o.length < 8) return { vote: '?', conf: 10 }; let w = w10(o).filter(x => x !== 'T'); let half = Math.floor(w.length / 2); let first = w.slice(0, half).filter(x => x === 'P').length / half; let last = w.slice(half).filter(x => x === 'P').length / (w.length - half); let mom = last - first; let best = mom > 0.1 ? 'P' : mom < -0.1 ? 'B' : 'P'; let conf = clamp(Math.abs(mom) * 180, 15, 85); return { vote: best, conf }; }
+function mTieAware(o, ti) { if (o.length < 8) return { vote: '?', conf: 10 }; let last = o[o.length - 1]; let base = last === 'B' ? { P: 0.44, B: 0.48 } : last === 'P' ? { P: 0.48, B: 0.44 } : { P: 0.45, B: 0.45 }; let vote = base.P >= base.B ? 'P' : 'B'; let conf = clamp(55 - (ti.prob * 180), 20, 85); return { vote, conf }; }
+function detectTrap(o) { let w = w10(o); let cP = w.filter(x => x === 'P').length, cB = w.filter(x => x === 'B').length; if (cP >= 7) return { risk: 75, type: 'P DOMINANCE' }; if (cB >= 7) return { risk: 75, type: 'B DOMINANCE' }; let changes = 0; for (let i = 1; i < w.length; i++) if (w[i] !== w[i - 1]) changes++; if (changes >= 6) return { risk: 60, type: 'ZIGZAG' }; return { risk: 0, type: 'none' }; }
+
+function computeDecision() {
+  let n = STATE.outcomes.length;
+  if (n < 6) return { side: 'SKIP', confidence: 0, stake: 0, reasoning: [{ t: 'S', txt: 'need ≥6 outcomes' }], ent: { Hn: 1, regime: 'WAIT' }, ti: { prob: 0.08 } };
+  let ent = entropyCalc(STATE.outcomes);
+  let ti = tieRisk(STATE.outcomes);
+  let trap = detectTrap(STATE.outcomes);
+  let mk = mMarkov(STATE.outcomes), pm = mPattern(STATE.outcomes), sc = mStreak(STATE.outcomes), by = mBayes(STATE.outcomes), mo = mMomentum(STATE.outcomes), tiM = mTieAware(STATE.outcomes, ti);
+  let models = { mk, pm, sc, by, mo, ti: tiM };
+  let vP = 0, vB = 0;
+  Object.values(models).forEach(m => { if (m.vote === 'P') vP += m.conf / 100; else if (m.vote === 'B') vB += m.conf / 100; });
+  let winner = vP >= vB ? 'P' : 'B';
+  let agree = Object.values(models).filter(m => m.vote === winner).length;
+  let rawConf = clamp((Math.abs(vP - vB) / (vP + vB || 1)) * 100 + agree * 5, 0, 96);
+  let finalConf = Math.floor(rawConf * (1 - clamp((ent.Hn - 0.68) * 3, 0, 0.4)));
+  let thresh = STATE.config.confThreshold + (STATE.config.secureMode ? 6 : 0) + (ent.Hn * 12);
+  let entBlocked = STATE.config.entropyGate && !ent.gate;
+  let tieBlocked = STATE.config.tieProtect && ti.prob > 0.21;
+  let trapRisk = STATE.config.trapFilter && trap.risk > 55;
+  let skip = entBlocked || tieBlocked || trapRisk || finalConf < thresh || agree < (STATE.config.secureMode ? 4 : 3);
+  let side = skip ? 'SKIP' : winner;
+  let stake = 0;
+  if (side !== 'SKIP') { let entScale = clamp(1 - (ent.Hn - 0.55) * 2.2, 0.3, 1.0); stake = clamp(STATE.bankroll * (STATE.config.stakePct / 100) * entScale, 0, STATE.bankroll * 0.045); }
+  let ev = (0.468 * (winner === 'B' ? 0.95 : 1.0) - 0.532) * 100;
+  let reasoning = [{ t: winner, txt: `${winner} · conf ${finalConf}%` }, { t: 'G', txt: `Entropy ${ent.Hn.toFixed(3)} ${ent.regime}` }, { t: 'G', txt: `Tie risk ${(ti.prob * 100).toFixed(0)}%` }];
+  if (skip) reasoning.push({ t: 'S', txt: `SKIP: ${entBlocked ? 'entropy' : tieBlocked ? 'tie' : 'low conf'}` });
+  else reasoning.push({ t: 'G', txt: `✅ ENTRY $${stake.toFixed(2)}` });
+  return { side, confidence: finalConf, stake, reasoning, ent, ti, winner, agree, ev, entBlocked, tieBlocked, thresh, models, voteP: vP, voteB: vB };
+}
+
+function flashButton(btnId) { let btn = document.getElementById(btnId); if (btn) { btn.classList.add('active-flash'); setTimeout(() => btn.classList.remove('active-flash'), 200); } }
+
+function record(outcome) {
+  if (STATE.halted) { showAlert('Session halted. Reset to continue.', 'danger'); return; }
+  flashButton('btn-' + outcome);
+  let bet = STATE.pendingBet;
+  let pnl = 0;
+  if (bet && bet.side !== 'SKIP') {
+    STATE.stats.bets++;
+    STATE.stats.totalStaked += bet.stake;
+    if (bet.side === 'P') STATE.stats.pbets++; else STATE.stats.bbets++;
+    if (outcome === bet.side) {
+      let odds = bet.side === 'B' ? ODDS_B : ODDS_P;
+      pnl = (odds - 1) * bet.stake;
+      STATE.stats.won++;
+      if (bet.side === 'P') STATE.stats.pwins++; else STATE.stats.bwins++;
+      STATE.stats.curStreak++;
+      STATE.stats.bestStreak = Math.max(STATE.stats.bestStreak, STATE.stats.curStreak);
+    } else { pnl = -bet.stake; STATE.stats.lost++; STATE.stats.curStreak = 0; }
+    STATE.stats.totalPnl += pnl;
+    STATE.bankroll = parseFloat((STATE.bankroll + pnl).toFixed(2));
+    STATE.equity.push(STATE.bankroll);
+  } else { STATE.stats.skipped++; if (STATE.lastDecision?.entBlocked) STATE.stats.entropyBlocked++; STATE.equity.push(STATE.bankroll); }
+  STATE.outcomes.push(outcome);
+  let entNow = entropyCalc(STATE.outcomes);
+  STATE.entHist.push(entNow.Hn);
+  if (STATE.entHist.length > 100) STATE.entHist.shift();
+  collectedData.push({ round: STATE.outcomes.length, outcome, betSide: bet?.side || 'SKIP', stake: bet?.stake || 0, pnl: pnl, entropy: entNow.Hn, ts: new Date().toISOString() });
+  let dec = computeDecision();
+  STATE.lastDecision = dec;
+  STATE.pendingBet = dec.side !== 'SKIP' ? { side: dec.side, stake: dec.stake } : null;
+  renderAll(dec);
+  updateDataPanel();
+  if ((STATE.startBank - STATE.bankroll) / STATE.startBank >= 0.2) { STATE.halted = true; showAlert('Stop-loss 20% triggered', 'danger'); }
+}
+
+function renderAll(dec) {
+  let ent = dec.ent || { Hn: 1, regime: 'WAIT', gate: false };
+  let ti = dec.ti || { prob: 0.08 };
+  document.getElementById('ent-fill').style.width = ent.Hn * 100 + '%';
+  document.getElementById('ent-fill').style.background = ent.Hn < 0.55 ? 'var(--G)' : ent.Hn < 0.75 ? 'var(--W)' : 'var(--R)';
+  document.getElementById('ent-val').innerText = ent.Hn.toFixed(3);
+  document.getElementById('rs-ent').innerText = ent.Hn.toFixed(3);
+  document.getElementById('rs-tierisk').innerHTML = (ti.prob * 100).toFixed(0) + '%';
+  document.getElementById('rs-gate').innerText = (ent.gate && !dec.entBlocked) ? 'OPEN' : 'LOCKED';
+  let box = document.getElementById('bet-box'), ba = document.getElementById('ba');
+  box.className = dec.side === 'P' ? 'BP' : dec.side === 'B' ? 'BB' : 'SKIP';
+  ba.className = dec.side === 'P' ? 'BP' : dec.side === 'B' ? 'BB' : 'SKIP';
+  if (dec.side === 'P') { ba.innerText = 'BET PLAYER'; document.getElementById('bstake').className = 'stk-P'; document.getElementById('bstake').innerHTML = `STAKE $${dec.stake.toFixed(2)}`; }
+  else if (dec.side === 'B') { ba.innerText = 'BET BANKER'; document.getElementById('bstake').className = 'stk-B'; document.getElementById('bstake').innerHTML = `STAKE $${dec.stake.toFixed(2)}`; }
+  else { ba.innerText = 'SKIP'; document.getElementById('bstake').className = 'stk-S'; document.getElementById('bstake').innerHTML = 'NO BET'; }
+  document.getElementById('d-stake').innerHTML = dec.side !== 'SKIP' ? `$${dec.stake.toFixed(2)}` : '—';
+  document.getElementById('d-prob').innerHTML = '46%';
+  document.getElementById('d-ev').innerHTML = `${dec.ev > 0 ? '+' : ''}${(dec.ev || 0).toFixed(1)}%`;
+  document.getElementById('d-agree').innerHTML = `${dec.agree || 0}/6`;
+  document.getElementById('cpct').innerHTML = `${dec.confidence}%`;
+  document.getElementById('cin').style.width = clamp(dec.confidence, 0, 100) + '%';
+  document.getElementById('rlist').innerHTML = (dec.reasoning || []).map(r => { let cls = r.t === 'T' ? 'ri-T' : r.t === 'G' ? 'ri-G' : r.t === 'S' ? 'ri-S' : 'ri-P'; return `<div class="ri"><div class="rico ${cls}">${r.t === 'T' ? '!' : r.t === 'G' ? '✓' : '—'}</div><span>${r.txt}</span></div>`; }).join('');
+  document.getElementById('dec-rnd').innerHTML = `Round #${STATE.outcomes.length + 1}`;
+  let s = STATE.stats;
+  document.getElementById('s-bets').innerText = s.bets;
+  document.getElementById('s-won').innerText = s.won;
+  document.getElementById('s-lost').innerText = s.lost;
+  let wr = s.bets ? (s.won / s.bets * 100).toFixed(1) : '—';
+  document.getElementById('s-wr').innerHTML = wr;
+  if (s.bets > 0) { document.getElementById('wbw').style.width = (s.won / s.bets * 100) + '%'; document.getElementById('wbl').style.width = (s.lost / s.bets * 100) + '%'; }
+  document.getElementById('s-pnl').innerHTML = `${s.totalPnl >= 0 ? '+' : ''}$${s.totalPnl.toFixed(2)}`;
+  document.getElementById('s-roi').innerHTML = s.totalStaked ? ((s.totalPnl / s.totalStaked) * 100).toFixed(1) + '%' : '0%';
+  let pnlTotal = STATE.bankroll - STATE.startBank;
+  document.getElementById('t-bank').innerHTML = `$${STATE.bankroll.toFixed(2)}`;
+  document.getElementById('t-pnl').innerHTML = `${pnlTotal >= 0 ? '+' : ''}$${pnlTotal.toFixed(2)}`;
+  document.getElementById('t-pnl').className = `tv ${pnlTotal > 0 ? 'pos' : pnlTotal < 0 ? 'neg' : 'w'}`;
+  document.getElementById('t-wr').innerHTML = wr !== '—' ? wr + '%' : '—';
+  document.getElementById('t-bets').innerText = s.bets;
+  updateHistoryUI();
+  if (eqChart && STATE.equity.length) { eqChart.data.labels = STATE.equity.map((_, i) => i); eqChart.data.datasets[0].data = STATE.equity; eqChart.update('none'); }
+  if (entChart && STATE.entHist.length) { entChart.data.labels = STATE.entHist.map((_, i) => i); entChart.data.datasets[0].data = STATE.entHist; entChart.update('none'); }
+}
+
+function updateHistoryUI() {
+  let hl = document.getElementById('hl');
+  hl.innerHTML = '';
+  for (let i = STATE.outcomes.length - 1; i >= 0; i--) {
+    let o = STATE.outcomes[i];
+    let div = document.createElement('div'); div.className = 'hi';
+    div.innerHTML = `<span class="hn">#${i + 1}</span><div class="hb hb${o}">${o}</div><span class="hp neu">—</span>`;
+    hl.appendChild(div);
+  }
+  document.getElementById('hc').innerText = STATE.outcomes.length;
+}
+
+function updateDataPanel() {
+  document.getElementById('dc-rounds').innerText = collectedData.length;
+  let wins = collectedData.filter(d => d.pnl > 0).length;
+  let wrTotal = collectedData.length ? ((wins / collectedData.length) * 100).toFixed(1) : 0;
+  document.getElementById('dc-wr').innerHTML = wrTotal + '%';
+  let totalProfit = collectedData.reduce((s, d) => s + d.pnl, 0);
+  document.getElementById('dc-profit').innerHTML = `${totalProfit >= 0 ? '+' : ''}$${totalProfit.toFixed(2)}`;
+  let avgEnt = collectedData.length ? mean(collectedData.map(d => d.entropy)).toFixed(3) : '—';
+  document.getElementById('dc-avg-ent').innerHTML = avgEnt;
+}
+
+function resetSession() {
+  let bank = parseFloat(document.getElementById('sl-b').value);
+  STATE = {
+    outcomes: [], bankroll: bank, startBank: bank, equity: [bank], entHist: [],
+    config: { ...STATE.config }, halted: false, pendingBet: null, lastDecision: null,
+    stats: { bets: 0, won: 0, lost: 0, skipped: 0, totalStaked: 0, totalPnl: 0, bestStreak: 0, curStreak: 0, pbets: 0, bbets: 0, pwins: 0, bwins: 0, entropyBlocked: 0, tieBlocked: 0 },
+    modelAcc: { mk: [], pm: [], sc: [], by: [], mo: [], ti: [] }
+  };
+  document.getElementById('hl').innerHTML = '';
+  let dec = computeDecision();
+  STATE.lastDecision = dec;
+  renderAll(dec);
+  updateDataPanel();
+  showAlert('Session reset', 'ok');
+}
+
+function updateCfg() {
+  STATE.config.confThreshold = parseFloat(document.getElementById('sl-c').value);
+  STATE.config.stakePct = parseFloat(document.getElementById('sl-s').value);
+  STATE.config.entropyMax = parseFloat(document.getElementById('sl-e').value);
+  STATE.config.secureMode = document.getElementById('tg-sec').checked;
+  STATE.config.trapFilter = document.getElementById('tg-trp').checked;
+  STATE.config.allowBanker = document.getElementById('tg-bnk').checked;
+  STATE.config.entropyGate = document.getElementById('tg-ent').checked;
+  STATE.config.tieProtect = document.getElementById('tg-tie').checked;
+  document.getElementById('sv-c').innerText = STATE.config.confThreshold + '%';
+  document.getElementById('sv-b').innerHTML = '$' + (STATE.bankroll / 1000).toFixed(1) + 'K';
+  document.getElementById('sv-s').innerText = STATE.config.stakePct + '%';
+  document.getElementById('sv-e').innerText = STATE.config.entropyMax.toFixed(2);
+  if (STATE.outcomes.length >= 6) { let dec = computeDecision(); STATE.lastDecision = dec; STATE.pendingBet = dec.side !== 'SKIP' ? { side: dec.side, stake: dec.stake } : null; renderAll(dec); }
+}
+
+function batchImport() {
+  let raw = document.getElementById('batch').value.toUpperCase().replace(/[^BPT]/g, '');
+  if (!raw) return;
+  for (let ch of raw) { let dec = computeDecision(); STATE.lastDecision = dec; STATE.pendingBet = dec.side !== 'SKIP' ? { side: dec.side, stake: dec.stake } : null; record(ch); }
+  document.getElementById('batch').value = '';
+  showAlert(`Imported ${raw.length} outcomes`, 'ok');
+}
+
+function runBacktest() {
+  if (STATE.outcomes.length < 20) { showAlert('Need 20+ outcomes', 'warn'); return; }
+  let bets = 0, wins = 0;
+  for (let i = 8; i < STATE.outcomes.length; i++) {
+    let hist = STATE.outcomes.slice(0, i);
+    let ent = entropyCalc(hist);
+    let ti = tieRisk(hist);
+    if (STATE.config.entropyGate && !ent.gate) continue;
+    if (STATE.config.tieProtect && ti.prob > 0.21) continue;
+    let mk = mMarkov(hist), pm = mPattern(hist), sc = mStreak(hist), by = mBayes(hist), mo = mMomentum(hist), tiM = mTieAware(hist, ti);
+    let vP = 0, vB = 0;
+    [mk, pm, sc, by, mo, tiM].forEach(m => { if (m.vote === 'P') vP += m.conf / 100; else if (m.vote === 'B') vB += m.conf / 100; });
+    let winner = vP >= vB ? 'P' : 'B';
+    let agree = [mk, pm, sc, by, mo, tiM].filter(m => m.vote === winner).length;
+    let thresh = STATE.config.confThreshold + (STATE.config.secureMode ? 6 : 0) + ent.Hn * 12;
+    let conf = clamp((Math.abs(vP - vB) / (vP + vB || 1)) * 100 + agree * 4, 0, 96);
+    if (conf >= thresh && agree >= 4) { bets++; if (STATE.outcomes[i] === winner) wins++; }
+  }
+  let pct = bets ? (wins / bets * 100).toFixed(1) : 0;
+  showAlert(`Backtest: ${bets} bets, ${wins} wins (${pct}%)`, 'ok');
+}
+
+function exportCSV() {
+  let headers = ['round', 'outcome', 'bet_side', 'stake', 'pnl', 'entropy', 'timestamp'];
+  let rows = collectedData.map(d => [d.round, d.outcome, d.betSide, d.stake, d.pnl, d.entropy, d.ts]);
+  let csv = [headers.join(','), ...rows.map(r => r.map(v => `"${v}"`).join(','))].join('\n');
+  let blob = new Blob([csv], { type: 'text/csv' });
+  let a = document.createElement('a'); a.href = URL.createObjectURL(blob); a.download = `baccarat_data_${new Date().toISOString().slice(0, 19)}.csv`; a.click();
+  showAlert('CSV exported', 'ok');
+}
+function clearData() { collectedData = []; updateDataPanel(); showAlert('Data cleared', 'info'); }
+
+window.onload = () => {
+  eqChart = new Chart(document.getElementById('eq-c'), { type: 'line', data: { labels: [], datasets: [{ data: [], borderWidth: 1.8, fill: true, tension: 0.3, pointRadius: 0 }] }, options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false } }, scales: { x: { display: false }, y: { grid: { color: 'rgba(255,255,255,0.02)' }, ticks: { color: '#28404E', font: { size: 7 } } } } } });
+  entChart = new Chart(document.getElementById('ent-c'), { type: 'line', data: { labels: [], datasets: [{ label: 'H', data: [], borderColor: '#FF3355', borderWidth: 1.5, fill: true, backgroundColor: 'rgba(255,51,85,0.06)', tension: 0.3, pointRadius: 0 }, { label: 'Gate', data: [], borderColor: 'rgba(0,230,118,.5)', borderWidth: 1, borderDash: [3, 3], pointRadius: 0 }] }, options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false } }, scales: { x: { display: false }, y: { min: 0, max: 1, grid: { color: 'rgba(255,255,255,0.02)' }, ticks: { color: '#28404E', font: { size: 7 } } } } } });
+  updateCfg();
+  resetSession();
+  document.getElementById('btn-P').onclick = () => record('P');
+  document.getElementById('btn-B').onclick = () => record('B');
+  document.getElementById('btn-T').onclick = () => record('T');
+  document.getElementById('batchBtn').onclick = batchImport;
+  document.getElementById('resetBtn').onclick = resetSession;
+  document.getElementById('backtestBtn').onclick = runBacktest;
+  document.getElementById('exportCsvBtn').onclick = exportCSV;
+  document.getElementById('clearDataBtn').onclick = clearData;
+  document.addEventListener('keydown', e => { if (document.activeElement.tagName !== 'INPUT') { if (e.key === 'P' || e.key === 'p') record('P'); else if (e.key === 'B' || e.key === 'b') record('B'); else if (e.key === 'T' || e.key === 't') record('T'); } });
+  ['sl-c', 'sl-b', 'sl-s', 'sl-e'].forEach(id => document.getElementById(id).addEventListener('input', updateCfg));
+  ['tg-sec', 'tg-trp', 'tg-bnk', 'tg-ent', 'tg-tie'].forEach(id => document.getElementById(id).addEventListener('change', updateCfg));
+  showAlert('✅ BaccaratIQ v12 ready! Click P, B, or T to start recording outcomes.', 'ok');
+};
 </script>
 </body>
 </html>
